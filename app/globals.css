@@ -443,7 +443,7 @@ h3{font-weight:500}
 .result-choice-grid label.is-selected{border:0.125rem solid var(--navy-800);background:var(--blue-50)}
 .reason-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.625rem}
 .reason-grid label{padding:0.75rem;border:0.0625rem solid var(--border)}
-.danger-zone{padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;border:0.0625rem solid #efaaa6;background:#fff7f6}
+.danger-zone{margin-top:2.5rem;padding:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1.25rem;border:0.0625rem solid #efaaa6;background:#fff7f6}
 .danger-zone h2{margin:0;font-size:1.25rem}
 .danger-zone p{margin:0.3125rem 0 0;color:var(--gray-600)}
 .notification-list{display:grid;gap:0.75rem}

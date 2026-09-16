@@ -1,12 +1,12 @@
-import Link from "next/link"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faArrowLeft,
+  faChevronRight,
   faCircleExclamation,
   faCircleInfo,
-  faChevronRight,
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
 
 export function PageHeader({
   eyebrow,
@@ -37,7 +37,7 @@ export function Breadcrumbs({
   items: Array<{ label: string; href?: string }>
 }) {
   return (
-    <nav className="breadcrumbs motion-enter" aria-label="현재 위치">
+    <nav className="breadcrumbs" aria-label="현재 위치">
       {items.map((item, index) => (
         <span key={`${item.label}-${index}`}>
           {index > 0 && <FontAwesomeIcon icon={faChevronRight} />}
