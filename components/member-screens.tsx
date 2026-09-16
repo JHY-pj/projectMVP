@@ -280,7 +280,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
   return (
     <main id="main-content" className="content-width page-main case-detail-main">
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases/demo-2026" }, { label: demoCase.id }]} />
-      <section className="case-identity motion-enter">
+      <section className="case-identity">
         <div><div className="eyebrow">{demoCase.id}</div><h1>{demoCase.type} 청구 사건</h1><p>{demoCase.amount} · 최근 업데이트 {demoCase.updatedAt}</p></div>
         <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary" href="/app/cases/demo-2026/result">결과 입력</Link></div>
       </section>
