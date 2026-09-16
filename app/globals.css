@@ -675,3 +675,8 @@ body{background:radial-gradient(circle at 90% -10%,#dbeee0 0,transparent 25rem),
 /* Signup keeps the footer directly beneath its full-height content. */
 body:has(.auth-login) .site-footer,
 body:has(.auth-signup) .site-footer{margin-top:0}
+
+/* Case detail action alignment and report CTA hover states */
+.case-identity > div:last-child > .status { min-height: 2.75rem; padding: 0.5625rem 1.125rem; font-size: 0.9375rem; font-weight: 700; }
+.report-action .button-primary:hover { color: #fff; }
+.report-action .button-outline:hover { background: linear-gradient(135deg, #175b49, #287c5c); border-color: #175b49; }
