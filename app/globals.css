@@ -701,3 +701,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .case-tabs::-webkit-scrollbar,
   .settings-tabs [data-slot="tabs-list"]::-webkit-scrollbar { display: none; }
 }
+
+/* Keep the active tab indicator on the shared bottom rule. */
+.case-tabs [data-slot="tabs-trigger"]::after,
+.settings-tabs [data-slot="tabs-trigger"]::after { bottom: -0.0625rem; height: 0.125rem; }
