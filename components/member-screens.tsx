@@ -1,9 +1,20 @@
 "use client"
 
-import { FormEvent, useState } from "react"
-import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Progress } from "@/components/ui/progress"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   faArrowRight,
   faBank,
@@ -28,22 +39,11 @@ import {
   faUserShield,
   faWallet,
 } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { FormEvent, useState } from "react"
 import { toast } from "sonner"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Progress } from "@/components/ui/progress"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
 
 const demoCase = {
   id: "EC-2026-0001",
@@ -90,7 +90,7 @@ export function DashboardScreen() {
             <div className="case-actions"><Link className="button button-outline" href="/app/cases/demo-2026">사건 상세</Link><Link className="button button-primary" href="/app/cases/demo-2026/report">리포트 보기</Link></div>
           </article>
         </section>
-        <aside className="panel motion-enter">
+        <aside className="panel motion-enter trans">
           <div className="panel-heading"><div><p className="eyebrow">최근 리포트</p><h2>실익 판단 기준선</h2></div><StatusBadge tone="warning">데모</StatusBadge></div>
           <div className="mini-score"><strong>{demoCase.score}</strong><span>/ 100</span></div>
           <p>현재 데이터 기준 <b>추가 확인 후 착수 검토</b> 구간입니다.</p>

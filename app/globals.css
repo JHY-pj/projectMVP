@@ -300,6 +300,8 @@ h3{font-weight:500}
 .next-action-card h2{margin:0.3125rem 0 0.125rem;font-size:1.25rem}
 .next-action-card p{margin:0;color:var(--gray-600)}
 .dashboard-grid{display:grid;grid-template-columns:1.5fr .7fr;gap:1.125rem}
+.dashboard-grid .panel.trans{position:relative;padding-bottom:5rem}
+.dashboard-grid .panel.trans .text-link{position:absolute;left:1.75rem;bottom:1.75rem}
 .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:0.9375rem;margin-bottom:1.25rem}
 .panel-heading h2,.panel-heading .eyebrow{margin:0}
 .panel-heading a{color:var(--blue-700);font-size:0.875rem;font-weight:600}
