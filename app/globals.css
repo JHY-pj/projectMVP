@@ -702,6 +702,8 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .settings-tabs [data-slot="tabs-list"]::-webkit-scrollbar { display: none; }
 }
 
-/* Keep the active tab indicator on the shared bottom rule. */
+/* Active indicator overlays the tab baseline and grows from left to right. */
 .case-tabs [data-slot="tabs-trigger"]::after,
-.settings-tabs [data-slot="tabs-trigger"]::after { bottom: -0.0625rem; height: 0.125rem; }
+.settings-tabs [data-slot="tabs-trigger"]::after { bottom: 0.125rem; height: 0.125rem; transform: scaleX(0); transform-origin: left center; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
+.case-tabs [data-slot="tabs-trigger"][data-state="active"]::after,
+.settings-tabs [data-slot="tabs-trigger"][data-state="active"]::after { opacity: 1; transform: scaleX(1); }
