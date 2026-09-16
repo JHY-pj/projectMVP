@@ -345,7 +345,7 @@ function PlanView() {
   return (
     <>
       <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 체크리스트</h2></div><strong>{checked.length} / {items.length} 완료</strong></div>
-      <Progress className="plan-progress" value={(checked.length / items.length) * 100} />
+      <Progress value={(checked.length / items.length) * 100} />
       <section className="checklist-panel">
         {items.map(([id, title, status], index) => <label className="plan-item" key={id}><Checkbox checked={checked.includes(id)} onCheckedChange={(value) => setChecked((current) => value ? [...new Set([...current, id])] : current.filter((item) => item !== id))} /><span className="plan-index">{index + 1}</span><div><strong>{title}</strong><small>{id === "cost" ? "관할 법원 안내와 신청서 기준으로 확인" : id === "priority" ? "배당 가능성을 판단하기 위한 정보" : "사건 기록에 저장됩니다."}</small></div><StatusBadge tone={status === "완료" ? "positive" : status === "확인 필요" ? "warning" : "neutral"}>{status}</StatusBadge></label>)}
       </section>
