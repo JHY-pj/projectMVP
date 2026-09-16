@@ -36,8 +36,8 @@ export function MotionLayer() {
         const value = Number(progress?.getAttribute("aria-valuenow") ?? 0)
         gsap.fromTo(
           indicator,
-          { xPercent: -100 },
-          { xPercent: -(100 - value), duration: 0.85, ease: "power3.out" },
+          { width: "0%" },
+          { width: `${value}%`, duration: 0.85, ease: "power3.out" },
         )
       })
       gsap.fromTo(
