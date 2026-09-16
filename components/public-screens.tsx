@@ -31,7 +31,7 @@ export function HomeScreen() {
         <div className="content-width hero-grid">
           <div className="hero-copy">
             <div className="eyebrow motion-enter">
-              <span className="eyebrow-dot" /> 승소 이후의 다음 판단
+              승소 이후의 다음 판단
             </div>
             <h1 className="motion-enter">
               판결은 끝났지만,
