@@ -96,7 +96,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
   }
 
   return (
-    <main id="main-content" className="auth-main">
+    <main id="main-content" className={`auth-main auth-${mode}`}>
       <section className="auth-aside">
         <div>
           <span className="auth-icon"><FontAwesomeIcon icon={faCompassMark} /></span>
