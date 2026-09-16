@@ -285,3 +285,6 @@ body { background: radial-gradient(circle at 90% -10%, #dbeee0 0, transparent 25
   .process-card, .panel { border-radius: 17px; }
   .hero-actions .button, .auth-card .button, .page-actions .button, .cta-panel .button, .report-action .button, .wizard-actions .button { width: 100%; }
 }
+
+/* Home hero label: lighter emphasis without a decorative dot */
+.hero-copy .eyebrow { color: #6a9b82; font-size: 16px; }
