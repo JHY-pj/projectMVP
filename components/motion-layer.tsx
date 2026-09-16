@@ -31,7 +31,7 @@ export function MotionLayer() {
         { rotate: -36 },
         { rotate: 24, duration: 1.2, ease: "elastic.out(1, 0.45)" },
       )
-      gsap.utils.toArray<HTMLElement>(".plan-progress [data-slot=progress-indicator]").forEach((indicator) => {
+      gsap.utils.toArray<HTMLElement>(".app-progress .app-progress-indicator").forEach((indicator) => {
         const progress = indicator.closest<HTMLElement>("[data-slot=progress]")
         const value = Number(progress?.getAttribute("aria-valuenow") ?? 0)
         gsap.fromTo(
