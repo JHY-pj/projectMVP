@@ -666,3 +666,6 @@ body{background:radial-gradient(circle at 90% -10%,#dbeee0 0,transparent 25rem),
 
 /* Home hero label:lighter emphasis without a decorative dot */
 .hero-copy .eyebrow{color:#6a9b82;font-size:1rem}
+
+/* Signup keeps the footer directly beneath its full-height content. */
+body:has(.auth-main) .site-footer { margin-top: 0; }
