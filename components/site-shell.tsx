@@ -1,8 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { MotionLayer } from "@/components/motion-layer"
 import {
   faBars,
   faBell,
@@ -15,7 +13,9 @@ import {
   faShieldHalved,
   faUser,
 } from "@fortawesome/free-solid-svg-icons"
-import { MotionLayer } from "@/components/motion-layer"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 type ShellMode = "public" | "member" | "admin"
 

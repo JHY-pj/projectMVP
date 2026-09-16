@@ -1,7 +1,12 @@
 "use client"
 
-import Link from "next/link"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import {
   faArrowRight,
   faArrowTrendUp,
@@ -16,13 +21,8 @@ import {
   faShieldHalved,
   faUserLock,
 } from "@fortawesome/free-solid-svg-icons"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
 
 export function HomeScreen() {
   return (
@@ -148,7 +148,6 @@ export function AboutScreen() {
     <main id="main-content" className="content-width page-main">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "서비스 소개" }]} />
       <PageHeader
-        eyebrow="서비스 소개"
         title="판결과 회수 사이의 정보 공백을 줄입니다"
         description="승소했지만 어디서부터 무엇을 확인해야 할지 모르는 소액 채권자가 비용을 더 쓰기 전에 판단 근거를 정리하도록 돕습니다."
       />

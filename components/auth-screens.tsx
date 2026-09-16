@@ -1,9 +1,9 @@
 "use client"
 
-import { FormEvent, useState } from "react"
-import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Notice, PageHeader } from "@/components/screen-kit"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Progress } from "@/components/ui/progress"
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client"
 import {
   faArrowRight,
   faCheck,
@@ -13,11 +13,11 @@ import {
   faLock,
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { FormEvent, useState } from "react"
 import { toast } from "sonner"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Progress } from "@/components/ui/progress"
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/client"
-import { BackLink, Notice, PageHeader } from "@/components/screen-kit"
 
 type AuthMode = "login" | "signup" | "reset"
 
@@ -111,7 +111,6 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
         </ul>
       </section>
       <section className="auth-card motion-enter">
-        <BackLink href="/" label="홈으로" />
         <div className="auth-card-heading">
           <h2>{copy[mode][0]}</h2>
           <p>{mode === "login" ? "계정 정보를 입력해 주세요." : mode === "signup" ? "서비스 이용 계정을 만듭니다." : "본인 계정의 정보를 입력해 주세요."}</p>
