@@ -713,3 +713,15 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 
 /* The final case summary reuses the confirmation layout and preserves left-aligned labels. */
 .submit-review-list { margin-top: 1.5rem; text-align: left; }
+
+/* Tablet and smaller: card contents use the complete available width. */
+@media (max-width: 64rem) {
+  .settings-tabs [data-slot="tabs-content"],
+  .settings-tabs .panel,
+  .case-tab-content,
+  .danger-zone,
+  .rights-grid > * { width: 100%; max-width: none; }
+  .rights-grid { grid-template-columns: 1fr; }
+  .danger-zone { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .danger-zone .button { width: 100%; }
+}
