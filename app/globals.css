@@ -731,3 +731,10 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 @media (max-width: 47.5rem) {
   .case-identity > div:last-child { width: 100%; margin-left: 0; justify-content: space-between; }
 }
+
+/* Collapse the case header before cards become visually cramped. */
+@media (max-width: 64rem) {
+  .case-identity { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; width: 100%; }
+  .case-identity > div { min-width: 0; }
+  .case-identity > div:last-child { width: 100%; margin-left: 0; justify-content: space-between; }
+}
