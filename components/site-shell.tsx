@@ -48,7 +48,7 @@ const mobileBottomNav = [
 ] as const
 
 function isCurrentPath(pathname: string, href: string) {
-  return pathname === href || (href !== "/app" && pathname.startsWith(`${href}/`))
+  return pathname === href || (!["/app", "/admin"].includes(href) && pathname.startsWith(`${href}/`))
 }
 
 function closeMobileMenu(target: HTMLElement) {
