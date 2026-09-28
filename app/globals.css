@@ -776,3 +776,10 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .mobile-bottom-nav a.is-active span {
   font-weight: 800;
 }
+
+
+/* Table dividers remain deliberately neutral across all data tables. */
+.responsive-table th,
+.responsive-table td {
+  border-bottom-color: #e5e5e5;
+}
