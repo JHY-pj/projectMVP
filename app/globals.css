@@ -760,3 +760,19 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .admin-grid,
   .review-workspace { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Mobile bottom navigation: the current route is the only emphasized item. */
+.mobile-bottom-nav a {
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+.mobile-bottom-nav a.is-active {
+  color: var(--navy-800);
+  font-weight: 800;
+}
+.mobile-bottom-nav a.is-active svg {
+  color: var(--green-700);
+}
+.mobile-bottom-nav a.is-active span {
+  font-weight: 800;
+}
