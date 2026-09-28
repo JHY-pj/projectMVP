@@ -106,6 +106,12 @@ export function DashboardScreen() {
 
 const wizardSteps = ["대상 확인", "입력 방식", "사건 정보", "집행 경험", "정보 확인", "제출"]
 
+const caseTypeLabels: Record<string, string> = { loan: "대여금", sale: "매매대금", construction: "공사대금", other: "기타" }
+const amountLabels: Record<string, string> = { "under-100": "100만 원 미만", "100-300": "100만~300만 원", "300-500": "300만~500만 원" }
+const regionLabels: Record<string, string> = { capital: "수도권", metro: "광역시", other: "그 외 지역", unknown: "모름" }
+const statusLabels: Record<string, string> = { in_progress: "진행 중", success_partial: "일부 회수", fail_confirmed: "전혀 회수 못함", abandoned: "중단함" }
+const attemptLabels: Record<string, string> = { bank: "통장 압류", wage: "급여 압류", car: "차량", estate: "부동산", none: "아직 안 함" }
+
 export function CaseWizardScreen() {
   const router = useRouter()
   const [step, setStep] = useState(1)
@@ -119,6 +125,14 @@ export function CaseWizardScreen() {
   const [fileName, setFileName] = useState("")
 
   const progress = Math.round((step / wizardSteps.length) * 100)
+  const reviewItems: Array<[string, string]> = [
+    ["입력 방식", method === "manual" ? "직접 입력" : "판결문 업로드"],
+    ["사건 유형", caseTypeLabels[caseType]],
+    ["채권 금액", amountLabels[amount]],
+    ["지역 범위", regionLabels[region]],
+    ["집행 시도", attempts.map((attempt) => attemptLabels[attempt]).join(", ") || "선택 안 함"],
+    ["현재 상태", statusLabels[status]],
+  ]
 
   function next() {
     if (step === 2 && method === "upload" && !documentConsent) {
@@ -235,12 +249,7 @@ export function CaseWizardScreen() {
           <div className="wizard-section">
             <h2>분석에 사용할 정보를 확인해 주세요</h2>
             <dl className="review-list">
-              <div><dt>입력 방식</dt><dd>{method === "manual" ? "직접 입력" : "판결문 업로드"}</dd></div>
-              <div><dt>사건 유형</dt><dd>{caseType === "loan" ? "대여금" : "기타"}</dd></div>
-              <div><dt>채권 금액</dt><dd>{amount === "300-500" ? "300만~500만 원" : amount}</dd></div>
-              <div><dt>지역 범위</dt><dd>{region === "capital" ? "수도권" : region}</dd></div>
-              <div><dt>집행 시도</dt><dd>{attempts.includes("none") ? "아직 안 함" : `${attempts.length}개 수단`}</dd></div>
-              <div><dt>현재 상태</dt><dd>{status === "in_progress" ? "진행 중" : status}</dd></div>
+              {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </dl>
             <Notice tone="info" title="추가 정보가 필요한 경우">데이터가 부족하면 점수를 단정하지 않고, 리포트에서 먼저 확인할 항목을 안내합니다.</Notice>
           </div>
@@ -250,7 +259,7 @@ export function CaseWizardScreen() {
             <span className="submit-icon"><FontAwesomeIcon icon={faFileCircleCheck} /></span>
             <h2>사건을 등록할 준비가 되었습니다</h2>
             <p>제출하면 룰 기반 시범 리포트가 생성됩니다. 입력 정보는 이후 사건 상세에서 수정할 수 있습니다.</p>
-            <div className="summary-chips"><span>{caseType === "loan" ? "대여금" : "기타"}</span><span>300만~500만 원</span><span>{status === "in_progress" ? "진행 중" : status}</span></div>
+            <dl className="review-list submit-review-list">{reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
           </div>
         )}
