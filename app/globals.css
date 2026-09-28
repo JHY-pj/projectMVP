@@ -707,3 +707,6 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .settings-tabs [data-slot="tabs-trigger"]::after { bottom: 0.125rem; height: 0.125rem; transform: scaleX(0); transform-origin: left center; transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 .case-tabs [data-slot="tabs-trigger"][data-state="active"]::after,
 .settings-tabs [data-slot="tabs-trigger"][data-state="active"]::after { opacity: 1; transform: scaleX(1); }
+
+/* Legal and safety notices retain readable left alignment inside centered completion states. */
+.submit-summary .notice { text-align: left; }
