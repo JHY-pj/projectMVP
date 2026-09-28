@@ -725,3 +725,9 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .danger-zone { display: grid; grid-template-columns: minmax(0, 1fr); }
   .danger-zone .button { width: 100%; }
 }
+
+/* Case header actions: right-aligned on wide screens, full-width action row on small screens. */
+.case-identity > div:last-child { margin-left: auto; }
+@media (max-width: 47.5rem) {
+  .case-identity > div:last-child { width: 100%; margin-left: 0; justify-content: space-between; }
+}
