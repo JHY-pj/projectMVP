@@ -39,6 +39,22 @@ const adminNav = [
   ["권리 요청", "/admin/requests"],
 ]
 
+const mobileBottomNav = [
+  ["홈", "/app", faHouse],
+  ["내 사건", "/app/cases/demo-2026", faFileLines],
+  ["등록", "/app/cases/new", faCirclePlus],
+  ["알림", "/app/notifications", faBell],
+  ["설정", "/app/settings", faGear],
+] as const
+
+function isCurrentPath(pathname: string, href: string) {
+  return pathname === href || (href !== "/app" && pathname.startsWith(`${href}/`))
+}
+
+function closeMobileMenu(target: HTMLElement) {
+  target.closest(".site-shell")?.querySelector<HTMLDetailsElement>("details.mobile-menu")?.removeAttribute("open")
+}
+
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <Link className="brand" href="/" aria-label="집행나침반 홈">
@@ -60,22 +76,44 @@ function NavLinks({ items }: { items: string[][] }) {
   return (
     <>
       {items.map(([label, href]) => {
-        const active =
-          pathname === href ||
-          (href !== "/app" && href !== "/admin" && pathname.startsWith(href))
+        const active = isCurrentPath(pathname, href)
         return (
           <Link
             className={active ? "nav-link is-active" : "nav-link"}
             href={href}
             key={href}
             aria-current={active ? "page" : undefined}
-            onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}
+            onClick={(event) => closeMobileMenu(event.currentTarget)}
           >
             {label}
           </Link>
         )
       })}
     </>
+  )
+}
+
+function MobileBottomNav() {
+  const pathname = usePathname()
+
+  return (
+    <nav className="mobile-bottom-nav" aria-label="회원 바로가기">
+      {mobileBottomNav.map(([label, href, icon]) => {
+        const active = isCurrentPath(pathname, href)
+        return (
+          <Link
+            className={active ? "is-active" : undefined}
+            href={href}
+            key={href}
+            aria-current={active ? "page" : undefined}
+            onClick={(event) => closeMobileMenu(event.currentTarget)}
+          >
+            <FontAwesomeIcon icon={icon} />
+            <span>{label}</span>
+          </Link>
+        )
+      })}
+    </nav>
   )
 }
 
@@ -154,15 +192,7 @@ export function SiteShell({
         </div>
       )}
       {children}
-      {mode === "member" && (
-        <nav className="mobile-bottom-nav" aria-label="회원 바로가기">
-          <Link href="/app"><FontAwesomeIcon icon={faHouse} /><span>홈</span></Link>
-          <Link href="/app/cases/demo-2026"><FontAwesomeIcon icon={faFileLines} /><span>내 사건</span></Link>
-          <Link className="bottom-primary" href="/app/cases/new"><FontAwesomeIcon icon={faCirclePlus} /><span>등록</span></Link>
-          <Link href="/app/notifications"><FontAwesomeIcon icon={faBell} /><span>알림</span></Link>
-          <Link href="/app/settings"><FontAwesomeIcon icon={faGear} /><span>설정</span></Link>
-        </nav>
-      )}
+      {mode === "member" && <MobileBottomNav />}
       <footer className="site-footer">
         <div className="footer-inner">
           <div>
