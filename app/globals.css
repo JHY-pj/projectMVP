@@ -807,3 +807,17 @@ body:has(.auth-signup) .site-footer{margin-top:0}
     padding-bottom: 4.375rem;
   }
 }
+
+
+/* Checkbox and its single-line label share the same visual center. */
+.checkbox-row {
+  align-items: center;
+}
+.checkbox-row [data-slot="checkbox"] {
+  flex: 0 0 1.1875rem;
+  margin-top: 0;
+}
+.checkbox-row > span {
+  min-width: 0;
+  line-height: 1.35;
+}
