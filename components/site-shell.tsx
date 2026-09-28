@@ -69,6 +69,7 @@ function NavLinks({ items }: { items: string[][] }) {
             href={href}
             key={href}
             aria-current={active ? "page" : undefined}
+            onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}
           >
             {label}
           </Link>
@@ -107,7 +108,7 @@ export function SiteShell({
                 <Link className="button button-ghost" href="/login">
                   로그인
                 </Link>
-                <Link className="button button-primary" href="/signup">
+                <Link className="button button-primary" href="/signup" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
                   내 사건 분석하기
                 </Link>
               </>
@@ -137,7 +138,7 @@ export function SiteShell({
                   내 사건 분석하기
                 </Link>
               ) : (
-                <Link className="nav-link" href="/login">
+                <Link className="nav-link" href="/login" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
                   <FontAwesomeIcon icon={faRightFromBracket} /> 로그아웃
                 </Link>
               )}
