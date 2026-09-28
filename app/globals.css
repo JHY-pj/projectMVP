@@ -738,3 +738,27 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .case-identity > div { min-width: 0; }
   .case-identity > div:last-child { width: 100%; margin-left: 0; justify-content: space-between; }
 }
+
+/* Responsive contract: below desktop, every primary content block fills its available width. */
+@media (max-width: 64rem) {
+  .page-heading { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; width: 100%; }
+  .page-heading > div,
+  .page-actions,
+  .page-actions .button,
+  .two-column-feature > *,
+  .case-overview-grid > *,
+  .factor-grid > *,
+  .form-layout > *,
+  .rights-grid > *,
+  .dashboard-grid > *,
+  .admin-grid > *,
+  .review-workspace > * { width: 100%; max-width: none; }
+  .two-column-feature,
+  .case-overview-grid,
+  .factor-grid,
+  .form-layout,
+  .rights-grid,
+  .dashboard-grid,
+  .admin-grid,
+  .review-workspace { grid-template-columns: minmax(0, 1fr); }
+}
