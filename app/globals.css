@@ -710,3 +710,6 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 
 /* Legal and safety notices retain readable left alignment inside centered completion states. */
 .submit-summary .notice { text-align: left; }
+
+/* The final case summary reuses the confirmation layout and preserves left-aligned labels. */
+.submit-review-list { margin-top: 1.5rem; text-align: left; }
