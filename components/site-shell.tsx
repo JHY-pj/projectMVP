@@ -23,6 +23,7 @@ const publicNav = [
   ["서비스 소개", "/about"],
   ["승소 후 절차", "/guide"],
   ["자주 묻는 질문", "/faq"],
+  ["고객센터", "/support"],
 ]
 
 const memberNav = [
