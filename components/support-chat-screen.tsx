@@ -41,6 +41,10 @@ function toApiHistory(messages: ChatMessage[]) {
   return messages.map(({ role, content }) => ({ role, content }))
 }
 
+const chatbotApiUrl =
+  (import.meta as ImportMeta & { env?: { VITE_CHATBOT_API_URL?: string } }).env
+    ?.VITE_CHATBOT_API_URL ?? "/api/chat"
+
 export function SupportChatScreen() {
   const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage])
   const [draft, setDraft] = useState("")
@@ -101,18 +105,19 @@ export function SupportChatScreen() {
     setIsSending(true)
 
     try {
-      const response = await fetch(import.meta.env.VITE_CHATBOT_API_URL ?? "/api/chat", {
+      const response = await fetch(chatbotApiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: content, history: toApiHistory(history) }),
       })
       const data = (await response.json().catch(() => ({}))) as { answer?: string; detail?: string }
-      if (!response.ok || !data.answer) {
+      const answer = data.answer?.trim()
+      if (!response.ok || !answer) {
         throw new Error(data.detail || "답변을 받아오지 못했습니다.")
       }
       setMessages((current) => [
         ...current,
-        { id: `assistant-${Date.now()}`, role: "assistant", content: data.answer },
+        { id: `assistant-${Date.now()}`, role: "assistant", content: answer },
       ])
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "상담 서버와 연결하지 못했습니다.")
