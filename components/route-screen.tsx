@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { SiteShell } from "@/components/site-shell"
+import { SupportChatScreen } from "@/components/support-chat-screen"
 import {
   AboutScreen,
   FaqScreen,
@@ -68,6 +69,7 @@ export function RouteScreen({ segments }: { segments: string[] }) {
   else if (path === "guide") screen = <GuideScreen />
   else if (path === "faq") screen = <FaqScreen />
   else if (path === "notices") screen = <NoticesScreen />
+  else if (path === "support") screen = <SupportChatScreen />
   else if (legalRoutes.includes(path as (typeof legalRoutes)[number])) screen = <LegalScreen type={path as (typeof legalRoutes)[number]} />
   else screen = <NotFoundScreen />
   return <SiteShell>{screen}</SiteShell>
