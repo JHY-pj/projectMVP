@@ -5,6 +5,7 @@ import {
   faArrowUp,
   faCommentDots,
   faFileArrowDown,
+  faFloppyDisk,
   faList,
   faPlus,
   faRotateLeft,
@@ -47,6 +48,38 @@ export function SupportChatScreen() {
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const canSend = useMemo(() => draft.trim().length > 0 && !isSending, [draft, isSending])
+
+  function downloadConversation() {
+    if (messages.length <= 1) {
+      setError("저장할 상담 내용이 없습니다.")
+      return
+    }
+
+    const savedAt = new Date().toLocaleString("ko-KR")
+    const transcript = [
+      "민사 챗봇 상담 기록",
+      "",
+      `저장일시: ${savedAt}`,
+      "",
+      "==================================================",
+      "",
+      ...messages.flatMap((message) => [
+        `[${message.role === "user" ? "사용자" : "민사 챗봇"}]`,
+        message.content,
+        "",
+      ]),
+      "==================================================",
+      "",
+      "※ 본 자료는 AI 챗봇과의 대화 기록입니다.",
+      "※ 개별 사건에 대한 법률전문가의 법률의견을 의미하지 않습니다.",
+    ].join("\n")
+    const blob = new Blob([transcript], { type: "text/plain;charset=utf-8" })
+    const link = document.createElement("a")
+    link.href = URL.createObjectURL(blob)
+    link.download = `civil-chat-${new Date().toISOString().replace(/[:.]/g, "-")}-full.txt`
+    link.click()
+    URL.revokeObjectURL(link.href)
+  }
 
   function resetConversation() {
     setMessages([welcomeMessage])
@@ -104,9 +137,14 @@ export function SupportChatScreen() {
             <span className="support-chat-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span>
             <span><strong>민사 절차 안내</strong><small><i /> 실시간 상담 중</small></span>
           </div>
-          <button className="button button-ghost" type="button" onClick={resetConversation}>
-            <FontAwesomeIcon icon={faPlus} /> 새 상담
-          </button>
+          <div className="support-chat-actions">
+            <button className="button button-ghost" type="button" onClick={downloadConversation}>
+              <FontAwesomeIcon icon={faFloppyDisk} /> 저장
+            </button>
+            <button className="button button-ghost" type="button" onClick={resetConversation}>
+              <FontAwesomeIcon icon={faPlus} /> 새 상담
+            </button>
+          </div>
         </header>
 
         <div className="support-chat-notice">
