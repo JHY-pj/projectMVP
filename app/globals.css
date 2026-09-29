@@ -1048,3 +1048,26 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .wizard-card,
   .notice { padding-inline: 1rem; }
 }
+
+
+/* Chat message viewport: keep the most recent question and loading reply visible. */
+.support-chat-messages {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 64rem) {
+  .support-chat-messages {
+    min-height: 20rem;
+    height: clamp(20rem, 44dvh, 30rem);
+    max-height: 30rem;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 47.5rem) {
+  .support-chat-messages {
+    min-height: 18rem;
+    height: clamp(18rem, 46dvh, 24rem);
+    max-height: 24rem;
+  }
+}
