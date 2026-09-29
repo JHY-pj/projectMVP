@@ -86,7 +86,7 @@ h3{font-weight:500}
 .skip-link{position:fixed;left:1rem;top:-5rem;z-index:1000;background:#000;color:#fff;padding:.75rem 1rem}
 .skip-link:focus{top:1rem}
 .content-width{width:min(73.75rem,calc(100% - 2.5rem));margin-inline:auto}
-.narrow-main{max-width:53.75rem}
+.narrow-main{max-width:57.5rem}
 .site-shell{min-height:100vh}
 .site-header{position:sticky;top:0;z-index:40;border-bottom:0.0625rem solid rgba(215,224,232,.92);background:rgba(255,255,255,.94);backdrop-filter:blur(1rem)}
 .header-inner{width:min(77.5rem,calc(100% - 2.5rem));min-height:4.75rem;margin-inline:auto;display:flex;align-items:center;gap:3rem}
@@ -941,7 +941,8 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .support-tools small { margin-top: 0.125rem; color: var(--gray-600); font-size: 0.75rem; }
 
 @media (max-width: 64rem) {
-  .support-main { max-width: none; }
+  .support-main,
+  .narrow-main { max-width: none; }
   .support-chat-messages { max-height: none; }
 }
 @media (max-width: 47.5rem) {
