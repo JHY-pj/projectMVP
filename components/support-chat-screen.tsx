@@ -128,7 +128,7 @@ export function SupportChatScreen() {
   }
 
   return (
-    <main id="main-content" className="content-width page-main support-main">
+    <main id="main-content" className="content-width page-main narrow-main support-main">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "고객센터" }]} />
       <PageHeader
         eyebrow="고객센터 · 실시간 안내"
