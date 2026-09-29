@@ -824,7 +824,6 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 
 
 /* Customer support chat */
-.support-main { max-width: 57.5rem; }
 .support-chat {
   overflow: hidden;
   border: 0.0625rem solid #dbe7dd;
