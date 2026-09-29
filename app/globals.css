@@ -916,7 +916,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   transition: border-color .2s, background-color .2s;
 }
 .chat-quick-questions button:hover { border-color: var(--teal-700); background: #eff8f1; }
-.chat-composer { display: flex; align-items: end; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 0.0625rem solid #e5e5e5; background: #fff; }
+.chat-composer { display: flex; align-items: stretch; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 0.0625rem solid #e5e5e5; background: #fff; }
 .chat-composer textarea {
   width: 100%;
   min-height: 3.125rem;
@@ -963,10 +963,3 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 }
 
 
-/* Composer controls share one visual height and corner radius. */
-.chat-composer textarea,
-.chat-composer .button {
-  min-height: 4.9375rem;
-  height: 4.9375rem;
-  border-radius: 0.75rem;
-}
