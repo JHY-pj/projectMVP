@@ -963,3 +963,8 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 }
 
 
+
+
+.chat-composer .button {
+  border-radius: 0.75rem;
+}
