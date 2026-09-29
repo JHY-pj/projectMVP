@@ -14,7 +14,7 @@ import {
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { FormEvent, useMemo, useRef, useState } from "react"
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
 
 type ChatRole = "assistant" | "user"
 
@@ -51,7 +51,18 @@ export function SupportChatScreen() {
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const messageListRef = useRef<HTMLDivElement>(null)
   const canSend = useMemo(() => draft.trim().length > 0 && !isSending, [draft, isSending])
+
+  useEffect(() => {
+    const messageList = messageListRef.current
+    if (!messageList) return
+
+    messageList.scrollTo({
+      top: messageList.scrollHeight,
+      behavior: "smooth",
+    })
+  }, [messages, isSending])
 
   function downloadConversation() {
     if (messages.length <= 1) {
@@ -157,7 +168,7 @@ export function SupportChatScreen() {
           <span>판결·채권·계약·손해배상 등 민사 문제를 중심으로 안내합니다. 한 번에 하나씩 확인해요.</span>
         </div>
 
-        <div className="support-chat-messages" aria-live="polite">
+        <div className="support-chat-messages" ref={messageListRef} aria-live="polite" aria-busy={isSending}>
           {messages.map((message) => (
             <article className={`chat-message chat-message-${message.role}`} key={message.id}>
               {message.role === "assistant" && <span className="chat-avatar" aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></span>}
@@ -167,7 +178,7 @@ export function SupportChatScreen() {
           {isSending && (
             <article className="chat-message chat-message-assistant chat-message-loading">
               <span className="chat-avatar" aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></span>
-              <p><FontAwesomeIcon icon={faSpinner} spin /> 말씀해주신 내용을 정리하고 있어요.</p>
+              <p role="status"><FontAwesomeIcon icon={faSpinner} spin /> 말씀해주신 내용을 정리하고 있어요.</p>
             </article>
           )}
         </div>
