@@ -975,3 +975,76 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   align-items: center;
   gap: 0.5rem;
 }
+
+
+/* Layout system: one page-width, spacing, and responsive-grid contract. */
+:root {
+  --layout-wide: 73.75rem;
+  --layout-reading: 57.5rem;
+  --layout-header: 77.5rem;
+  --layout-gutter: 1.25rem;
+  --layout-section-gap: 1.125rem;
+}
+.content-width,
+.footer-inner {
+  width: min(var(--layout-wide), calc(100% - (var(--layout-gutter) * 2)));
+}
+.header-inner {
+  width: min(var(--layout-header), calc(100% - (var(--layout-gutter) * 2)));
+}
+.narrow-main { max-width: var(--layout-reading); }
+.page-main { min-width: 0; padding-top: 2.375rem; }
+.page-main > *,
+.page-heading > *,
+.panel,
+.notice,
+.wizard-card,
+.next-action-card,
+.case-identity,
+.support-chat,
+.support-tools { min-width: 0; max-width: 100%; }
+.page-heading { margin: 2rem 0; }
+.page-heading .page-description { max-width: 42rem; }
+.two-column-feature,
+.dashboard-grid,
+.admin-grid,
+.review-workspace,
+.form-layout,
+.form-grid,
+.case-overview-grid,
+.factor-grid,
+.rights-grid,
+.support-tools { gap: var(--layout-section-gap); }
+.responsive-table,
+[data-slot="table-container"] { max-width: 100%; -webkit-overflow-scrolling: touch; }
+
+@media (max-width: 64rem) {
+  .content-width,
+  .header-inner,
+  .footer-inner { width: calc(100% - (var(--layout-gutter) * 2)); }
+  .page-main { min-height: auto; padding-top: 2rem; }
+  .narrow-main { max-width: none; }
+  .page-heading { align-items: stretch; gap: 1rem; margin: 1.5rem 0; }
+  .page-heading .page-actions,
+  .page-heading .page-actions > * { width: 100%; max-width: none; }
+  .two-column-feature,
+  .dashboard-grid,
+  .admin-grid,
+  .review-workspace,
+  .form-layout,
+  .form-grid,
+  .case-overview-grid,
+  .factor-grid,
+  .rights-grid { grid-template-columns: minmax(0, 1fr); }
+  .case-identity,
+  .next-action-card { width: 100%; }
+}
+
+@media (max-width: 47.5rem) {
+  :root { --layout-gutter: 0.875rem; }
+  .page-main { padding-top: 1.5rem; }
+  .page-heading { margin: 1.25rem 0; }
+  .panel,
+  .wizard-card,
+  .notice { padding-inline: 1rem; }
+}
