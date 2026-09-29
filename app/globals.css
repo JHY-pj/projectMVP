@@ -961,3 +961,12 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .support-chat-footer { align-items: flex-start; flex-direction: column; padding-inline: 1rem; }
   .support-tools { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Composer controls share one visual height and corner radius. */
+.chat-composer textarea,
+.chat-composer .button {
+  min-height: 4.9375rem;
+  height: 4.9375rem;
+  border-radius: 0.75rem;
+}
