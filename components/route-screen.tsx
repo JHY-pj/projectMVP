@@ -16,6 +16,7 @@ import {
 } from "@/components/auth-screens"
 import {
   CaseDetailScreen,
+  CaseListScreen,
   CaseWizardScreen,
   DashboardScreen,
   NotificationsScreen,
@@ -50,7 +51,8 @@ export function RouteScreen({ segments }: { segments: string[] }) {
 
   if (path.startsWith("app")) {
     let screen = <DashboardScreen />
-    if (path === "app/cases/new") screen = <CaseWizardScreen />
+    if (path === "app/cases") screen = <CaseListScreen />
+    else if (path === "app/cases/new") screen = <CaseWizardScreen />
     else if (segments[1] === "cases" && segments[2]) screen = <CaseDetailScreen section={segments[3] ?? "summary"} />
     else if (path === "app/notifications") screen = <NotificationsScreen />
     else if (path === "app/settings") screen = <SettingsScreen />
