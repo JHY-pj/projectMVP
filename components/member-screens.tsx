@@ -492,7 +492,7 @@ function DataView() {
   return (
     <>
       <section className="panel"><div className="panel-heading"><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>대여금</dd></div><div><dt>금액</dt><dd>300만~500만 원</dd></div><div><dt>지역</dt><dd>수도권</dd></div><div><dt>경과 기간</dt><dd>1년 미만</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></dl></section>
-      <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog><DialogTrigger asChild><button className="button button-danger-outline"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>요청 후 운영 검토가 시작되며, 처리 전까지 취소할 수 있습니다.</DialogDescription></DialogHeader><DialogFooter><button className="button button-danger" onClick={() => toast.success("삭제 요청이 접수되었습니다.")}>삭제 요청 접수</button></DialogFooter></DialogContent></Dialog></section>
+      <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog><DialogTrigger asChild><button className="button button-danger-outline"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>요청 후 운영 검토가 시작되며, 처리 전까지 취소할 수 있습니다. 사건 삭제가 완료되면 사건 원본과 개인 계정에 연결된 데이터는 삭제됩니다. 다만 회원가입 시 동의한 데이터 활용 범위에 따라 이미 비식별 처리되어 판단 기준 검증 및 서비스·모델 개선에 활용된 데이터는 개인 사건과 분리되어 유지될 수 있습니다.</DialogDescription></DialogHeader><DialogFooter><button className="button button-danger" onClick={() => toast.success("삭제 요청이 접수되었습니다.")}>삭제 요청 접수</button></DialogFooter></DialogContent></Dialog></section>
     </>
   )
 }
