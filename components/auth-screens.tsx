@@ -196,16 +196,14 @@ export function VerifyEmailScreen() {
 const consentItems = [
   ["terms", "[필수] 이용약관", "서비스 제공 범위와 이용자의 책임"],
   ["privacy", "[필수] 개인정보 처리", "계정·문의·권리 요청에 필요한 최소 정보"],
-  ["case", "[필수] 판결문·사건정보 처리", "분석 변수 추출, 식별정보 제거, 원문 폐기 원칙"],
-  ["model", "[선택] 서비스·모델 개선 참여", "비식별 사건 변수와 확정 결과의 연구 활용"],
-  ["marketing", "[선택] 마케팅 정보 수신", "서비스 소식과 참여 안내"],
+  ["case", "[필수] 판결문·사건정보 및 데이터 활용", "분석 변수 추출, 식별정보 제거, 원문 폐기와 비식별 사건·결과 데이터의 판단 기준 검증 및 서비스 개선 활용"],
 ]
 
 export function OnboardingScreen() {
   const router = useRouter()
   const [checked, setChecked] = useState<string[]>([])
   const [eligible, setEligible] = useState("yes")
-  const requiredDone = ["terms", "privacy", "case"].every((item) => checked.includes(item))
+  const requiredDone = consentItems.every(([id]) => checked.includes(id))
 
   function toggleItem(item: string, value: boolean) {
     setChecked((current) => value ? [...new Set([...current, item])] : current.filter((entry) => entry !== item))
@@ -233,7 +231,7 @@ export function OnboardingScreen() {
         <div className="consent-all">
           <label className="checkbox-row">
             <Checkbox checked={checked.length === consentItems.length} onCheckedChange={(value) => setChecked(value ? consentItems.map(([id]) => id) : [])} />
-            <span><strong>전체 동의</strong><small>선택 항목은 동의하지 않아도 서비스를 이용할 수 있습니다.</small></span>
+            <span><strong>필수 항목 전체 동의</strong><small>서비스 이용에 필요한 개인정보 처리와 사건·결과 데이터 활용 동의입니다.</small></span>
           </label>
         </div>
         {consentItems.map(([id, title, description]) => (
