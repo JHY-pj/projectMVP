@@ -1160,5 +1160,5 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 
 .delete-request-notice h2,
 [role="dialog"] h2 {
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.75rem;
 }
