@@ -1136,7 +1136,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 /* Case deletion confirmation -------------------------------------------------- */
 .delete-request-notice {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.25rem;
   text-align: left;
 }
 .delete-request-notice > strong {
@@ -1156,4 +1156,9 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 }
 .delete-request-notice li::marker {
   font-size: 0.8em;
+}
+
+.delete-request-notice h2,
+[role="dialog"] h2 {
+  margin-bottom: 1.25rem;
 }
