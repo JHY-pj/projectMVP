@@ -1071,3 +1071,10 @@ body:has(.auth-signup) .site-footer{margin-top:0}
     max-height: 24rem;
   }
 }
+
+
+/* Plan status labels stay aligned to the far right of each checklist row. */
+.plan-item > .status {
+  margin-left: auto;
+  justify-self: end;
+}
