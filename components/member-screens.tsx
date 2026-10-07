@@ -291,7 +291,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases/demo-2026" }, { label: demoCase.id }]} />
       <section className="case-identity">
         <div><div className="eyebrow">{demoCase.id}</div><h1>{demoCase.type} 청구 사건</h1><p>{demoCase.amount} · 최근 업데이트 {demoCase.updatedAt}</p></div>
-        <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary" href="/app/cases/demo-2026/result">결과 입력</Link></div>
+        <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary" href="/app/cases/demo-2026/result">결과 수정</Link></div>
       </section>
       <Tabs value={active} onValueChange={(value) => router.push(caseTabs.find(([id]) => id === value)?.[2] ?? pathname)}>
         <TabsList variant="line" className="case-tabs">
@@ -349,16 +349,57 @@ function ReportView() {
 }
 
 function PlanView() {
-  const [checked, setChecked] = useState<string[]>(["judgment"])
-  const items = [["judgment", "집행권원과 확정 여부 확인", "완료"], ["cost", "신청 비용·송달료 확인", "확인 필요"], ["priority", "선순위 권리 여부 확인", "확인 필요"], ["target", "우선 검토할 집행 수단 선택", "대기"]]
+  const items = [
+    {
+      id: "judgment",
+      title: "집행권원과 확정 여부 확인",
+      status: "완료",
+      description: "등록된 증빙에서 집행권원과 확정 여부를 확인했습니다.",
+      action: "증빙 보기",
+    },
+    {
+      id: "cost",
+      title: "신청 비용·송달료 확인",
+      status: "확인 필요",
+      description: "신청할 집행 절차에 따라 실제 비용을 확인해야 합니다.",
+      action: "확인 방법 보기",
+    },
+    {
+      id: "priority",
+      title: "선순위 권리 여부 확인",
+      status: "확인 필요",
+      description: "배당 가능성을 판단하기 위해 권리관계 증빙이 필요합니다.",
+      action: "증빙 등록",
+    },
+    {
+      id: "target",
+      title: "우선 검토할 집행 수단 선택",
+      status: "대기",
+      description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.",
+      action: null,
+    },
+  ]
+
+  const completedCount = items.filter((item) => item.status === "완료").length
+
   return (
     <>
-      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 체크리스트</h2></div><strong>{checked.length} / {items.length} 완료</strong></div>
-      <Progress value={(checked.length / items.length) * 100} />
+      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 확인 항목</h2></div><strong>{completedCount} / {items.length} 확인 완료</strong></div>
+      <Progress value={(completedCount / items.length) * 100} />
       <section className="checklist-panel">
-        {items.map(([id, title, status], index) => <label className="plan-item" key={id}><Checkbox checked={checked.includes(id)} onCheckedChange={(value) => setChecked((current) => value ? [...new Set([...current, id])] : current.filter((item) => item !== id))} /><span className="plan-index">{index + 1}</span><div><strong>{title}</strong><small>{id === "cost" ? "관할 법원 안내와 신청서 기준으로 확인" : id === "priority" ? "배당 가능성을 판단하기 위한 정보" : "사건 기록에 저장됩니다."}</small></div><StatusBadge tone={status === "완료" ? "positive" : status === "확인 필요" ? "warning" : "neutral"}>{status}</StatusBadge></label>)}
+        {items.map((item, index) => (
+          <div className="plan-item" key={item.id}>
+            <span className="plan-index">{index + 1}</span>
+            <div className="plan-item-content">
+              <strong>{item.title}</strong>
+              <small>{item.description}</small>
+              {item.action && <button className="text-link" type="button" onClick={() => toast.info(`${item.action} 기능은 증빙 관리 화면과 연결할 예정입니다.`)}>{item.action}</button>}
+            </div>
+            <StatusBadge tone={item.status === "완료" ? "positive" : item.status === "확인 필요" ? "warning" : item.status === "검토중" ? "info" : "neutral"}>{item.status}</StatusBadge>
+          </div>
+        ))}
       </section>
-      <Notice tone="info" title="체크 결과는 자동 법률 판단이 아닙니다">준비 상태를 빠뜨리지 않도록 돕는 기록 도구입니다. 신청 요건은 법원 또는 전문가에게 확인하세요.</Notice>
+      <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">사용자가 직접 완료 처리하지 않습니다. 증빙이 적합하면 완료, 증빙이 없거나 추가 확인이 필요하면 확인 필요, 제출된 증빙을 확인 중이면 검토중, 선행 확인이 필요한 단계는 대기로 표시합니다.</Notice>
     </>
   )
 }
