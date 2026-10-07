@@ -470,7 +470,7 @@ function ResultView() {
   const router = useRouter()
   const [result, setResult] = useState("success_partial")
   const [reasons, setReasons] = useState<string[]>([])
-  function save(event: FormEvent) { event.preventDefault(); toast.success("결과 입력이 완료되었습니다."); router.push("/app") }
+  function save(event: FormEvent) { event.preventDefault(); toast.success("결과 입력이 완료되었습니다."); router.push("/app/cases/demo-2026") }
   return (
     <form className="result-form" onSubmit={save}>
       <section className="panel form-stack">
