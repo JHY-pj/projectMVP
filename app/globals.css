@@ -1131,3 +1131,29 @@ body:has(.auth-signup) .site-footer{margin-top:0}
   .case-list-meta { justify-items:start; }
   .case-list-item > .button { width:100%; }
 }
+
+
+/* Case deletion confirmation -------------------------------------------------- */
+.delete-request-notice {
+  display: grid;
+  gap: 0.75rem;
+  text-align: left;
+}
+.delete-request-notice > strong {
+  display: block;
+  color: var(--navy-950);
+}
+.delete-request-notice ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.delete-request-notice li {
+  display: list-item;
+  margin: 0.375rem 0;
+  padding-left: 0.125rem;
+  line-height: 1.55;
+}
+.delete-request-notice li::marker {
+  font-size: 0.8em;
+}
