@@ -82,7 +82,7 @@ export function DashboardScreen() {
 
       <div className="dashboard-grid">
         <section className="panel motion-enter">
-          <div className="panel-heading"><div><p className="eyebrow">내 사건</p><h2>진행 중인 사건</h2></div><Link href="/app/cases/demo-2026">전체 보기</Link></div>
+          <div className="panel-heading"><div><p className="eyebrow">내 사건</p><h2>진행 중인 사건</h2></div><Link href="/app/cases">전체 보기</Link></div>
           <article className="case-card">
             <div className="case-card-top"><span className="case-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span><div><small>{demoCase.id}</small><h3>{demoCase.type} 청구 사건</h3></div><StatusBadge tone="info">{demoCase.status}</StatusBadge></div>
             <dl className="case-summary"><div><dt>채권 금액</dt><dd>{demoCase.amount}</dd></div><div><dt>데이터 충분도</dt><dd>{demoCase.sufficiency}%</dd></div><div><dt>최근 갱신</dt><dd>{demoCase.updatedAt}</dd></div></dl>
@@ -111,6 +111,49 @@ const amountLabels: Record<string, string> = { "under-100": "100만 원 미만",
 const regionLabels: Record<string, string> = { capital: "수도권", metro: "광역시", other: "그 외 지역", unknown: "모름" }
 const statusLabels: Record<string, string> = { in_progress: "진행 중", success_partial: "일부 회수", fail_confirmed: "전혀 회수 못함", abandoned: "중단함" }
 const attemptLabels: Record<string, string> = { bank: "통장 압류", wage: "급여 압류", car: "차량", estate: "부동산", none: "아직 안 함" }
+
+export function CaseListScreen() {
+  const cases = [
+    { id: "demo-2026", caseNo: "EC-2026-0001", type: "대여금", amount: "300만 원 이상 ~ 500만 원 미만", status: "진행 중", next: "신청 비용·선순위 권리 확인", updatedAt: "2026.08.29", tone: "info" as const },
+    { id: "demo-2025-02", caseNo: "EC-2025-0002", type: "매매대금", amount: "100만 원 이상 ~ 300만 원 미만", status: "완료", next: "집행 결과 기록 완료", updatedAt: "2026.07.14", tone: "positive" as const },
+    { id: "demo-2025-03", caseNo: "EC-2025-0003", type: "기타", amount: "100만 원 미만", status: "중단", next: "필요 시 사건 다시 검토", updatedAt: "2026.05.02", tone: "neutral" as const },
+  ]
+
+  return (
+    <main id="main-content" className="content-width page-main cases-main">
+      <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건" }]} />
+      <PageHeader
+        eyebrow="내 사건"
+        title="등록한 사건"
+        description="사건별 진행 상태와 다음 할 일을 확인하세요."
+        actions={<Link className="button button-primary" href="/app/cases/new"><FontAwesomeIcon icon={faFileLines} /> 새 사건 등록</Link>}
+      />
+      <div className="case-list-summary">
+        <span>전체 <strong>{cases.length}</strong></span>
+        <span>진행 중 <strong>{cases.filter((item) => item.status === "진행 중").length}</strong></span>
+        <span>완료 <strong>{cases.filter((item) => item.status === "완료").length}</strong></span>
+        <span>중단 <strong>{cases.filter((item) => item.status === "중단").length}</strong></span>
+      </div>
+      <section className="case-list" aria-label="등록한 사건 목록">
+        {cases.map((item) => (
+          <article className="case-list-item" key={item.id}>
+            <div className="case-list-primary">
+              <span className="case-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span>
+              <div>
+                <small>{item.caseNo}</small>
+                <h2>{item.type} 청구 사건</h2>
+                <p>{item.amount}</p>
+              </div>
+            </div>
+            <div className="case-list-next"><small>다음 할 일</small><strong>{item.next}</strong></div>
+            <div className="case-list-meta"><StatusBadge tone={item.tone}>{item.status}</StatusBadge><small>최근 업데이트 {item.updatedAt}</small></div>
+            <Link className="button button-outline" href={`/app/cases/${item.id}`}>사건 보기 <FontAwesomeIcon icon={faChevronRight} /></Link>
+          </article>
+        ))}
+      </section>
+    </main>
+  )
+}
 
 export function CaseWizardScreen() {
   const router = useRouter()
