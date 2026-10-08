@@ -503,7 +503,7 @@ function ReportView() {
 type PlanRecordType = "progress" | "cost" | "recovery"
 type PlanEntry = {
   id: string; note: string; reference: string; updatedAt: string
-  type?: PlanRecordType; amount?: number; occurredOn?: string; category?: string
+  type?: PlanRecordType; amount?: number; occurredOn?: string; category?: string; details?: Record<string,string>
   attachmentName?: string; attachmentType?: string
 }
 const planRecordLabels: Record<PlanRecordType, string> = { progress: "진행", cost: "비용", recovery: "회수" }
@@ -561,7 +561,10 @@ function PlanView() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [note, setNote] = useState("")
   const [reference, setReference] = useState("")
-  const [recordType, setRecordType] = useState<PlanRecordType>("progress")
+  const editingEntry = (entries[activeId || ""] || []).find((item) => item.id === editingId)
+  const editingDetails = editingEntry?.details || {}
+  const [editFile, setEditFile] = useState<File | null>(null)
+  const [removeFile, setRemoveFile] = useState(false)
 
   // Browser-only demo persistence; no evidence files or personal identifiers are stored.
   useEffect(() => {
@@ -603,25 +606,25 @@ function PlanView() {
     setReference("")
   }
 
-  function saveEdit(event: FormEvent) {
+  async function saveEdit(event: FormEvent) {
     event.preventDefault()
-    if (!activeId || !editingId || !note.trim()) {
-      toast.error("확인 내용 또는 검토 결과를 입력해 주세요.")
-      return
-    }
-    const current = entries[activeId] || []
-    if (!current.some((item) => item.id === editingId)) {
-      toast.error("수정할 기록을 찾을 수 없습니다.")
-      cancelEdit()
-      return
-    }
-    const next = current.map((item) => item.id === editingId
-      ? { ...item, note: note.trim(), reference: reference.trim(), updatedAt: new Date().toLocaleDateString("ko-KR") }
-      : item)
-    if (persist({ ...entries, [activeId]: next })) {
-      toast.success("기록을 수정했습니다.")
-      cancelEdit()
-    }
+    if (!activeId || !editingId || !note.trim()) { toast.error("기록 내용을 입력해 주세요."); return }
+    const original = (entries[activeId] || []).find((item) => item.id === editingId)
+    if (!original) return
+    const data = new FormData(event.currentTarget as HTMLFormElement)
+    const details: Record<string,string> = {}
+    for (const [key,value] of data.entries()) if (key.startsWith("detail_")) details[key.slice(7)] = String(value)
+    const amount = activeId === "cost" ? Number(data.get("amount")) : undefined
+    if (activeId === "cost" && (!Number.isSafeInteger(amount) || amount! <= 0)) { toast.error("유효한 금액을 입력해 주세요."); return }
+    if (editFile && (!["application/pdf","image/jpeg","image/png"].includes(editFile.type) || editFile.size > 10485760)) { toast.error("PDF·JPG·PNG, 최대 10MB만 첨부할 수 있습니다."); return }
+    const nextEntry: PlanEntry = { ...original, note: note.trim(), reference: reference.trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: editFile?.name || (removeFile ? undefined : original.attachmentName), attachmentType: editFile?.type || (removeFile ? undefined : original.attachmentType) }
+    try {
+      if (editFile) await writePlanFile(editingId, editFile)
+      if (persist({ ...entries, [activeId]: entries[activeId].map((item) => item.id === editingId ? nextEntry : item) })) {
+        if (removeFile && !editFile) await deletePlanFile(editingId)
+        toast.success("기록을 수정했습니다."); cancelEdit(); setEditFile(null); setRemoveFile(false)
+      }
+    } catch { toast.error("첨부파일 수정에 실패했습니다.") }
   }
 
   async function saveTypedEntry(event: FormEvent<HTMLFormElement>) {
@@ -629,39 +632,21 @@ function PlanView() {
     if (!activeId) return
     const form = event.currentTarget
     const data = new FormData(form)
-    const type = String(data.get("type")) as PlanRecordType
-    if (!["progress", "cost", "recovery"].includes(type)) return
     const noteValue = String(data.get("description") || "").trim()
-    const amountRaw = String(data.get("amount") || "").trim()
-    const amount = amountRaw ? Number(amountRaw) : undefined
-    if (!noteValue || (type !== "progress" && (!amount || !Number.isSafeInteger(amount) || amount <= 0))) {
-      toast.error("내용과 유효한 금액을 입력해 주세요.")
-      return
-    }
+    const amount = activeId === "cost" ? Number(data.get("amount")) : undefined
+    if (!noteValue || (activeId === "cost" && (!Number.isSafeInteger(amount) || amount! <= 0))) { toast.error("내용과 유효한 금액을 입력해 주세요."); return }
+    const details: Record<string,string> = {}
+    for (const [key,value] of data.entries()) if (key.startsWith("detail_")) details[key.slice(7)] = String(value)
     const fileValue = data.get("evidence")
     const file = fileValue instanceof File && fileValue.size > 0 ? fileValue : undefined
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"]
-    if (file && (!allowedTypes.includes(file.type) || file.size > 10 * 1024 * 1024)) {
-      toast.error("증빙은 PDF, JPG, PNG 파일만 가능하며 최대 10MB입니다.")
-      return
-    }
+    if (file && (!["application/pdf","image/jpeg","image/png"].includes(file.type) || file.size > 10485760)) { toast.error("PDF·JPG·PNG, 최대 10MB만 첨부할 수 있습니다."); return }
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
-    const entry: PlanEntry = {
-      id, type, note: noteValue, updatedAt: new Date().toLocaleDateString("ko-KR"),
-      occurredOn: String(data.get("occurredOn") || ""), category: String(data.get("category") || "").trim(),
-      reference: String(data.get("reference") || "").trim(),
-      amount: type === "progress" ? undefined : amount,
-      attachmentName: file?.name, attachmentType: file?.type,
-    }
+    const entry: PlanEntry = { id, note: noteValue, reference: String(data.get("reference") || "").trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: file?.name, attachmentType: file?.type }
     try {
       if (file) await writePlanFile(id, file)
-      if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) {
-        toast.success("기록을 등록했습니다.")
-        form.reset()
-      } else if (file) await deletePlanFile(id)
-    } catch {
-      toast.error("증빙 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
-    }
+      if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) { toast.success("기록을 등록했습니다."); form.reset() }
+      else if (file) await deletePlanFile(id)
+    } catch { toast.error("증빙 저장에 실패했습니다.") }
   }
 
   async function downloadPlanEvidence(entry: PlanEntry) {
@@ -745,20 +730,23 @@ function PlanView() {
                 {entries[activeId].map((entry) => (
                   <li key={entry.id}>
                     {editingId === entry.id ? (
-                      <form className="form-stack plan-inline-editor" onSubmit={saveEdit}>
-                        <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required autoFocus /></label>
+                      <form key={editingId} className="form-stack plan-inline-editor" onSubmit={saveEdit}>
+                        {activeId === "judgment" && <><label className="field"><span>집행권원 종류</span><select name="detail_kind" defaultValue={editingDetails.kind || ""} required><option value="" disabled>선택</option><option value="판결문">판결문</option><option value="지급명령">지급명령</option><option value="조정조서">조정조서</option><option value="화해조서">화해조서</option><option value="공정증서">공정증서</option><option value="기타">기타</option></select></label><label className="field"><span>확정 여부</span><select name="detail_finality" defaultValue={editingDetails.finality || ""} required><option value="" disabled>선택</option><option value="확정">확정</option><option value="미확정">미확정</option><option value="확인 중">확인 중</option><option value="확정 불요·별도 확인">확정 불요·별도 확인</option></select></label></>}
+{activeId === "cost" && <><label className="field"><span>비용 항목</span><select name="detail_costKind" defaultValue={editingDetails.costKind || ""} required><option value="" disabled>선택</option><option value="인지대">인지대</option><option value="송달료">송달료</option><option value="집행문·증명 발급">집행문·증명 발급</option><option value="재산조회">재산조회</option><option value="법무사 수수료">법무사 수수료</option><option value="기타">기타</option></select></label><label className="field"><span>지출 구분</span><select name="detail_costStatus" defaultValue={editingDetails.costStatus || ""} required><option value="" disabled>선택</option><option value="예상">예상</option><option value="실제 지출">실제 지출</option></select></label><label className="field"><span>금액 (원)</span><input name="amount" type="number" min="1" step="1" defaultValue={editingEntry?.amount} required /></label><label className="field"><span>기준일·지출일</span><input name="occurredOn" type="date" defaultValue={editingEntry?.occurredOn} required /></label></>}
+{activeId === "priority" && <><label className="field"><span>확인 대상</span><select name="detail_subject" defaultValue={editingDetails.subject || ""} required><option value="" disabled>선택</option><option value="예금채권">예금채권</option><option value="급여채권">급여채권</option><option value="부동산">부동산</option><option value="차량">차량</option><option value="기타">기타</option></select></label><label className="field"><span>선순위 권리</span><select name="detail_priorityResult" defaultValue={editingDetails.priorityResult || ""} required><option value="" disabled>선택</option><option value="있음">있음</option><option value="없음">없음</option><option value="확인 중">확인 중</option></select></label></>}
+{activeId === "target" && <><label className="field"><span>집행 수단</span><select name="detail_method" defaultValue={editingDetails.method || ""} required><option value="" disabled>선택</option><option value="예금채권 압류·추심">예금채권 압류·추심</option><option value="급여채권 압류·추심">급여채권 압류·추심</option><option value="차량 집행">차량 집행</option><option value="부동산 집행">부동산 집행</option><option value="기타">기타</option></select></label><label className="field"><span>검토 결과</span><select name="detail_decision" defaultValue={editingDetails.decision || ""} required><option value="" disabled>선택</option><option value="우선 검토">우선 검토</option><option value="추가 확인 필요">추가 확인 필요</option><option value="보류">보류</option><option value="제외">제외</option></select></label></>}
+                        <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required /></label>
                         <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} /></label>
-                        <div className="plan-record-actions">
-                          <button type="button" className="button button-outline" onClick={cancelEdit}>취소</button>
-                          <button type="submit" className="button button-primary">변경 저장</button>
-                        </div>
+                        {editingEntry?.attachmentName && <label className="plan-file-notice"><input type="checkbox" checked={removeFile} onChange={(event) => setRemoveFile(event.target.checked)} /> 기존 첨부파일 삭제</label>}
+                        <label className="field"><span>증빙파일 교체 (선택)</span><input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => setEditFile(event.target.files?.[0] || null)} /></label>
+                        <div className="plan-record-actions"><button type="button" className="button button-outline" onClick={cancelEdit}>취소</button><button type="submit" className="button button-primary">변경 저장</button></div>
                       </form>
                     ) : (
                       <>
                         <div>
-                          <strong>{entry.type ? `[${planRecordLabels[entry.type]}] ` : ""}{entry.note}</strong>
+                          <strong>{entry.note}</strong>{entry.details && Object.entries(entry.details).map(([key,value]) => <small key={key}>{({kind:"집행권원",finality:"확정 여부",costKind:"비용 항목",costStatus:"지출 구분",subject:"확인 대상",priorityResult:"선순위 권리",method:"집행 수단",decision:"검토 결과"} as Record<string,string>)[key] || key}: {value}</small>)}
                           {entry.category && <small>항목: {entry.category}</small>}
-                          {entry.amount !== undefined && <small>{entry.type === "recovery" ? "회수금액" : "지출금액"}: {entry.amount.toLocaleString("ko-KR")}원</small>}
+                          {entry.amount !== undefined && <small>비용: {entry.amount.toLocaleString("ko-KR")}원</small>}
                           {entry.occurredOn && <small>발생일: {entry.occurredOn}</small>}
                           {entry.reference && <small>확인 근거: {entry.reference}</small>}
                           {entry.attachmentName && <button type="button" className="plan-evidence-link" onClick={() => downloadPlanEvidence(entry)}>첨부파일: {entry.attachmentName} (다운로드)</button>}
@@ -774,24 +762,17 @@ function PlanView() {
                 ))}
               </ul>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
-            <form className="form-stack plan-typed-entry" onSubmit={saveTypedEntry}>
-              <h3>진행 · 비용 · 회수 기록</h3>
-              <label className="field"><span>기록 유형</span><select name="type" value={recordType} onChange={(event) => setRecordType(event.target.value as PlanRecordType)}>
-                <option value="progress">진행</option><option value="cost">비용</option><option value="recovery">회수</option>
-              </select></label>
-              <label className="field"><span>발생일</span><input name="occurredOn" type="date" required /></label>
-              {recordType !== "progress" && <>
-                <label className="field"><span>{recordType === "cost" ? "비용 항목" : "회수 구분"}</span><input name="category" maxLength={100} required placeholder={recordType === "cost" ? "예: 송달료, 인지대, 법무사 수수료" : "예: 일부 변제, 추심"} /></label>
-                <label className="field"><span>{recordType === "cost" ? "지출금액 (원)" : "회수금액 (원)"}</span><input name="amount" type="number" min="1" step="1" required /></label>
-              </>}
-              <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
-              <label className="field"><span>증빙자료 (선택)</span><input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" /></label>
-              <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 첨부파일은 이 브라우저에만 저장되며 다른 기기에서는 볼 수 없습니다. 민감정보는 가린 후 첨부하세요.</p>
-              <label className="field" htmlFor="plan-record-description">기록 내용</label>
-              <div className="plan-input-action">
-                <textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="진행 상황 또는 지출·회수 내용을 입력하세요." />
-                <button className="button button-primary" type="submit">등록</button>
-              </div>
+            <form key={activeId} className="form-stack plan-typed-entry" onSubmit={saveTypedEntry}>
+              <h3>{activeId === "judgment" ? "집행권원 확인 기록" : activeId === "cost" ? "비용 기록" : activeId === "priority" ? "선순위 권리 확인 기록" : "집행 수단 검토 기록"}</h3>
+              {activeId === "judgment" && <><label className="field"><span>집행권원 종류</span><select name="detail_kind" defaultValue="" required><option value="" disabled>선택</option><option value="판결문">판결문</option><option value="지급명령">지급명령</option><option value="조정조서">조정조서</option><option value="화해조서">화해조서</option><option value="공정증서">공정증서</option><option value="기타">기타</option></select></label><label className="field"><span>확정 여부</span><select name="detail_finality" defaultValue="" required><option value="" disabled>선택</option><option value="확정">확정</option><option value="미확정">미확정</option><option value="확인 중">확인 중</option><option value="확정 불요·별도 확인">확정 불요·별도 확인</option></select></label></>}
+{activeId === "cost" && <><label className="field"><span>비용 항목</span><select name="detail_costKind" defaultValue="" required><option value="" disabled>선택</option><option value="인지대">인지대</option><option value="송달료">송달료</option><option value="집행문·증명 발급">집행문·증명 발급</option><option value="재산조회">재산조회</option><option value="법무사 수수료">법무사 수수료</option><option value="기타">기타</option></select></label><label className="field"><span>지출 구분</span><select name="detail_costStatus" defaultValue="" required><option value="" disabled>선택</option><option value="예상">예상</option><option value="실제 지출">실제 지출</option></select></label><label className="field"><span>금액 (원)</span><input name="amount" type="number" min="1" step="1"  required /></label><label className="field"><span>기준일·지출일</span><input name="occurredOn" type="date"  required /></label></>}
+{activeId === "priority" && <><label className="field"><span>확인 대상</span><select name="detail_subject" defaultValue="" required><option value="" disabled>선택</option><option value="예금채권">예금채권</option><option value="급여채권">급여채권</option><option value="부동산">부동산</option><option value="차량">차량</option><option value="기타">기타</option></select></label><label className="field"><span>선순위 권리</span><select name="detail_priorityResult" defaultValue="" required><option value="" disabled>선택</option><option value="있음">있음</option><option value="없음">없음</option><option value="확인 중">확인 중</option></select></label></>}
+{activeId === "target" && <><label className="field"><span>집행 수단</span><select name="detail_method" defaultValue="" required><option value="" disabled>선택</option><option value="예금채권 압류·추심">예금채권 압류·추심</option><option value="급여채권 압류·추심">급여채권 압류·추심</option><option value="차량 집행">차량 집행</option><option value="부동산 집행">부동산 집행</option><option value="기타">기타</option></select></label><label className="field"><span>검토 결과</span><select name="detail_decision" defaultValue="" required><option value="" disabled>선택</option><option value="우선 검토">우선 검토</option><option value="추가 확인 필요">추가 확인 필요</option><option value="보류">보류</option><option value="제외">제외</option></select></label></>}
+              <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="확인한 자료나 경로" /></label>
+              <label className="field"><span>증빙자료 (선택)</span><input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png" /></label>
+              <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 파일은 이 브라우저에만 저장됩니다. 민감정보를 가린 후 첨부하세요.</p>
+              <label className="field" htmlFor="plan-record-description">{activeId === "target" ? "선택 이유 / 검토 내용" : "확인 내용 / 검토 결과"}</label>
+              <div className="plan-input-action"><textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="확인한 사실과 판단 근거를 입력하세요." /><button className="button button-primary" type="submit">등록</button></div>
             </form>
 
           </div>
