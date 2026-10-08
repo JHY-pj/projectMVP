@@ -45,7 +45,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key
 
 ## Python 백엔드
 
-`backend/`에 상담 챗봇(`chatbot/`)과 판결문 형식 검사(`documents/`)가 있습니다. 실행 방법은 [backend/README.md](backend/README.md)를 참고하세요.
+`backend/`에 상담 챗봇(`chatbot/`), 판결문 형식 검사(`documents/`), 시뮬레이션 데이터(`data/`)가 있습니다. 실행 방법은 [backend/README.md](backend/README.md)를 참고하세요.
 
 ## 검증
 
