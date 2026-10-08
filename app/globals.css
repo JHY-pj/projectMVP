@@ -1189,8 +1189,10 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 
 
 /* Execution plan item management */
-.plan-manage-dialog{width:min(94vw,42rem);max-height:min(88dvh,50rem);overflow-y:auto}
-.plan-manage-content{display:grid;gap:1rem;min-width:0}
+.plan-manage-dialog{width:min(94vw,42rem);height:min(88dvh,50rem);max-height:88dvh;display:flex;flex-direction:column;gap:0;overflow:hidden;padding:0}
+.plan-manage-header{flex:none;padding:1.5rem 3.5rem 1rem 1.5rem;border-bottom:1px solid var(--border)}
+.plan-manage-content{display:grid;align-content:start;gap:1rem;min-width:0;min-height:0;flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding:1.25rem 1.5rem;scrollbar-gutter:stable}
+.plan-manage-footer{flex:none;display:flex;justify-content:flex-end;align-items:center;gap:.5rem;padding:1rem 1.5rem;border-top:1px solid var(--border);background:white}
 .plan-manage-content>h3,.plan-manage-content form h3{margin:0;font-size:1rem}
 .plan-manage-content>p{margin:0;color:var(--gray-600)}
 .plan-record-list{list-style:none;padding:0;margin:0;display:grid;gap:.75rem}
@@ -1201,7 +1203,11 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-record-actions .button{min-height:2.25rem}
 .plan-manage-content .field textarea{min-height:6rem}
 @media(max-width:47.5rem){
-.plan-manage-dialog{width:calc(100vw - 1.25rem);max-height:85dvh;padding:1rem}
+.plan-manage-dialog{width:calc(100vw - 1.25rem);height:min(85dvh,46rem);max-height:85dvh;padding:0}
+.plan-manage-header{padding:1rem 3rem .875rem 1rem}
+.plan-manage-content{padding:1rem}
+.plan-manage-footer{padding:.75rem 1rem;flex-wrap:wrap}
+.plan-manage-footer .button{flex:1 1 auto}
 .plan-record-actions .button{flex:1 1 auto}
 .plan-record-list li{padding:.75rem}
 }
