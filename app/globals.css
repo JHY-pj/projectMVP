@@ -1208,10 +1208,12 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-new-entry{min-width:0}
 .plan-new-entry form{gap:.4375rem}
 .plan-new-entry label.field{color:var(--gray-700);font-size:.875rem;font-weight:600}
-.plan-input-action{display:flex;align-items:stretch;gap:.5rem;min-width:0}
-.plan-input-action textarea,.plan-input-action input{flex:1 1 auto;min-width:0;width:100%;min-height:3rem;padding:.625rem .75rem;border:1px solid var(--input);border-radius:.3125rem;background:white;color:var(--gray-950)}
-.plan-input-action textarea{min-height:6rem;resize:vertical}
-.app-dialog-layout .plan-input-action .button{flex:0 0 auto;height:auto;align-self:stretch;min-width:3.5rem}
+/* Follow the existing chatbot composer styling for side-by-side input and submit. */
+.plan-input-action{display:flex;align-items:stretch;gap:.75rem;min-width:0}
+.plan-input-action textarea,.plan-input-action input{flex:1 1 auto;min-width:0;width:100%;min-height:3.125rem;padding:.75rem .875rem;border:.0625rem solid #cbd9cf;border-radius:.75rem;background:white;color:var(--foreground);outline:none}
+.plan-input-action textarea{min-height:6rem;max-height:9rem;resize:vertical}
+.plan-input-action textarea:focus,.plan-input-action input:focus{border-color:var(--teal-700);box-shadow:0 0 0 .1875rem rgba(20,96,71,.12)}
+.app-dialog-layout .plan-input-action .button{flex:0 0 auto;height:auto;align-self:stretch;min-width:6.25rem;border-radius:.75rem}
 
 @media(max-width:47.5rem){
 .plan-manage-dialog{width:calc(100vw - 1.25rem)}
