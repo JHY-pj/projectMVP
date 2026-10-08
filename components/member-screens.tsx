@@ -688,11 +688,11 @@ function PlanView() {
               <h3>새 기록 등록</h3>
               <label className="field"><span>확인 내용 / 검토 결과</span><textarea name="note" maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
               <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
+              <div className="plan-record-actions">
+                <button className="button button-outline" type="reset">초기화</button>
+                <button className="button button-primary" type="submit">기록 등록</button>
+              </div>
             </form>
-          </div>
-          <div className="plan-manage-footer">
-            <button className="button button-outline" type="button" onClick={() => setActiveId(null)}>닫기</button>
-            <button className="button button-primary" type="submit" form="plan-entry-form">기록 등록</button>
           </div>
         </DialogContent>
       </Dialog>
