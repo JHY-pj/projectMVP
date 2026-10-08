@@ -166,6 +166,22 @@ export function CaseWizardScreen() {
   const [status, setStatus] = useState("in_progress")
   const [documentConsent, setDocumentConsent] = useState(false)
   const [fileName, setFileName] = useState("")
+  const [signals, setSignals] = useState<Record<string, string>>({
+    judgment_elapsed_band: "1년 미만",
+    debtor_type: "개인",
+    debtor_contact_status: "Unknown",
+    asset_signal: "Unknown",
+    income_signal: "Unknown",
+    enforcement_title_confirmed: "Unknown",
+    service_status: "Unknown",
+    known_bank: "Unknown",
+    known_employer: "Unknown",
+    known_real_estate: "Unknown",
+    known_vehicle: "Unknown",
+  })
+  function setSignal(key: string, value: string) {
+    setSignals((current) => ({ ...current, [key]: value }))
+  }
 
   const progress = Math.round((step / wizardSteps.length) * 100)
   const reviewItems: Array<[string, string]> = [
@@ -175,6 +191,17 @@ export function CaseWizardScreen() {
     ["지역 범위", regionLabels[region]],
     ["집행 시도", attempts.map((attempt) => attemptLabels[attempt]).join(", ") || "선택 안 함"],
     ["현재 상태", statusLabels[status]],
+    ["판결 후 경과 기간", signals.judgment_elapsed_band],
+    ["채무자 유형", signals.debtor_type],
+    ["채무자 연락 상태", signals.debtor_contact_status],
+    ["재산 단서", signals.asset_signal],
+    ["소득 단서", signals.income_signal],
+    ["집행권원 확인", signals.enforcement_title_confirmed],
+    ["송달 상태", signals.service_status],
+    ["은행 정보", signals.known_bank],
+    ["근무처 정보", signals.known_employer],
+    ["부동산 정보", signals.known_real_estate],
+    ["차량 정보", signals.known_vehicle],
   ]
 
   function next() {
@@ -199,8 +226,26 @@ export function CaseWizardScreen() {
   }
 
   function submitCase() {
-    toast.success("사건이 등록되었습니다. 데모 리포트를 보여드릴게요.")
-    router.push("/app/cases/demo-2026/report")
+    const record = {
+      case_id: "LOCAL-" + Date.now(),
+      claim_type: caseTypeLabels[caseType],
+      claim_amount_band: amountLabels[amount],
+      region: regionLabels[region],
+      ...signals,
+      attempted_actions: attempts,
+      outcome_status: status,
+      process_status: status === "abandoned" ? "중단" : status === "in_progress" ? "진행 중" : "완료",
+      result_source: "user",
+      is_dummy: "N",
+    }
+    try {
+      const previous = JSON.parse(window.localStorage.getItem("mvp-case-drafts") || "[]") as unknown[]
+      window.localStorage.setItem("mvp-case-drafts", JSON.stringify([...previous, record]))
+      toast.success("입력값을 이 브라우저에 임시 저장했습니다. 데모 리포트로 이동합니다.")
+      router.push("/app/cases/demo-2026/report")
+    } catch {
+      toast.error("임시 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
+    }
   }
 
   return (
@@ -260,8 +305,8 @@ export function CaseWizardScreen() {
             <div className="form-grid">
               <label className="field"><span>사건 유형</span><select value={caseType} onChange={(event) => setCaseType(event.target.value)}><option value="loan">대여금</option><option value="sale">매매대금</option><option value="construction">공사대금</option><option value="other">기타</option></select></label>
               <label className="field"><span>채권 금액 구간</span><select value={amount} onChange={(event) => setAmount(event.target.value)}><option value="under-100">100만 원 미만</option><option value="100-300">100만~300만 원</option><option value="300-500">300만~500만 원</option></select></label>
-              <label className="field"><span>판결 후 경과 기간</span><select><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option></select></label>
-              <label className="field"><span>채무자 유형</span><select><option>개인</option><option>개인사업자</option><option>법인</option><option>모름</option></select></label>
+              <label className="field"><span>판결 후 경과 기간</span><select value={signals.judgment_elapsed_band} onChange={(event) => setSignal("judgment_elapsed_band", event.target.value)}><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option></select></label>
+              <label className="field"><span>채무자 유형</span><select value={signals.debtor_type} onChange={(event) => setSignal("debtor_type", event.target.value)}><option>개인</option><option>개인사업자</option><option>법인</option><option>모름</option></select></label>
               <label className="field"><span>지역 범위</span><select value={region} onChange={(event) => setRegion(event.target.value)}><option value="capital">수도권</option><option value="metro">광역시</option><option value="other">그 외 지역</option><option value="unknown">모름</option></select></label>
               <label className="field"><span>법원 급</span><select><option>지방법원</option><option>지원</option><option>기타·모름</option></select></label>
             </div>
@@ -279,6 +324,19 @@ export function CaseWizardScreen() {
                   <span>{String(label)}</span>
                 </label>
               ))}
+            </div>
+            <h3>채무자 정보와 집행 단서</h3>
+            <p>집행을 시도한 적이 있는지와 재산 단서를 알고 있는지는 별개입니다. 모르는 내용은 모름으로 선택하세요.</p>
+            <div className="form-grid">
+              <label className="field"><span>채무자 연락 상태</span><select value={signals.debtor_contact_status} onChange={(event) => setSignal("debtor_contact_status", event.target.value)}><option value="Unknown">모름</option><option value="연락 가능">연락 가능</option><option value="연락 불안정">연락 불안정</option><option value="소재 불명">소재 불명</option></select></label>
+              <label className="field"><span>재산 단서</span><select value={signals.asset_signal} onChange={(event) => setSignal("asset_signal", event.target.value)}><option value="Unknown">모름</option><option value="있음">있음</option><option value="약함">약함</option><option value="없음">없음</option></select></label>
+              <label className="field"><span>소득 단서</span><select value={signals.income_signal} onChange={(event) => setSignal("income_signal", event.target.value)}><option value="Unknown">모름</option><option value="있음">있음</option><option value="약함">약함</option><option value="없음">없음</option></select></label>
+              <label className="field"><span>집행권원·확정 여부</span><select value={signals.enforcement_title_confirmed} onChange={(event) => setSignal("enforcement_title_confirmed", event.target.value)}><option value="Unknown">확인 필요</option><option value="Y">확인함 (사용자 진술)</option><option value="N">아직 확인하지 못함</option></select></label>
+              <label className="field"><span>송달 상태</span><select value={signals.service_status} onChange={(event) => setSignal("service_status", event.target.value)}><option value="Unknown">모름</option><option value="정상">정상</option><option value="불명">확인 필요</option></select></label>
+              <label className="field"><span>은행 단서</span><select value={signals.known_bank} onChange={(event) => setSignal("known_bank", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
+              <label className="field"><span>근무처 단서</span><select value={signals.known_employer} onChange={(event) => setSignal("known_employer", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
+              <label className="field"><span>부동산 단서</span><select value={signals.known_real_estate} onChange={(event) => setSignal("known_real_estate", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
+              <label className="field"><span>차량 단서</span><select value={signals.known_vehicle} onChange={(event) => setSignal("known_vehicle", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
             </div>
             <h3>현재 상태는 어떤가요?</h3>
             <RadioGroup className="radio-list" value={status} onValueChange={setStatus}>
