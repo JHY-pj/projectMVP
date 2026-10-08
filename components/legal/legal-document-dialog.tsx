@@ -24,7 +24,7 @@ export function LegalDocumentDialog({
           <LegalDocumentContent type={type} />
         </div>
         <DialogFooter>
-          <button type="button" className="button button-outline" onClick={() => onOpenChange(false)}>닫기</button>
+          <button type="button" className="button button-outline button-small" onClick={() => onOpenChange(false)}>닫기</button>
           <button type="button" className="button button-primary" onClick={onAgree}>동의하고 완료</button>
         </DialogFooter>
       </DialogContent>
