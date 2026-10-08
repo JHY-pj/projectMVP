@@ -12,11 +12,12 @@ import os
 from typing import Literal, TypedDict
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from pydantic import BaseModel, Field
+from judgment_validator import classify_judgment_pdf, MAX_PDF_BYTES
 
 load_dotenv()
 
@@ -314,6 +315,15 @@ api.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type"],
 )
+
+@api.post("/documents/validate-judgment")
+async def validate_judgment(file: UploadFile = File(...)) -> dict:
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="PDF 파일만 업로드할 수 있습니다.")
+    data = await file.read(MAX_PDF_BYTES + 1)
+    if len(data) > MAX_PDF_BYTES:
+        raise HTTPException(status_code=413, detail="PDF 파일은 10MB 이하여야 합니다.")
+    return classify_judgment_pdf(data)
 
 @api.get("/health")
 def health() -> dict[str, str]:
