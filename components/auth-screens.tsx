@@ -158,7 +158,7 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           )}
           {mode === "signup" && <SignupConsent onChange={setTerms} />}
           {mode === "login" && <Link className="form-side-link" href="/reset-password">비밀번호를 잊으셨나요?</Link>}
-          <button className="button button-primary button-block button-large" disabled={loading} type="submit">
+          <button className="button button-primary button-block button-large" disabled={loading || (mode === "signup" && !terms)} type="submit">
             {loading ? "처리 중..." : mode === "login" ? "로그인" : mode === "signup" ? "회원가입" : isPasswordChange ? "새 비밀번호 저장" : "재설정 메일 받기"}
             {!loading && <FontAwesomeIcon icon={faArrowRight} />}
           </button>
