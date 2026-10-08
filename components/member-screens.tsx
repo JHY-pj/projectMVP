@@ -291,7 +291,24 @@ export function CaseWizardScreen() {
                   <FontAwesomeIcon icon={faFileArrowUp} />
                   <strong>{fileName || "PDF 판결문을 선택하세요"}</strong>
                   <span>PDF · 최대 10MB · 암호화 문서 제외</span>
-                  <input type="file" accept="application/pdf" onChange={(event) => setFileName(event.target.files?.[0]?.name ?? "")} />
+                  <input type="file" accept=".pdf,application/pdf" onChange={(event) => {
+                    const file = event.target.files?.[0]
+                    if (!file) { setFileName(""); return }
+                    const isPdf = file.name.toLowerCase().endsWith(".pdf") && (file.type === "application/pdf" || file.type === "")
+                    if (!isPdf) {
+                      event.target.value = ""
+                      setFileName("")
+                      toast.error("PDF 파일만 업로드할 수 있습니다.")
+                      return
+                    }
+                    if (file.size > 10 * 1024 * 1024) {
+                      event.target.value = ""
+                      setFileName("")
+                      toast.error("PDF 파일은 최대 10MB까지 선택할 수 있습니다.")
+                      return
+                    }
+                    setFileName(file.name)
+                  }} />
                 </label>
                 <label className="checkbox-row"><Checkbox checked={documentConsent} onCheckedChange={(value) => setDocumentConsent(Boolean(value))} /><span><strong>[필수]</strong> 문서 처리·식별정보 제거·원문 폐기 원칙을 확인했습니다.</span></label>
                 <Notice tone="info" title="현재는 UI 프로토타입입니다">선택한 파일은 브라우저 밖으로 전송되지 않습니다. 실제 파싱 API와 단기보관 정책 연결 전 화면 흐름만 검증합니다.</Notice>
