@@ -1162,3 +1162,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 [role="dialog"] h2 {
   margin-bottom: 0.75rem;
 }
+
+.wizard-subsection{margin-top:2.25rem;padding-top:1.75rem;border-top:1px solid var(--border)}
+.wizard-subsection>h3{margin:0 0 .5rem;font-size:1.125rem}
+.wizard-subsection>p{margin:0 0 1.25rem;color:var(--gray-600);font-size:.9375rem}
