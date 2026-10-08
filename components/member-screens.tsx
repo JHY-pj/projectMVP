@@ -42,7 +42,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
 
 const demoCase = {
@@ -500,58 +500,148 @@ function ReportView() {
   )
 }
 
+type PlanEntry = { id: string; note: string; reference: string; updatedAt: string }
+type PlanItem = { id: string; title: string; description: string; action: string; initialStatus: "완료" | "확인 필요" | "대기"; guide: string }
+const planItems: PlanItem[] = [
+  { id: "judgment", title: "집행권원과 확정 여부 확인", description: "판결문·확정증명 등 집행권원 관련 자료를 확인합니다.", action: "증빙 관리", initialStatus: "완료", guide: "판결문과 확정 여부를 확인할 수 있는 자료를 준비해 주세요. 문서 진위 및 확정 여부는 별도 검증이 필요합니다." },
+  { id: "cost", title: "신청 비용·송달료 확인", description: "신청할 집행 절차에 따라 실제 비용을 확인해야 합니다.", action: "비용 등록", initialStatus: "확인 필요", guide: "법원·집행 절차별 신청 수수료와 송달료를 확인하고 금액 구간 또는 참고 근거를 기록하세요." },
+  { id: "priority", title: "선순위 권리 여부 확인", description: "배당 가능성을 판단하기 위해 권리관계 증빙이 필요합니다.", action: "증빙 등록", initialStatus: "확인 필요", guide: "선순위 채권·담보권 여부를 확인한 경로와 결과를 기록하세요. 상대방의 직접식별정보는 입력하지 마세요." },
+  { id: "target", title: "우선 검토할 집행 수단 선택", description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.", action: "집행 수단 관리", initialStatus: "대기", guide: "통장·급여·차량·부동산 등 검토 중인 수단과 그 이유를 기록하세요. 실제 착수 결정은 별도 판단이 필요합니다." },
+]
+const planStorageKey = "mvp-plan-demo-2026"
+
 function PlanView() {
-  const items = [
-    {
-      id: "judgment",
-      title: "집행권원과 확정 여부 확인",
-      status: "완료",
-      description: "등록된 증빙에서 집행권원과 확정 여부를 확인했습니다.",
-      action: "증빙 보기",
-    },
-    {
-      id: "cost",
-      title: "신청 비용·송달료 확인",
-      status: "확인 필요",
-      description: "신청할 집행 절차에 따라 실제 비용을 확인해야 합니다.",
-      action: "확인 방법 보기",
-    },
-    {
-      id: "priority",
-      title: "선순위 권리 여부 확인",
-      status: "확인 필요",
-      description: "배당 가능성을 판단하기 위해 권리관계 증빙이 필요합니다.",
-      action: "증빙 등록",
-    },
-    {
-      id: "target",
-      title: "우선 검토할 집행 수단 선택",
-      status: "대기",
-      description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.",
-      action: null,
-    },
-  ]
+  const [entries, setEntries] = useState<Record<string, PlanEntry[]>>({})
+  const [loaded, setLoaded] = useState(false)
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [note, setNote] = useState("")
+  const [reference, setReference] = useState("")
 
-  const completedCount = items.filter((item) => item.status === "완료").length
+  // Browser-only demo persistence; no evidence files or personal identifiers are stored.
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(planStorageKey) || "{}") as Record<string, PlanEntry[]>
+      if (stored && typeof stored === "object" && !Array.isArray(stored)) setEntries(stored)
+    } catch {
+      toast.error("저장된 집행 계획 정보를 불러오지 못했습니다.")
+    }
+    setLoaded(true)
+  }, [])
 
+  function persist(next: Record<string, PlanEntry[]>) {
+    try {
+      window.localStorage.setItem(planStorageKey, JSON.stringify(next))
+      setEntries(next)
+      return true
+    } catch {
+      toast.error("저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
+      return false
+    }
+  }
+
+  function openItem(id: string) {
+    setActiveId(id)
+    setEditingId(null)
+    setNote("")
+    setReference("")
+  }
+
+  function startEdit(entry: PlanEntry) {
+    setEditingId(entry.id)
+    setNote(entry.note)
+    setReference(entry.reference)
+  }
+
+  function saveEntry(event: FormEvent) {
+    event.preventDefault()
+    if (!activeId || !note.trim()) {
+      toast.error("확인 내용 또는 검토 결과를 입력해 주세요.")
+      return
+    }
+    const current = entries[activeId] || []
+    const entry: PlanEntry = {
+      id: editingId || (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())),
+      note: note.trim(),
+      reference: reference.trim(),
+      updatedAt: new Date().toLocaleDateString("ko-KR"),
+    }
+    const nextEntries = editingId ? current.map((item) => item.id === editingId ? entry : item) : [...current, entry]
+    if (persist({ ...entries, [activeId]: nextEntries })) {
+      toast.success(editingId ? "기록을 수정했습니다." : "기록을 등록했습니다.")
+      setEditingId(null)
+      setNote("")
+      setReference("")
+    }
+  }
+
+  function deleteEntry(id: string) {
+    if (!activeId || !window.confirm("이 기록을 삭제할까요? 삭제 후 복구할 수 없습니다.")) return
+    const nextEntries = (entries[activeId] || []).filter((entry) => entry.id !== id)
+    if (persist({ ...entries, [activeId]: nextEntries })) {
+      if (editingId === id) { setEditingId(null); setNote(""); setReference("") }
+      toast.success("기록을 삭제했습니다.")
+    }
+  }
+
+  const activeItem = planItems.find((item) => item.id === activeId)
+  const completedCount = planItems.filter((item) => item.initialStatus === "완료").length
   return (
     <>
-      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 확인 항목</h2></div><strong>{completedCount} / {items.length} 확인 완료</strong></div>
-      <Progress value={(completedCount / items.length) * 100} />
+      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 확인 항목</h2></div><strong>{completedCount} / {planItems.length} 확인 완료</strong></div>
+      <Progress value={(completedCount / planItems.length) * 100} />
       <section className="checklist-panel">
-        {items.map((item, index) => (
-          <div className="plan-item" key={item.id}>
-            <span className="plan-index">{index + 1}</span>
-            <div className="plan-item-content">
-              <strong>{item.title}</strong>
-              <small>{item.description}</small>
-              {item.action && <button className="text-link" type="button" onClick={() => toast.info(`${item.action} 기능은 증빙 관리 화면과 연결할 예정입니다.`)}>{item.action}</button>}
+        {planItems.map((item, index) => {
+          const count = (entries[item.id] || []).length
+          const status = item.initialStatus === "완료" ? "완료" : count > 0 ? "검토중" : item.initialStatus
+          return (
+            <div className="plan-item" key={item.id}>
+              <span className="plan-index">{index + 1}</span>
+              <div className="plan-item-content">
+                <strong>{item.title}</strong>
+                <small>{item.description}</small>
+                {count > 0 && <small>등록된 기록 {count}건 · {status === "검토중" ? "확인 대기" : "기록 있음"}</small>}
+                <button className="text-link" type="button" onClick={() => openItem(item.id)}>{count ? "기록 관리" : item.action}</button>
+              </div>
+              <StatusBadge tone={status === "완료" ? "positive" : status === "확인 필요" ? "warning" : status === "검토중" ? "info" : "neutral"}>{status}</StatusBadge>
             </div>
-            <StatusBadge tone={item.status === "완료" ? "positive" : item.status === "확인 필요" ? "warning" : item.status === "검토중" ? "info" : "neutral"}>{item.status}</StatusBadge>
-          </div>
-        ))}
+          )
+        })}
       </section>
-      <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">사용자가 직접 완료 처리하지 않습니다. 증빙이 적합하면 완료, 증빙이 없거나 추가 확인이 필요하면 확인 필요, 제출된 증빙을 확인 중이면 검토중, 선행 확인이 필요한 단계는 대기로 표시합니다.</Notice>
+      <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">기록을 등록하면 검토중으로 표시합니다. 사용자가 직접 완료 처리하지 않으며, 완료는 운영 검증 이후 반영할 예정입니다. 현재 기록은 이 브라우저에만 임시 저장됩니다.</Notice>
+      <Dialog open={Boolean(activeItem)} onOpenChange={(open) => { if (!open) { setActiveId(null); setEditingId(null); setNote(""); setReference("") } }}>
+        <DialogContent className="plan-manage-dialog">
+          <DialogHeader>
+            <DialogTitle>{activeItem?.title || "집행 계획 관리"}</DialogTitle>
+            <DialogDescription>{activeItem?.guide}</DialogDescription>
+          </DialogHeader>
+          <div className="plan-manage-content">
+            <h3>등록된 기록</h3>
+            {(activeId && entries[activeId]?.length) ? (
+              <ul className="plan-record-list">
+                {entries[activeId].map((entry) => (
+                  <li key={entry.id}>
+                    <div><strong>{entry.note}</strong>{entry.reference && <small>확인 근거: {entry.reference}</small>}<small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small></div>
+                    <div className="plan-record-actions">
+                      <button type="button" className="button button-outline" onClick={() => startEdit(entry)}>수정</button>
+                      <button type="button" className="button button-outline" onClick={() => deleteEntry(entry.id)}>삭제</button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : <p>아직 등록된 기록이 없습니다.</p>}
+            <form className="form-stack" onSubmit={saveEntry}>
+              <h3>{editingId ? "기록 수정" : "새 기록 등록"}</h3>
+              <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
+              <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
+              <div className="plan-record-actions">
+                {editingId && <button type="button" className="button button-outline" onClick={() => { setEditingId(null); setNote(""); setReference("") }}>수정 취소</button>}
+                <button className="button button-primary" type="submit">{editingId ? "변경 저장" : "기록 등록"}</button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
