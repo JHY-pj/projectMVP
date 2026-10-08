@@ -204,6 +204,8 @@ export function CaseWizardScreen() {
   }
 
   const progress = Math.round((step / wizardSteps.length) * 100)
+  const displaySignal = (value: string) => value === "Unknown" ? "미확인" : value
+
   const reviewItems: Array<[string, string]> = [
     ["입력 방식", method === "manual" ? "직접 입력" : "판결문 업로드"],
     ["사건 유형", caseTypeLabels[caseType]],
@@ -213,15 +215,15 @@ export function CaseWizardScreen() {
     ["현재 상태", statusLabels[status]],
     ["판결 후 경과 기간", signals.judgment_elapsed_band],
     ["채무자 유형", signals.debtor_type],
-    ["채무자 연락 상태", signals.debtor_contact_status],
-    ["재산 단서", signals.asset_signal],
-    ["소득 단서", signals.income_signal],
-    ["집행권원 확인", signals.enforcement_title_confirmed],
-    ["송달 상태", signals.service_status],
-    ["은행 정보", signals.known_bank],
-    ["근무처 정보", signals.known_employer],
-    ["부동산 정보", signals.known_real_estate],
-    ["차량 정보", signals.known_vehicle],
+    ["채무자 연락 상태", displaySignal(signals.debtor_contact_status)],
+    ["재산 단서", displaySignal(signals.asset_signal)],
+    ["소득 단서", displaySignal(signals.income_signal)],
+    ["집행권원 확인", displaySignal(signals.enforcement_title_confirmed)],
+    ["송달 상태", displaySignal(signals.service_status)],
+    ["은행 정보", displaySignal(signals.known_bank)],
+    ["근무처 정보", displaySignal(signals.known_employer)],
+    ["부동산 정보", displaySignal(signals.known_real_estate)],
+    ["차량 정보", displaySignal(signals.known_vehicle)],
   ]
 
   function next() {
