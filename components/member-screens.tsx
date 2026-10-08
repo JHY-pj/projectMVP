@@ -166,6 +166,26 @@ export function CaseWizardScreen() {
   const [status, setStatus] = useState("in_progress")
   const [documentConsent, setDocumentConsent] = useState(false)
   const [fileName, setFileName] = useState("")
+  const [judgmentCheck, setJudgmentCheck] = useState<"idle" | "checking" | "true" | "false" | "unknown">("idle")
+  const [judgmentMessage, setJudgmentMessage] = useState("")
+  async function checkJudgment(file: File) {
+    setJudgmentCheck("checking")
+    setJudgmentMessage("판결문 형식을 확인하고 있습니다.")
+    try {
+      const payload = new FormData()
+      payload.append("file", file)
+      const response = await fetch("http://localhost:8000/documents/validate-judgment", { method: "POST", body: payload })
+      if (!response.ok) throw new Error("판별 서버 응답 오류")
+      const result = await response.json() as {result: "true" | "false" | "unknown"; reason: string}
+      setJudgmentCheck(result.result)
+      setJudgmentMessage(result.reason)
+      if (result.result !== "true") setFileName("")
+    } catch {
+      setJudgmentCheck("unknown")
+      setJudgmentMessage("판별 서버에 연결하지 못했습니다. 서버를 실행하거나 직접 입력을 선택해 주세요.")
+      setFileName("")
+    }
+  }
   const [signals, setSignals] = useState<Record<string, string>>({
     judgment_elapsed_band: "1년 미만",
     debtor_type: "개인",
@@ -205,6 +225,10 @@ export function CaseWizardScreen() {
   ]
 
   function next() {
+    if (step === 2 && method === "upload" && judgmentCheck !== "true") {
+      toast.error("판결문 PDF 형식 확인이 완료되어야 다음 단계로 진행할 수 있습니다.")
+      return
+    }
     if (step === 2 && method === "upload" && !documentConsent) {
       toast.error("문서 처리 안내를 확인해 주세요.")
       return
@@ -308,8 +332,10 @@ export function CaseWizardScreen() {
                       return
                     }
                     setFileName(file.name)
+                    void checkJudgment(file)
                   }} />
                 </label>
+                {judgmentCheck !== "idle" && <Notice tone={judgmentCheck === "true" ? "secure" : judgmentCheck === "checking" ? "info" : "warning"} title={judgmentCheck === "checking" ? "판별 중" : judgmentCheck === "true" ? "판결문 형식 확인" : "판결문 확인 필요"}>{judgmentMessage}</Notice>}
                 <label className="checkbox-row"><Checkbox checked={documentConsent} onCheckedChange={(value) => setDocumentConsent(Boolean(value))} /><span><strong>[필수]</strong> 문서 처리·식별정보 제거·원문 폐기 원칙을 확인했습니다.</span></label>
                 <Notice tone="info" title="현재는 UI 프로토타입입니다">선택한 파일은 브라우저 밖으로 전송되지 않습니다. 실제 파싱 API와 단기보관 정책 연결 전 화면 흐름만 검증합니다.</Notice>
               </div>
