@@ -43,6 +43,10 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key
 
 `service_role` 또는 secret key는 브라우저 코드와 `NEXT_PUBLIC_` 환경변수에 넣지 않습니다.
 
+## Python 백엔드
+
+`backend/`에 상담 챗봇(`chatbot/`)과 판결문 형식 검사(`documents/`)가 있습니다. 실행 방법은 [backend/README.md](backend/README.md)를 참고하세요.
+
 ## 검증
 
 ```bash
@@ -62,7 +66,7 @@ npm run build
 ## 후속 연결
 
 - Supabase Auth Site URL과 이메일 Redirect URL 확정
-- 판결문 파싱 API와 단기 보관·폐기 작업 연결
+- 판결문 형식 검사 API 운영 검증 및 필요 시 OCR·단기 보관·폐기 정책 연결
 - 사건·집행·결과 스키마와 RLS 연결
 - 관리자 `profiles.role` 서버 검증
 - 법률·개인정보 안내문 전문가 검토
