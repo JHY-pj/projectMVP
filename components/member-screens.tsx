@@ -501,9 +501,9 @@ function ReportView() {
 }
 
 type PlanEntry = { id: string; note: string; reference: string; updatedAt: string }
-type PlanItem = { id: string; title: string; description: string; action: string; initialStatus: "완료" | "확인 필요" | "대기"; guide: string }
+type PlanItem = { id: string; title: string; description: string; action: string; initialStatus: "확인 필요" | "대기"; guide: string }
 const planItems: PlanItem[] = [
-  { id: "judgment", title: "집행권원과 확정 여부 확인", description: "판결문·확정증명 등 집행권원 관련 자료를 확인합니다.", action: "증빙 관리", initialStatus: "완료", guide: "판결문과 확정 여부를 확인할 수 있는 자료를 준비해 주세요. 문서 진위 및 확정 여부는 별도 검증이 필요합니다." },
+  { id: "judgment", title: "집행권원과 확정 여부 확인", description: "판결문·확정증명 등 집행권원 관련 자료를 확인합니다.", action: "증빙 관리", initialStatus: "확인 필요", guide: "판결문과 확정 여부를 확인할 수 있는 자료를 준비해 주세요. 문서 진위 및 확정 여부는 별도 검증이 필요합니다." },
   { id: "cost", title: "신청 비용·송달료 확인", description: "신청할 집행 절차에 따라 실제 비용을 확인해야 합니다.", action: "비용 등록", initialStatus: "확인 필요", guide: "법원·집행 절차별 신청 수수료와 송달료를 확인하고 금액 구간 또는 참고 근거를 기록하세요." },
   { id: "priority", title: "선순위 권리 여부 확인", description: "배당 가능성을 판단하기 위해 권리관계 증빙이 필요합니다.", action: "증빙 등록", initialStatus: "확인 필요", guide: "선순위 채권·담보권 여부를 확인한 경로와 결과를 기록하세요. 상대방의 직접식별정보는 입력하지 마세요." },
   { id: "target", title: "우선 검토할 집행 수단 선택", description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.", action: "집행 수단 관리", initialStatus: "대기", guide: "통장·급여·차량·부동산 등 검토 중인 수단과 그 이유를 기록하세요. 실제 착수 결정은 별도 판단이 필요합니다." },
@@ -512,7 +512,6 @@ const planStorageKey = "mvp-plan-demo-2026"
 
 function PlanView() {
   const [entries, setEntries] = useState<Record<string, PlanEntry[]>>({})
-  const [loaded, setLoaded] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [note, setNote] = useState("")
@@ -526,7 +525,6 @@ function PlanView() {
     } catch {
       toast.error("저장된 집행 계획 정보를 불러오지 못했습니다.")
     }
-    setLoaded(true)
   }, [])
 
   function persist(next: Record<string, PlanEntry[]>) {
@@ -584,16 +582,31 @@ function PlanView() {
     }
   }
 
+  function resetDemo() {
+    if (!window.confirm("이 브라우저에 저장된 집행 계획 시연 기록을 모두 초기화할까요?")) return
+    try {
+      window.localStorage.removeItem(planStorageKey)
+      setEntries({})
+      setActiveId(null)
+      setEditingId(null)
+      setNote("")
+      setReference("")
+      toast.success("시연 기록을 초기화했습니다.")
+    } catch {
+      toast.error("초기화에 실패했습니다.")
+    }
+  }
+
   const activeItem = planItems.find((item) => item.id === activeId)
-  const completedCount = planItems.filter((item) => item.initialStatus === "완료").length
+  const completedCount = 0 // 실제 검증 완료 데이터가 연결되기 전에는 완료로 표시하지 않음
   return (
     <>
-      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로</p><h2>집행 착수 전 확인 항목</h2></div><strong>{completedCount} / {planItems.length} 확인 완료</strong></div>
+      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로 · 데모</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>시연 기록 초기화</button></div></div>
       <Progress value={(completedCount / planItems.length) * 100} />
       <section className="checklist-panel">
         {planItems.map((item, index) => {
           const count = (entries[item.id] || []).length
-          const status = item.initialStatus === "완료" ? "완료" : count > 0 ? "검토중" : item.initialStatus
+          const status = count > 0 ? "검토중" : item.initialStatus
           return (
             <div className="plan-item" key={item.id}>
               <span className="plan-index">{index + 1}</span>
