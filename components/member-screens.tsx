@@ -391,12 +391,15 @@ export function CaseWizardScreen() {
               <label className="field"><span>부동산 단서</span><select value={signals.known_real_estate} onChange={(event) => setSignal("known_real_estate", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
               <label className="field"><span>차량 단서</span><select value={signals.known_vehicle} onChange={(event) => setSignal("known_vehicle", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
             </div>
-            <h3>현재 상태는 어떤가요?</h3>
-            <RadioGroup className="radio-list" value={status} onValueChange={setStatus}>
+            <section className="wizard-subsection" aria-labelledby="case-progress-heading">
+              <h3 id="case-progress-heading">현재 상태는 어떤가요?</h3>
+              <p>재산 단서와 별개로, 지금까지의 집행 진행·회수 상황을 선택해 주세요.</p>
+              <RadioGroup className="radio-list" value={status} onValueChange={setStatus}>
               {[["in_progress", "진행 중", "결과를 기다리고 있어요"], ["success_partial", "일부 회수", "채권 일부를 회수했어요"], ["fail_confirmed", "전혀 회수 못함", "현재까지 회수액이 없어요"], ["abandoned", "중단함", "비용·시간 등의 이유로 중단했어요"]].map(([value, label, hint]) => (
                 <label key={value}><RadioGroupItem value={value} /><span><strong>{label}</strong><small>{hint}</small></span></label>
               ))}
-            </RadioGroup>
+              </RadioGroup>
+            </section>
           </div>
         )}
         {step === 5 && (
