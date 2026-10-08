@@ -1,6 +1,7 @@
 "use client"
 
 import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
+import { ActionCard } from "@/components/common/panel"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -900,7 +901,7 @@ export function SettingsScreen() {
         <TabsContent value="profile"><section className="panel form-stack"><div><h2>프로필</h2><p>이메일은 Supabase Auth에서 관리하며 프로필 테이블에 중복 저장하지 않습니다.</p></div><label className="field"><span>이름 또는 별칭</span><input defaultValue="지현" /></label><label className="field"><span>이메일</span><input defaultValue="jihyun@example.com" disabled /></label><button className="button button-primary" onClick={() => toast.success("프로필이 저장되었습니다.")}>변경사항 저장</button></section></TabsContent>
         <TabsContent value="consent"><section className="panel"><div className="panel-heading"><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></div><div className="consent-history">{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <div key={String(title)}><div><strong>{String(title)}</strong><small>버전 {String(version)} · {String(required)}</small></div><StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge></div>)}</div></section></TabsContent>
         <TabsContent value="notification"><section className="panel setting-list"><div><span><strong>사건 상태 알림</strong><small>30일·60일 상태 확인</small></span><Switch defaultChecked /></div><div><span><strong>처리 결과 알림</strong><small>삭제·정정·문의 처리 결과</small></span><Switch defaultChecked /></div><div><span><strong>마케팅 알림</strong><small>서비스 소식과 참여 안내</small></span><Switch /></div></section></TabsContent>
-        <TabsContent value="rights"><div className="rights-grid"><section className="panel"><FontAwesomeIcon icon={faUserShield} /><h2>내 데이터 요청</h2><p>열람·정정·다운로드 요청을 접수할 수 있습니다.</p><button className="button button-outline" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</button></section><section className="danger-zone"><div><FontAwesomeIcon icon={faTrashCan} /><h2>회원 탈퇴</h2><p>탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다.</p></div><button className="button button-danger-outline">탈퇴 요청</button></section></div></TabsContent>
+        <TabsContent value="rights"><div className="rights-grid"><ActionCard icon={<FontAwesomeIcon icon={faUserShield} />} title="내 데이터 요청" description="열람·정정·다운로드 요청을 접수할 수 있습니다." action={<button className="button button-outline" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</button>} /><ActionCard danger icon={<FontAwesomeIcon icon={faTrashCan} />} title="회원 탈퇴" description="탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다." action={<button className="button button-danger-outline">탈퇴 요청</button>} /></div></TabsContent>
       </Tabs>
     </main>
   )
