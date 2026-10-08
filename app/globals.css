@@ -1205,6 +1205,11 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 /* Footer actions retain the standard button size, regardless of content wrappers. */
 .app-dialog-layout>[data-slot="dialog-footer"] .button,.app-dialog-layout>.plan-manage-footer .button{min-height:2.75rem;padding:.5625rem 1.125rem;font-size:.9375rem;line-height:normal}
 .plan-manage-content .field textarea{min-height:6rem}
+.plan-typed-entry{min-width:0;padding:1rem;border:1px solid var(--border);border-radius:.75rem;gap:.875rem}
+.plan-typed-entry h3{margin:0}
+.plan-typed-entry .field input[type="file"]{padding:.625rem .75rem;max-width:100%;font-size:.875rem}
+.plan-file-notice{margin:0;color:var(--gray-600);font-size:.8125rem;line-height:1.5}
+.plan-evidence-link{border:0;background:none;color:var(--navy-800);text-decoration:underline;text-align:left;overflow-wrap:anywhere;cursor:pointer;padding:0;font-size:.8125rem}
 .plan-new-entry{min-width:0}
 .plan-new-entry form{gap:.4375rem}
 .plan-new-entry label.field{color:var(--gray-700);font-size:.875rem;font-weight:600}
