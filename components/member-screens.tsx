@@ -500,7 +500,52 @@ function ReportView() {
   )
 }
 
-type PlanEntry = { id: string; note: string; reference: string; updatedAt: string }
+type PlanRecordType = "progress" | "cost" | "recovery"
+type PlanEntry = {
+  id: string; note: string; reference: string; updatedAt: string
+  type?: PlanRecordType; amount?: number; occurredOn?: string; category?: string
+  attachmentName?: string; attachmentType?: string
+}
+const planRecordLabels: Record<PlanRecordType, string> = { progress: "진행", cost: "비용", recovery: "회수" }
+const planFileDbName = "jibhaeng-plan-evidence"
+function planFileStore(mode: IDBTransactionMode): Promise<{ db: IDBDatabase; transaction: IDBTransaction; store: IDBObjectStore }> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(planFileDbName, 1)
+    request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains("files")) request.result.createObjectStore("files") }
+    request.onerror = () => reject(request.error)
+    request.onsuccess = () => {
+      const db = request.result
+      const transaction = db.transaction("files", mode)
+      resolve({ db, transaction, store: transaction.objectStore("files") })
+    }
+  })
+}
+async function writePlanFile(id: string, file: File): Promise<void> {
+  const { db, transaction, store } = await planFileStore("readwrite")
+  return new Promise((resolve, reject) => {
+    store.put(file, id)
+    transaction.oncomplete = () => { db.close(); resolve() }
+    transaction.onerror = () => { db.close(); reject(transaction.error) }
+    transaction.onabort = () => { db.close(); reject(transaction.error) }
+  })
+}
+async function readPlanFile(id: string): Promise<Blob | undefined> {
+  const { db, store } = await planFileStore("readonly")
+  return new Promise((resolve, reject) => {
+    const request = store.get(id)
+    request.onsuccess = () => { db.close(); resolve(request.result as Blob | undefined) }
+    request.onerror = () => { db.close(); reject(request.error) }
+  })
+}
+async function deletePlanFile(id: string): Promise<void> {
+  const { db, transaction, store } = await planFileStore("readwrite")
+  return new Promise((resolve, reject) => {
+    store.delete(id)
+    transaction.oncomplete = () => { db.close(); resolve() }
+    transaction.onerror = () => { db.close(); reject(transaction.error) }
+    transaction.onabort = () => { db.close(); reject(transaction.error) }
+  })
+}
 type PlanItem = { id: string; title: string; description: string; action: string; initialStatus: "확인 필요" | "대기"; guide: string }
 const planItems: PlanItem[] = [
   { id: "judgment", title: "집행권원과 확정 여부 확인", description: "판결문·확정증명 등 집행권원 관련 자료를 확인합니다.", action: "증빙 관리", initialStatus: "확인 필요", guide: "판결문과 확정 여부를 확인할 수 있는 자료를 준비해 주세요. 문서 진위 및 확정 여부는 별도 검증이 필요합니다." },
@@ -516,6 +561,7 @@ function PlanView() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [note, setNote] = useState("")
   const [reference, setReference] = useState("")
+  const [recordType, setRecordType] = useState<PlanRecordType>("progress")
 
   // Browser-only demo persistence; no evidence files or personal identifiers are stored.
   useEffect(() => {
@@ -601,10 +647,67 @@ function PlanView() {
     }
   }
 
+  async function saveTypedEntry(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!activeId) return
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const type = String(data.get("type")) as PlanRecordType
+    if (!["progress", "cost", "recovery"].includes(type)) return
+    const noteValue = String(data.get("description") || "").trim()
+    const amountRaw = String(data.get("amount") || "").trim()
+    const amount = amountRaw ? Number(amountRaw) : undefined
+    if (!noteValue || (type !== "progress" && (!amount || !Number.isSafeInteger(amount) || amount <= 0))) {
+      toast.error("내용과 유효한 금액을 입력해 주세요.")
+      return
+    }
+    const fileValue = data.get("evidence")
+    const file = fileValue instanceof File && fileValue.size > 0 ? fileValue : undefined
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"]
+    if (file && (!allowedTypes.includes(file.type) || file.size > 10 * 1024 * 1024)) {
+      toast.error("증빙은 PDF, JPG, PNG 파일만 가능하며 최대 10MB입니다.")
+      return
+    }
+    const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
+    const entry: PlanEntry = {
+      id, type, note: noteValue, reference: "", updatedAt: new Date().toLocaleDateString("ko-KR"),
+      occurredOn: String(data.get("occurredOn") || ""), category: String(data.get("category") || "").trim(),
+      amount: type === "progress" ? undefined : amount,
+      attachmentName: file?.name, attachmentType: file?.type,
+    }
+    try {
+      if (file) await writePlanFile(id, file)
+      if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) {
+        toast.success("기록을 등록했습니다.")
+        form.reset()
+      } else if (file) await deletePlanFile(id)
+    } catch {
+      toast.error("증빙 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
+    }
+  }
+
+  async function downloadPlanEvidence(entry: PlanEntry) {
+    try {
+      const blob = await readPlanFile(entry.id)
+      if (!blob) { toast.error("이 브라우저에서 첨부파일을 찾을 수 없습니다."); return }
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = entry.attachmentName || "evidence"
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch {
+      toast.error("첨부파일을 열 수 없습니다.")
+    }
+  }
+
   function deleteEntry(id: string) {
     if (!activeId || !window.confirm("이 기록을 삭제할까요? 삭제 후 복구할 수 없습니다.")) return
     const nextEntries = (entries[activeId] || []).filter((entry) => entry.id !== id)
     if (persist({ ...entries, [activeId]: nextEntries })) {
+      void deletePlanFile(id).catch(() => toast.error("첨부파일 삭제에 실패했습니다."))
       if (editingId === id) { setEditingId(null); setNote(""); setReference("") }
       toast.success("기록을 삭제했습니다.")
     }
@@ -614,6 +717,7 @@ function PlanView() {
     if (!window.confirm("이 브라우저에 저장된 집행 계획 시연 기록을 모두 초기화할까요?")) return
     try {
       window.localStorage.removeItem(planStorageKey)
+      for (const item of Object.values(entries).flat()) void deletePlanFile(item.id).catch(() => toast.error("일부 첨부파일 삭제에 실패했습니다."))
       setEntries({})
       setActiveId(null)
       setEditingId(null)
@@ -673,7 +777,15 @@ function PlanView() {
                       </form>
                     ) : (
                       <>
-                        <div><strong>{entry.note}</strong>{entry.reference && <small>확인 근거: {entry.reference}</small>}<small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small></div>
+                        <div>
+                          <strong>{entry.type ? `[${planRecordLabels[entry.type]}] ` : ""}{entry.note}</strong>
+                          {entry.category && <small>항목: {entry.category}</small>}
+                          {entry.amount !== undefined && <small>{entry.type === "recovery" ? "회수금액" : "지출금액"}: {entry.amount.toLocaleString("ko-KR")}원</small>}
+                          {entry.occurredOn && <small>발생일: {entry.occurredOn}</small>}
+                          {entry.reference && <small>확인 근거: {entry.reference}</small>}
+                          {entry.attachmentName && <button type="button" className="plan-evidence-link" onClick={() => downloadPlanEvidence(entry)}>첨부파일: {entry.attachmentName} (다운로드)</button>}
+                          <small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small>
+                        </div>
                         <div className="plan-record-actions">
                           <button type="button" className="button button-outline" onClick={() => startEdit(entry)}>수정</button>
                           <button type="button" className="button button-outline" onClick={() => deleteEntry(entry.id)}>삭제</button>
@@ -684,6 +796,21 @@ function PlanView() {
                 ))}
               </ul>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
+            <form className="form-stack plan-typed-entry" onSubmit={saveTypedEntry}>
+              <h3>진행 · 비용 · 회수 기록</h3>
+              <label className="field"><span>기록 유형</span><select name="type" value={recordType} onChange={(event) => setRecordType(event.target.value as PlanRecordType)}>
+                <option value="progress">진행</option><option value="cost">비용</option><option value="recovery">회수</option>
+              </select></label>
+              <label className="field"><span>발생일</span><input name="occurredOn" type="date" required /></label>
+              {recordType !== "progress" && <>
+                <label className="field"><span>{recordType === "cost" ? "비용 항목" : "회수 구분"}</span><input name="category" maxLength={100} required placeholder={recordType === "cost" ? "예: 송달료, 인지대, 법무사 수수료" : "예: 일부 변제, 추심"} /></label>
+                <label className="field"><span>{recordType === "cost" ? "지출금액 (원)" : "회수금액 (원)"}</span><input name="amount" type="number" min="1" step="1" required /></label>
+              </>}
+              <label className="field"><span>기록 내용</span><textarea name="description" maxLength={1000} required placeholder="진행 상황 또는 지출·회수 내용을 입력하세요." /></label>
+              <label className="field"><span>증빙자료 (선택)</span><input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" /></label>
+              <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 첨부파일은 이 브라우저에만 저장되며 다른 기기에서는 볼 수 없습니다. 민감정보는 가린 후 첨부하세요.</p>
+              <div className="plan-record-actions"><button className="button button-primary" type="submit">기록 등록</button></div>
+            </form>
             <div className="form-stack plan-new-entry">
               <h3>새 기록 등록</h3>
               <form className="form-stack" onSubmit={saveEntry}>
