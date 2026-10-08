@@ -1192,7 +1192,6 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-manage-dialog{width:min(94vw,42rem)}
 
 .plan-manage-content{display:grid;align-content:start;gap:1rem;min-width:0}
-.plan-manage-footer{display:flex;justify-content:flex-end;align-items:center;gap:.5rem}
 .plan-manage-content>h3,.plan-manage-content form h3{margin:0;font-size:1rem}
 .plan-manage-content>p{margin:0;color:var(--gray-600)}
 .plan-record-list{list-style:none;padding:0;margin:0;display:grid;gap:.75rem}
@@ -1200,13 +1199,13 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-record-list li>div:first-child{display:grid;gap:.35rem;min-width:0;overflow-wrap:anywhere}
 .plan-record-list li small{color:var(--gray-600)}
 .plan-record-actions{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:flex-end}
-.plan-record-actions .button{min-height:2.25rem}
+/* Dialog content actions are one size smaller than dialog footer actions. */
+.app-dialog-layout .app-dialog-body .button,.app-dialog-layout .plan-manage-content .button{min-height:2.25rem;padding:.375rem .75rem;font-size:.8125rem;line-height:1.3}
+.app-dialog-layout>[data-slot="dialog-footer"] .button,.app-dialog-layout>.plan-manage-footer .button{min-height:2.75rem;padding:.5625rem 1.125rem;font-size:.9375rem}
 .plan-manage-content .field textarea{min-height:6rem}
 @media(max-width:47.5rem){
 .plan-manage-dialog{width:calc(100vw - 1.25rem)}
-.plan-manage-footer{flex-wrap:wrap}
-.plan-manage-footer .button{flex:1 1 auto}
-.plan-record-actions .button{flex:1 1 auto}
+.plan-record-actions .button{flex:0 0 auto}
 .plan-record-list li{padding:.75rem}
 }
 
