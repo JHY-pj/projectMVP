@@ -88,7 +88,7 @@ export function DashboardScreen() {
             <div className="case-card-top"><span className="case-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span><div><small>{demoCase.id}</small><h3>{demoCase.type} 청구 사건</h3></div><StatusBadge tone="info">{demoCase.status}</StatusBadge></div>
             <dl className="case-summary"><div><dt>채권 금액</dt><dd>{demoCase.amount}</dd></div><div><dt>데이터 충분도</dt><dd>{demoCase.sufficiency}%</dd></div><div><dt>최근 갱신</dt><dd>{demoCase.updatedAt}</dd></div></dl>
             <Progress value={demoCase.sufficiency} aria-label={`데이터 충분도 ${demoCase.sufficiency}%`} />
-            <div className="case-actions"><Link className="button button-outline" href="/app/cases/demo-2026">사건 상세</Link><Link className="button button-primary" href="/app/cases/demo-2026/report">리포트 보기</Link></div>
+            <div className="case-actions"><Link className="button button-outline button-small" href="/app/cases/demo-2026">사건 상세</Link><Link className="button button-primary button-small" href="/app/cases/demo-2026/report">리포트 보기</Link></div>
           </article>
         </section>
         <aside className="panel motion-enter trans">
@@ -148,7 +148,7 @@ export function CaseListScreen() {
             </div>
             <div className="case-list-next"><small>다음 할 일</small><strong>{item.next}</strong></div>
             <div className="case-list-meta"><StatusBadge tone={item.tone}>{item.status}</StatusBadge><small>최근 업데이트 {item.updatedAt}</small></div>
-            <Link className="button button-outline" href={`/app/cases/${item.id}`}>사건 보기 <FontAwesomeIcon icon={faChevronRight} /></Link>
+            <Link className="button button-outline button-small" href={`/app/cases/${item.id}`}>사건 보기 <FontAwesomeIcon icon={faChevronRight} /></Link>
           </article>
         ))}
       </section>
@@ -483,7 +483,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases/demo-2026" }, { label: demoCase.id }]} />
       <section className="case-identity">
         <div><div className="eyebrow">{demoCase.id}</div><h1>{demoCase.type} 청구 사건</h1><p>{demoCase.amount} · 최근 업데이트 {demoCase.updatedAt}</p></div>
-        <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary" href="/app/cases/demo-2026/result">결과 수정</Link></div>
+        <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary button-small" href="/app/cases/demo-2026/result">결과 수정</Link></div>
       </section>
       <Tabs value={active} onValueChange={(value) => router.push(`/app/cases/${caseId}${value === "summary" ? "" : `/${value}`}`)}>
         <TabsList variant="line" className="case-tabs">
@@ -779,7 +779,7 @@ function PlanView() {
                         <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} /></label>
                         {editingEntry?.attachmentName && <label className="plan-file-notice"><input type="checkbox" checked={removeFile} onChange={(event) => setRemoveFile(event.target.checked)} /> 기존 첨부파일 삭제</label>}
                         <label className="field"><span>증빙파일 교체 (선택)</span><input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => setEditFile(event.target.files?.[0] || null)} /></label>
-                        <div className="plan-record-actions"><button type="button" className="button button-outline" onClick={cancelEdit}>취소</button><button type="submit" className="button button-primary">변경 저장</button></div>
+                        <div className="plan-record-actions"><button type="button" className="button button-outline button-small" onClick={cancelEdit}>취소</button><button type="submit" className="button button-primary">변경 저장</button></div>
                       </form>
                     ) : (
                       <>
@@ -793,8 +793,8 @@ function PlanView() {
                           <small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small>
                         </div>
                         <div className="plan-record-actions">
-                          <button type="button" className="button button-outline" onClick={() => startEdit(entry)}>수정</button>
-                          <button type="button" className="button button-outline" onClick={() => deleteEntry(entry.id)}>삭제</button>
+                          <button type="button" className="button button-outline button-small" onClick={() => startEdit(entry)}>수정</button>
+                          <button type="button" className="button button-outline button-small" onClick={() => deleteEntry(entry.id)}>삭제</button>
                         </div>
                       </>
                     )}
@@ -901,7 +901,7 @@ export function SettingsScreen() {
         <TabsContent value="profile"><section className="panel form-stack"><div><h2>프로필</h2><p>이메일은 Supabase Auth에서 관리하며 프로필 테이블에 중복 저장하지 않습니다.</p></div><label className="field"><span>이름 또는 별칭</span><input defaultValue="지현" /></label><label className="field"><span>이메일</span><input defaultValue="jihyun@example.com" disabled /></label><button className="button button-primary" onClick={() => toast.success("프로필이 저장되었습니다.")}>변경사항 저장</button></section></TabsContent>
         <TabsContent value="consent"><section className="panel"><div className="panel-heading"><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></div><div className="consent-history">{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <div key={String(title)}><div><strong>{String(title)}</strong><small>버전 {String(version)} · {String(required)}</small></div><StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge></div>)}</div></section></TabsContent>
         <TabsContent value="notification"><section className="panel setting-list"><div><span><strong>사건 상태 알림</strong><small>30일·60일 상태 확인</small></span><Switch defaultChecked /></div><div><span><strong>처리 결과 알림</strong><small>삭제·정정·문의 처리 결과</small></span><Switch defaultChecked /></div><div><span><strong>마케팅 알림</strong><small>서비스 소식과 참여 안내</small></span><Switch /></div></section></TabsContent>
-        <TabsContent value="rights"><div className="rights-grid"><ActionCard icon={<FontAwesomeIcon icon={faUserShield} />} title="내 데이터 요청" description="열람·정정·다운로드 요청을 접수할 수 있습니다." action={<button className="button button-outline" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</button>} /><ActionCard danger icon={<FontAwesomeIcon icon={faTrashCan} />} title="회원 탈퇴" description="탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다." action={<button className="button button-danger-outline">탈퇴 요청</button>} /></div></TabsContent>
+        <TabsContent value="rights"><div className="rights-grid"><ActionCard icon={<FontAwesomeIcon icon={faUserShield} />} title="내 데이터 요청" description="열람·정정·다운로드 요청을 접수할 수 있습니다." action={<button className="button button-outline button-small" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</button>} /><ActionCard danger icon={<FontAwesomeIcon icon={faTrashCan} />} title="회원 탈퇴" description="탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다." action={<button className="button button-danger-outline button-small">탈퇴 요청</button>} /></div></TabsContent>
       </Tabs>
     </main>
   )
