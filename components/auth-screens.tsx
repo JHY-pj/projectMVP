@@ -1,5 +1,6 @@
-import { SignupConsent } from "@/components/auth/signup-consent"
 "use client"
+
+import { SignupConsent } from "@/components/auth/signup-consent"
 
 import { Notice, PageHeader } from "@/components/screen-kit"
 import { Checkbox } from "@/components/ui/checkbox"
