@@ -1200,8 +1200,10 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-record-list li small{color:var(--gray-600)}
 .plan-record-actions{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:flex-end}
 /* Dialog content actions are one size smaller than dialog footer actions. */
-.app-dialog-layout .app-dialog-body .button,.app-dialog-layout .plan-manage-content .button{min-height:2.25rem;padding:.375rem .75rem;font-size:.8125rem;line-height:1.3}
-.app-dialog-layout>[data-slot="dialog-footer"] .button,.app-dialog-layout>.plan-manage-footer .button{min-height:2.75rem;padding:.5625rem 1.125rem;font-size:.9375rem}
+/* Default: every action inside a dialog is one step smaller than footer actions. */
+.app-dialog-layout .button{min-height:2.25rem;padding:.375rem .75rem;font-size:.8125rem;line-height:1.3}
+/* Footer actions retain the standard button size, regardless of content wrappers. */
+.app-dialog-layout>[data-slot="dialog-footer"] .button,.app-dialog-layout>.plan-manage-footer .button{min-height:2.75rem;padding:.5625rem 1.125rem;font-size:.9375rem;line-height:normal}
 .plan-manage-content .field textarea{min-height:6rem}
 @media(max-width:47.5rem){
 .plan-manage-dialog{width:calc(100vw - 1.25rem)}
