@@ -1289,6 +1289,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .signup-consent-final{margin-top:.25rem}
 @media(max-width:30rem){.signup-consent-row{align-items:flex-start;flex-direction:column}.legal-consent-dialog .app-dialog-layout{padding:1rem}}
 
-/* Auth layout: keep breathing room even when the form grows taller than the viewport. */
-.auth-main{padding-block:3rem}
-@media (max-width:47.5rem){.auth-main{padding-block:1.5rem}}
+/* Auth layout: only the form column gets vertical breathing room; the aside stays flush. */
+.auth-main{padding-block:0}
+.auth-card{margin-block:3rem}
+@media (max-width:47.5rem){.auth-card{margin-block:1.5rem}}
