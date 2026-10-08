@@ -585,13 +585,13 @@ function PlanView() {
     const data = new FormData(form)
     const newNote = String(data.get("note") || "").trim()
     const newReference = String(data.get("reference") || "").trim()
-    if (!newNote) {
-      toast.error("확인 내용 또는 검토 결과를 입력해 주세요.")
+    if (!newNote && !newReference) {
+      toast.error("등록할 내용을 입력해 주세요.")
       return
     }
     const entry: PlanEntry = {
       id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()),
-      note: newNote,
+      note: newNote || "확인 근거 등록",
       reference: newReference,
       updatedAt: new Date().toLocaleDateString("ko-KR"),
     }
@@ -684,15 +684,23 @@ function PlanView() {
                 ))}
               </ul>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
-            <form id="plan-entry-form" className="form-stack" onSubmit={saveEntry}>
+            <div className="form-stack plan-new-entry">
               <h3>새 기록 등록</h3>
-              <label className="field"><span>확인 내용 / 검토 결과</span><textarea name="note" maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
-              <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
-              <div className="plan-record-actions">
-                <button className="button button-outline" type="reset">초기화</button>
-                <button className="button button-primary" type="submit">기록 등록</button>
-              </div>
-            </form>
+              <form className="form-stack" onSubmit={saveEntry}>
+                <label className="field" htmlFor="plan-new-note">확인 내용 / 검토 결과</label>
+                <div className="plan-input-action">
+                  <textarea id="plan-new-note" name="note" maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." />
+                  <button className="button button-primary" type="submit">등록</button>
+                </div>
+              </form>
+              <form className="form-stack" onSubmit={saveEntry}>
+                <label className="field" htmlFor="plan-new-reference">확인 근거 (선택)</label>
+                <div className="plan-input-action">
+                  <input id="plan-new-reference" name="reference" maxLength={200} required placeholder="예: 법원 안내문 확인, 비용 구간 확인" />
+                  <button className="button button-primary" type="submit">등록</button>
+                </div>
+              </form>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
