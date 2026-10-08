@@ -1275,3 +1275,16 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .action-card-danger{border-color:#efaaa6;background:#fff7f6}
 .action-card-danger .action-card-icon{color:var(--red-700)}
 @media(max-width:47.5rem){.rights-grid{grid-template-columns:minmax(0,1fr)}.action-card{min-height:0}}
+
+/* Shared legal document modal and signup completion states */
+.legal-consent-dialog{width:min(42rem,calc(100vw - 2rem));max-width:42rem;max-height:min(85vh,50rem)}
+.legal-consent-dialog .app-dialog-layout{display:flex;flex-direction:column;min-height:0;max-height:inherit;padding:1.5rem;gap:1rem}
+.legal-consent-scroll{overflow-y:auto;min-height:0;flex:1;padding-right:.5rem}
+.legal-consent-scroll .legal-section{margin-top:1rem}
+.legal-consent-warning{font-size:.875rem;color:var(--red-700)}
+.signup-consent{display:flex;flex-direction:column;gap:.75rem}
+.signup-consent-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem;border:1px solid var(--border);border-radius:.75rem}
+.signup-consent-row .button{flex-shrink:0}
+.signup-consent-state{margin-left:.5rem;color:var(--gray-600);font-size:.875rem}
+.signup-consent-final{margin-top:.25rem}
+@media(max-width:30rem){.signup-consent-row{align-items:flex-start;flex-direction:column}.legal-consent-dialog .app-dialog-layout{padding:1rem}}
