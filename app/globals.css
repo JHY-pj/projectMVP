@@ -1256,3 +1256,11 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-inline-editor .field{min-width:0}
 .plan-inline-editor textarea{min-height:6rem}
 .plan-inline-editor .plan-record-actions{margin-top:.25rem}
+
+/* Case-wide deletion review lock */
+.case-deletion-pending{max-width:45rem;margin:2rem auto;padding:2rem;display:grid;justify-items:start;gap:1rem}
+.case-deletion-pending h1{margin:0;font-size:clamp(1.375rem,2.5vw,1.875rem);line-height:1.35}
+.case-deletion-pending p{margin:0;color:var(--gray-700);line-height:1.7}
+.case-deletion-pending .case-deletion-pending-note{font-size:.875rem;color:var(--gray-600)}
+.case-deletion-pending-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem}
+@media(max-width:47.5rem){.case-deletion-pending{margin:1rem auto;padding:1.25rem}.case-deletion-pending-actions{width:100%}.case-deletion-pending-actions .button{flex:1 1 auto;text-align:center}}
