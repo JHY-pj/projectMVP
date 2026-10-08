@@ -1231,3 +1231,8 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .app-dialog-layout>.app-dialog-body,.app-dialog-layout>.plan-manage-content{padding:1rem}
 .app-dialog-layout>[data-slot="dialog-footer"],.app-dialog-layout>.plan-manage-footer{padding:.75rem 1rem}
 }
+
+.plan-inline-editor{width:100%;min-width:0}
+.plan-inline-editor .field{min-width:0}
+.plan-inline-editor textarea{min-height:6rem}
+.plan-inline-editor .plan-record-actions{margin-top:.25rem}
