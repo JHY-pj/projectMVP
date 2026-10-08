@@ -551,25 +551,53 @@ function PlanView() {
     setReference(entry.reference)
   }
 
-  function saveEntry(event: FormEvent) {
+  function cancelEdit() {
+    setEditingId(null)
+    setNote("")
+    setReference("")
+  }
+
+  function saveEdit(event: FormEvent) {
     event.preventDefault()
-    if (!activeId || !note.trim()) {
+    if (!activeId || !editingId || !note.trim()) {
       toast.error("확인 내용 또는 검토 결과를 입력해 주세요.")
       return
     }
     const current = entries[activeId] || []
+    if (!current.some((item) => item.id === editingId)) {
+      toast.error("수정할 기록을 찾을 수 없습니다.")
+      cancelEdit()
+      return
+    }
+    const next = current.map((item) => item.id === editingId
+      ? { ...item, note: note.trim(), reference: reference.trim(), updatedAt: new Date().toLocaleDateString("ko-KR") }
+      : item)
+    if (persist({ ...entries, [activeId]: next })) {
+      toast.success("기록을 수정했습니다.")
+      cancelEdit()
+    }
+  }
+
+  function saveEntry(event: FormEvent) {
+    event.preventDefault()
+    if (!activeId) return
+    const form = event.currentTarget as HTMLFormElement
+    const data = new FormData(form)
+    const newNote = String(data.get("note") || "").trim()
+    const newReference = String(data.get("reference") || "").trim()
+    if (!newNote) {
+      toast.error("확인 내용 또는 검토 결과를 입력해 주세요.")
+      return
+    }
     const entry: PlanEntry = {
-      id: editingId || (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())),
-      note: note.trim(),
-      reference: reference.trim(),
+      id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()),
+      note: newNote,
+      reference: newReference,
       updatedAt: new Date().toLocaleDateString("ko-KR"),
     }
-    const nextEntries = editingId ? current.map((item) => item.id === editingId ? entry : item) : [...current, entry]
-    if (persist({ ...entries, [activeId]: nextEntries })) {
-      toast.success(editingId ? "기록을 수정했습니다." : "기록을 등록했습니다.")
-      setEditingId(null)
-      setNote("")
-      setReference("")
+    if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) {
+      toast.success("기록을 등록했습니다.")
+      form.reset()
     }
   }
 
@@ -634,25 +662,37 @@ function PlanView() {
               <ul className="plan-record-list">
                 {entries[activeId].map((entry) => (
                   <li key={entry.id}>
-                    <div><strong>{entry.note}</strong>{entry.reference && <small>확인 근거: {entry.reference}</small>}<small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small></div>
-                    <div className="plan-record-actions">
-                      <button type="button" className="button button-outline" onClick={() => startEdit(entry)}>수정</button>
-                      <button type="button" className="button button-outline" onClick={() => deleteEntry(entry.id)}>삭제</button>
-                    </div>
+                    {editingId === entry.id ? (
+                      <form className="form-stack plan-inline-editor" onSubmit={saveEdit}>
+                        <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required autoFocus /></label>
+                        <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} /></label>
+                        <div className="plan-record-actions">
+                          <button type="button" className="button button-outline" onClick={cancelEdit}>취소</button>
+                          <button type="submit" className="button button-primary">변경 저장</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <div><strong>{entry.note}</strong>{entry.reference && <small>확인 근거: {entry.reference}</small>}<small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small></div>
+                        <div className="plan-record-actions">
+                          <button type="button" className="button button-outline" onClick={() => startEdit(entry)}>수정</button>
+                          <button type="button" className="button button-outline" onClick={() => deleteEntry(entry.id)}>삭제</button>
+                        </div>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
             <form id="plan-entry-form" className="form-stack" onSubmit={saveEntry}>
-              <h3>{editingId ? "기록 수정" : "새 기록 등록"}</h3>
-              <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
-              <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
+              <h3>새 기록 등록</h3>
+              <label className="field"><span>확인 내용 / 검토 결과</span><textarea name="note" maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
+              <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
             </form>
           </div>
           <div className="plan-manage-footer">
-            {editingId && <button type="button" className="button button-outline" onClick={() => { setEditingId(null); setNote(""); setReference("") }}>수정 취소</button>}
             <button className="button button-outline" type="button" onClick={() => setActiveId(null)}>닫기</button>
-            <button className="button button-primary" type="submit" form="plan-entry-form">{editingId ? "변경 저장" : "기록 등록"}</button>
+            <button className="button button-primary" type="submit" form="plan-entry-form">기록 등록</button>
           </div>
         </DialogContent>
       </Dialog>
