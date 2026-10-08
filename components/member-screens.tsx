@@ -433,10 +433,48 @@ const caseTabs = [
   ["data", "데이터 관리", `/app/cases/demo-2026/data`],
 ]
 
+const caseDeletionKey = "jibhaeng-case-deletion-demo-2026"
+const caseDeletionEvent = "jibhaeng-case-deletion-changed"
+function getCaseDeletionPending() {
+  try { return window.localStorage.getItem(caseDeletionKey) === "requested" } catch { return false }
+}
+
 export function CaseDetailScreen({ section = "summary" }: { section?: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const active = caseTabs.find(([, , href]) => href === pathname)?.[0] ?? section
+  const [deletionPending, setDeletionPending] = useState<boolean | null>(null)
+  useEffect(() => {
+    const sync = () => setDeletionPending(getCaseDeletionPending())
+    sync()
+    window.addEventListener("storage", sync)
+    window.addEventListener(caseDeletionEvent, sync)
+    return () => { window.removeEventListener("storage", sync); window.removeEventListener(caseDeletionEvent, sync) }
+  }, [])
+
+  if (deletionPending === null) return <main id="main-content" className="content-width page-main case-detail-main" aria-busy="true" />
+  if (deletionPending) return (
+    <main id="main-content" className="content-width page-main case-detail-main">
+      <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases" }, { label: demoCase.id }]} />
+      <section className="panel case-deletion-pending" role="status">
+        <StatusBadge tone="warning">삭제 검토 중</StatusBadge>
+        <h1>사건 삭제 요청을 검토 중입니다</h1>
+        <p>해당 사건의 삭제 요청이 접수되어 검토 중입니다. 검토가 끝나거나 요청이 취소될 때까지 이 사건의 모든 상세 화면과 기록 기능을 이용할 수 없습니다.</p>
+        <p className="case-deletion-pending-note">현재는 브라우저에 저장되는 시연 상태이며 실제 운영자에게 요청이 전송되지는 않습니다.</p>
+        <div className="case-deletion-pending-actions">
+          <Link className="button button-outline" href="/app/cases">내 사건 목록</Link>
+          <button type="button" className="button button-primary" onClick={() => {
+            if (!window.confirm("사건 삭제 요청을 취소하고 다시 이용할까요?")) return
+            try {
+              window.localStorage.removeItem(caseDeletionKey)
+              window.dispatchEvent(new Event(caseDeletionEvent))
+              toast.success("삭제 요청을 취소했습니다.")
+            } catch { toast.error("삭제 요청 취소에 실패했습니다.") }
+          }}>삭제 요청 취소</button>
+        </div>
+      </section>
+    </main>
+  )
 
   return (
     <main id="main-content" className="content-width page-main case-detail-main">
@@ -828,7 +866,14 @@ function DataView() {
   return (
     <>
       <section className="panel"><div className="panel-heading"><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>대여금</dd></div><div><dt>금액</dt><dd>300만~500만 원</dd></div><div><dt>지역</dt><dd>수도권</dd></div><div><dt>경과 기간</dt><dd>1년 미만</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></dl></section>
-      <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><button className="button button-danger-outline"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><div className="app-dialog-body"><div className="delete-request-notice"><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></div><p className="delete-request-summary">삭제 요청은 운영 검토 후 처리됩니다.</p></div><DialogFooter><button className="button button-danger" onClick={() => { toast.success("삭제 요청이 접수되었습니다."); setDeleteDialogOpen(false) }}>삭제 요청 접수</button></DialogFooter></DialogContent></Dialog></section>
+      <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><button className="button button-danger-outline"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><div className="app-dialog-body"><div className="delete-request-notice"><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></div><p className="delete-request-summary">삭제 요청은 운영 검토 후 처리됩니다.</p></div><DialogFooter><button className="button button-danger" onClick={() => {
+          try {
+            window.localStorage.setItem(caseDeletionKey, "requested")
+            window.dispatchEvent(new Event(caseDeletionEvent))
+            toast.success("삭제 요청이 접수되었습니다.")
+            setDeleteDialogOpen(false)
+          } catch { toast.error("삭제 요청을 저장하지 못했습니다.") }
+        }}>삭제 요청 접수</button></DialogFooter></DialogContent></Dialog></section>
     </>
   )
 }
