@@ -624,7 +624,7 @@ function PlanView() {
       <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">기록을 등록하면 검토중으로 표시합니다. 사용자가 직접 완료 처리하지 않으며, 완료는 운영 검증 이후 반영할 예정입니다. 현재 기록은 이 브라우저에만 임시 저장됩니다.</Notice>
       <Dialog open={Boolean(activeItem)} onOpenChange={(open) => { if (!open) { setActiveId(null); setEditingId(null); setNote(""); setReference("") } }}>
         <DialogContent className="plan-manage-dialog">
-          <DialogHeader>
+          <DialogHeader className="plan-manage-header">
             <DialogTitle>{activeItem?.title || "집행 계획 관리"}</DialogTitle>
             <DialogDescription>{activeItem?.guide}</DialogDescription>
           </DialogHeader>
@@ -643,15 +643,16 @@ function PlanView() {
                 ))}
               </ul>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
-            <form className="form-stack" onSubmit={saveEntry}>
+            <form id="plan-entry-form" className="form-stack" onSubmit={saveEntry}>
               <h3>{editingId ? "기록 수정" : "새 기록 등록"}</h3>
               <label className="field"><span>확인 내용 / 검토 결과</span><textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." /></label>
               <label className="field"><span>확인 근거 (선택)</span><input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
-              <div className="plan-record-actions">
-                {editingId && <button type="button" className="button button-outline" onClick={() => { setEditingId(null); setNote(""); setReference("") }}>수정 취소</button>}
-                <button className="button button-primary" type="submit">{editingId ? "변경 저장" : "기록 등록"}</button>
-              </div>
             </form>
+          </div>
+          <div className="plan-manage-footer">
+            {editingId && <button type="button" className="button button-outline" onClick={() => { setEditingId(null); setNote(""); setReference("") }}>수정 취소</button>}
+            <button className="button button-outline" type="button" onClick={() => setActiveId(null)}>닫기</button>
+            <button className="button button-primary" type="submit" form="plan-entry-form">{editingId ? "변경 저장" : "기록 등록"}</button>
           </div>
         </DialogContent>
       </Dialog>
