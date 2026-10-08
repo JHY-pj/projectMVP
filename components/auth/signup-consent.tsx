@@ -20,11 +20,11 @@ export function SignupConsent({ onChange }: { onChange: (complete: boolean) => v
     <div className="signup-consent">
       <div className="signup-consent-row">
         <span><strong>[필수]</strong> 이용약관 <span className="signup-consent-state">{termsDone ? "완료" : "미완료"}</span></span>
-        <button type="button" className="button button-outline" onClick={() => setActive("terms")}>{termsDone ? "다시 보기" : "내용 보기"}</button>
+        <button type="button" className="button button-outline button-small" onClick={() => setActive("terms")}>{termsDone ? "다시 보기" : "내용 보기"}</button>
       </div>
       <div className="signup-consent-row">
         <span><strong>[필수]</strong> 개인정보 수집·이용 동의 <span className="signup-consent-state">{privacyDone ? "완료" : "미완료"}</span></span>
-        <button type="button" className="button button-outline" onClick={() => setActive("privacy")}>{privacyDone ? "다시 보기" : "내용 보기"}</button>
+        <button type="button" className="button button-outline button-small" onClick={() => setActive("privacy")}>{privacyDone ? "다시 보기" : "내용 보기"}</button>
       </div>
       <div className="checkbox-row signup-consent-final">
         <Checkbox checked={termsDone && privacyDone} disabled aria-label="필수 동의 완료 상태" />
