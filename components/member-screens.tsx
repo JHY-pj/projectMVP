@@ -226,7 +226,15 @@ export function CaseWizardScreen() {
 
   function next() {
     if (step === 2 && method === "upload" && judgmentCheck !== "true") {
-      toast.error("판결문 PDF 형식 확인이 완료되어야 다음 단계로 진행할 수 있습니다.")
+      toast.error(
+        judgmentCheck === "false"
+          ? "업로드한 파일이 민사 판결문 형식으로 확인되지 않았습니다. 판결문 PDF를 다시 선택해 주세요."
+          : judgmentCheck === "unknown"
+            ? "업로드한 PDF가 판결문인지 확인할 수 없습니다. 다른 PDF를 선택하거나 직접 입력해 주세요."
+            : judgmentCheck === "checking"
+              ? "판결문 PDF를 확인하고 있습니다. 잠시 후 다시 시도해 주세요."
+              : "민사 판결문 PDF를 먼저 업로드해 주세요."
+      )
       return
     }
     if (step === 2 && method === "upload" && !documentConsent) {
