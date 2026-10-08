@@ -317,6 +317,8 @@ export function CaseWizardScreen() {
                   <span>PDF · 최대 10MB · 암호화 문서 제외</span>
                   <input type="file" accept=".pdf,application/pdf" onChange={(event) => {
                     const file = event.target.files?.[0]
+                    setJudgmentCheck("idle")
+                    setJudgmentMessage("")
                     if (!file) { setFileName(""); return }
                     const isPdf = file.name.toLowerCase().endsWith(".pdf") && (file.type === "application/pdf" || file.type === "")
                     if (!isPdf) {
