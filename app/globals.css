@@ -1218,9 +1218,9 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 /* Shared dialog layout: fixed header/footer, scrollable content only */
 .app-dialog{width:min(94vw,42rem);max-width:calc(100vw - 1.25rem);max-height:min(88dvh,50rem);overflow:hidden;min-height:0}
 .app-dialog-layout{display:flex;flex-direction:column;min-height:0;max-height:min(88dvh,50rem);width:100%}
-/* Only long, editable record dialogs keep a stable height when rows are added or removed. */
-.app-dialog.plan-manage-dialog{height:min(88dvh,50rem)}
-.app-dialog.plan-manage-dialog>.app-dialog-layout{height:100%;max-height:100%}
+/* Plan management dialog grows with content; the shared max-height limits long records. */
+.app-dialog.plan-manage-dialog{height:auto}
+.app-dialog.plan-manage-dialog>.app-dialog-layout{height:auto;max-height:min(88dvh,50rem)}
 .app-dialog-layout>[data-slot="dialog-header"]{flex:0 0 auto;padding:1.5rem 3.5rem 1rem 1.5rem;border-bottom:1px solid var(--border);min-width:0}
 .app-dialog-layout>[data-slot="dialog-footer"],.app-dialog-layout>.plan-manage-footer{flex:0 0 auto;padding:1rem 1.5rem;border-top:1px solid var(--border);background:var(--background,#fff)}
 .app-dialog-layout>.app-dialog-body,.app-dialog-layout>.plan-manage-content{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:1.25rem 1.5rem}
@@ -1229,7 +1229,7 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 @media(max-width:47.5rem){
 .app-dialog{width:calc(100vw - 1.25rem);max-height:85dvh}
 .app-dialog-layout{max-height:85dvh}
-.app-dialog.plan-manage-dialog{height:min(85dvh,46rem)}
+.app-dialog.plan-manage-dialog{height:auto}
 .app-dialog-layout>[data-slot="dialog-header"]{padding:1rem 3rem .875rem 1rem}
 .app-dialog-layout>.app-dialog-body,.app-dialog-layout>.plan-manage-content{padding:1rem}
 .app-dialog-layout>[data-slot="dialog-footer"],.app-dialog-layout>.plan-manage-footer{padding:.75rem 1rem}
