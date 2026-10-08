@@ -1205,3 +1205,6 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .plan-record-actions .button{flex:1 1 auto}
 .plan-record-list li{padding:.75rem}
 }
+
+.plan-heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:.75rem;flex-wrap:wrap}
+@media(max-width:47.5rem){.plan-heading-actions{justify-content:flex-start;width:100%}.plan-heading-actions .button{width:auto}}
