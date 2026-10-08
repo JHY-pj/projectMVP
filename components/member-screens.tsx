@@ -104,7 +104,7 @@ export function DashboardScreen() {
   )
 }
 
-const wizardSteps = ["대상 확인", "입력 방식", "사건 정보", "집행 경험", "정보 확인", "제출"]
+const wizardSteps = ["대상 확인", "입력 방식", "사건 정보", "집행 경험", "정보 확인 및 제출"]
 
 const caseTypeLabels: Record<string, string> = { loan: "대여금", sale: "매매대금", construction: "공사대금", other: "기타" }
 const amountLabels: Record<string, string> = { "under-100": "100만 원 미만", "100-300": "100만~300만 원", "300-500": "300만~500만 원" }
@@ -243,7 +243,7 @@ export function CaseWizardScreen() {
       toast.error("문서 처리 안내를 확인해 주세요.")
       return
     }
-    setStep((current) => Math.min(6, current + 1))
+    setStep((current) => Math.min(wizardSteps.length, current + 1))
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
@@ -405,27 +405,20 @@ export function CaseWizardScreen() {
           </div>
         )}
         {step === 5 && (
-          <div className="wizard-section">
-            <h2>분석에 사용할 정보를 확인해 주세요</h2>
-            <dl className="review-list">
+          <div className="wizard-section submit-summary">
+            <h2>입력 정보를 확인하고 제출해 주세요</h2>
+            <p>아래 내용을 확인한 뒤 사건을 등록할 수 있습니다. 수정할 내용이 있다면 이전 단계로 돌아가세요.</p>
+            <dl className="review-list submit-review-list">
               {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </dl>
             <Notice tone="info" title="추가 정보가 필요한 경우">데이터가 부족하면 점수를 단정하지 않고, 리포트에서 먼저 확인할 항목을 안내합니다.</Notice>
-          </div>
-        )}
-        {step === 6 && (
-          <div className="wizard-section submit-summary">
-            <span className="submit-icon"><FontAwesomeIcon icon={faFileCircleCheck} /></span>
-            <h2>사건을 등록할 준비가 되었습니다</h2>
-            <p>제출하면 룰 기반 시범 리포트가 생성됩니다. 입력 정보는 이후 사건 상세에서 수정할 수 있습니다.</p>
-            <dl className="review-list submit-review-list">{reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
           </div>
         )}
       </section>
       <div className="wizard-actions">
         {step > 1 ? <button className="button button-outline" onClick={previous}>이전</button> : <Link className="button button-outline" href="/app">취소</Link>}
-        {step < 6 ? <button className="button button-primary button-large" onClick={next}>다음 <FontAwesomeIcon icon={faArrowRight} /></button> : <button className="button button-primary button-large" onClick={submitCase}>사건 등록하고 리포트 보기 <FontAwesomeIcon icon={faArrowRight} /></button>}
+        {step < wizardSteps.length ? <button className="button button-primary button-large" onClick={next}>다음 <FontAwesomeIcon icon={faArrowRight} /></button> : <button className="button button-primary button-large" onClick={submitCase}>사건 등록하고 리포트 보기 <FontAwesomeIcon icon={faArrowRight} /></button>}
       </div>
     </main>
   )
