@@ -624,29 +624,6 @@ function PlanView() {
     }
   }
 
-  function saveEntry(event: FormEvent) {
-    event.preventDefault()
-    if (!activeId) return
-    const form = event.currentTarget as HTMLFormElement
-    const data = new FormData(form)
-    const newNote = String(data.get("note") || "").trim()
-    const newReference = String(data.get("reference") || "").trim()
-    if (!newNote && !newReference) {
-      toast.error("등록할 내용을 입력해 주세요.")
-      return
-    }
-    const entry: PlanEntry = {
-      id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()),
-      note: newNote || "확인 근거 등록",
-      reference: newReference,
-      updatedAt: new Date().toLocaleDateString("ko-KR"),
-    }
-    if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) {
-      toast.success("기록을 등록했습니다.")
-      form.reset()
-    }
-  }
-
   async function saveTypedEntry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!activeId) return
@@ -670,8 +647,9 @@ function PlanView() {
     }
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
     const entry: PlanEntry = {
-      id, type, note: noteValue, reference: "", updatedAt: new Date().toLocaleDateString("ko-KR"),
+      id, type, note: noteValue, updatedAt: new Date().toLocaleDateString("ko-KR"),
       occurredOn: String(data.get("occurredOn") || ""), category: String(data.get("category") || "").trim(),
+      reference: String(data.get("reference") || "").trim(),
       amount: type === "progress" ? undefined : amount,
       attachmentName: file?.name, attachmentType: file?.type,
     }
@@ -806,28 +784,16 @@ function PlanView() {
                 <label className="field"><span>{recordType === "cost" ? "비용 항목" : "회수 구분"}</span><input name="category" maxLength={100} required placeholder={recordType === "cost" ? "예: 송달료, 인지대, 법무사 수수료" : "예: 일부 변제, 추심"} /></label>
                 <label className="field"><span>{recordType === "cost" ? "지출금액 (원)" : "회수금액 (원)"}</span><input name="amount" type="number" min="1" step="1" required /></label>
               </>}
-              <label className="field"><span>기록 내용</span><textarea name="description" maxLength={1000} required placeholder="진행 상황 또는 지출·회수 내용을 입력하세요." /></label>
+              <label className="field"><span>확인 근거 (선택)</span><input name="reference" maxLength={200} placeholder="예: 법원 안내문 확인, 비용 구간 확인" /></label>
               <label className="field"><span>증빙자료 (선택)</span><input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" /></label>
               <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 첨부파일은 이 브라우저에만 저장되며 다른 기기에서는 볼 수 없습니다. 민감정보는 가린 후 첨부하세요.</p>
-              <div className="plan-record-actions"><button className="button button-primary" type="submit">기록 등록</button></div>
+              <label className="field" htmlFor="plan-record-description">기록 내용</label>
+              <div className="plan-input-action">
+                <textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="진행 상황 또는 지출·회수 내용을 입력하세요." />
+                <button className="button button-primary" type="submit">등록</button>
+              </div>
             </form>
-            <div className="form-stack plan-new-entry">
-              <h3>새 기록 등록</h3>
-              <form className="form-stack" onSubmit={saveEntry}>
-                <label className="field" htmlFor="plan-new-note">확인 내용 / 검토 결과</label>
-                <div className="plan-input-action">
-                  <textarea id="plan-new-note" name="note" maxLength={1000} required placeholder="확인한 사실만 입력하세요. 이름·계좌번호·상세주소 등은 제외해 주세요." />
-                  <button className="button button-primary" type="submit">등록</button>
-                </div>
-              </form>
-              <form className="form-stack" onSubmit={saveEntry}>
-                <label className="field" htmlFor="plan-new-reference">확인 근거 (선택)</label>
-                <div className="plan-input-action">
-                  <input id="plan-new-reference" name="reference" maxLength={200} required placeholder="예: 법원 안내문 확인, 비용 구간 확인" />
-                  <button className="button button-primary" type="submit">등록</button>
-                </div>
-              </form>
-            </div>
+
           </div>
         </DialogContent>
       </Dialog>
