@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
+import Link from "next/link"
 
 type ChatRole = "assistant" | "user"
 
@@ -50,6 +51,7 @@ export function SupportChatScreen() {
   const [draft, setDraft] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
+  const messageIdRef = useRef(0)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
   const canSend = useMemo(() => draft.trim().length > 0 && !isSending, [draft, isSending])
@@ -109,7 +111,7 @@ export function SupportChatScreen() {
     if (!content || isSending) return
 
     const history = messages
-    const userMessage: ChatMessage = { id: `user-${Date.now()}`, role: "user", content }
+    const userMessage: ChatMessage = { id: `user-${++messageIdRef.current}`, role: "user", content }
     setMessages((current) => [...current, userMessage])
     setDraft("")
     setError("")
@@ -126,10 +128,8 @@ export function SupportChatScreen() {
       if (!response.ok || !answer) {
         throw new Error(data.detail || "답변을 받아오지 못했습니다.")
       }
-      setMessages((current) => [
-        ...current,
-        { id: `assistant-${Date.now()}`, role: "assistant", content: answer },
-      ])
+      const reply: ChatMessage = { id: `assistant-${++messageIdRef.current}`, role: "assistant", content: answer }
+      setMessages((current) => [...current, reply])
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "상담 서버와 연결하지 못했습니다.")
     } finally {
@@ -229,8 +229,8 @@ export function SupportChatScreen() {
       </section>
 
       <section className="support-tools motion-enter" aria-label="고객센터 보조 메뉴">
-        <a href="/faq"><FontAwesomeIcon icon={faList} /><span><strong>자주 묻는 질문</strong><small>서비스 범위와 기본 절차 확인</small></span></a>
-        <a href="/guide"><FontAwesomeIcon icon={faFileArrowDown} /><span><strong>승소 후 절차</strong><small>집행 전 확인할 네 가지</small></span></a>
+        <Link href="/faq"><FontAwesomeIcon icon={faList} /><span><strong>자주 묻는 질문</strong><small>서비스 범위와 기본 절차 확인</small></span></Link>
+        <Link href="/guide"><FontAwesomeIcon icon={faFileArrowDown} /><span><strong>승소 후 절차</strong><small>집행 전 확인할 네 가지</small></span></Link>
       </section>
 
       <Notice tone="warning" title="중요한 신청·기한·금액 판단 전 확인">

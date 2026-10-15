@@ -1315,3 +1315,8 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .report-check-note { color: var(--gray-500); font-size: 0.875rem; }
 .plan-item[id] { scroll-margin-top: 7rem; }
 @media (max-width: 40rem) { .report-check-list li { align-items: flex-start; flex-direction: column; gap: 0.75rem; } }
+
+.rule-reasons { margin: 1rem 0; padding-left: 1.25rem; display: grid; gap: 0.75rem; line-height: 1.7; }
+.case-input-editor { margin-top: 1.25rem; }
+.case-input-editor > summary { font-weight: 700; cursor: pointer; padding-block: 0.25rem; }
+.case-input-editor > p { margin-block: 1rem; color: var(--gray-600); }

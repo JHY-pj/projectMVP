@@ -1,5 +1,7 @@
 "use client"
 
+import { assessCase, type RuleEntries } from "@/lib/case-assessment"
+import { CaseInputEditor } from "@/components/case-input-editor"
 import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
 import { ActionCard } from "@/components/common/panel"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -64,7 +66,7 @@ export function DashboardScreen() {
   return <main id="main-content" className="content-width page-main dashboard-main">
     <PageHeader eyebrow="데모" title="집행나침반 체험" description="가상 사건을 입력하고, 확인할 정보와 다음 행동을 정리해 보세요." />
     <section className="panel"><h2>어디서 시작할까요?</h2><p>새 사건을 등록하거나 준비된 예시 사건을 살펴볼 수 있습니다.</p><div className="case-actions"><Link className="button button-primary" href="/app/cases/new">가상 사건 등록</Link><Link className="button button-outline" href="/app/cases">사건 목록</Link></div></section>
-    <Notice tone="info" title="이번 데모의 범위">사건 입력 → 정보 확인 → 집행 계획 → 진행·결과 기록을 체험합니다. 실익 판단 로직과 서버 저장은 아직 연결하지 않았습니다.</Notice>
+    <Notice tone="info" title="이번 데모의 범위">사건 입력 → 정보 확인 → 집행 계획 → 진행·결과 기록을 체험합니다. 입력 기반 규칙으로 검토 순서를 안내합니다. 서버 저장은 아직 연결하지 않았습니다.</Notice>
   </main>
 }
 
@@ -140,6 +142,8 @@ export function CaseWizardScreen() {
     known_employer: "Unknown",
     known_real_estate: "Unknown",
     known_vehicle: "Unknown",
+    expected_cost_band: "Unknown",
+    priority_right_risk: "Unknown",
   })
   function setSignal(key: string, value: string) {
     setSignals((current) => ({ ...current, [key]: value }))
@@ -166,6 +170,8 @@ export function CaseWizardScreen() {
     ["근무처 정보", displaySignal(signals.known_employer)],
     ["부동산 정보", displaySignal(signals.known_real_estate)],
     ["차량 정보", displaySignal(signals.known_vehicle)],
+    ["예상 비용 구간", ({ "under-10": "10만 원 미만", "10-30": "10만~30만 원", "30-50": "30만~50만 원", "over-50": "50만 원 이상" } as Record<string, string>)[signals.expected_cost_band] || "모름"],
+    ["선순위 권리", signals.priority_right_risk === "Y" ? "있음" : signals.priority_right_risk === "N" ? "없음 (사용자 확인)" : "모름"],
   ]
 
   function next() {
@@ -194,7 +200,7 @@ export function CaseWizardScreen() {
       ...signals,
       attempted_actions: attempts,
       outcome_status: status,
-      process_status: status === "abandoned" ? "중단" : status === "in_progress" ? "진행 중" : "완료",
+      process_status: status === "abandoned" ? "중단" : status === "success_full" ? "완료" : status === "success_partial" ? "일부 회수" : status === "fail_confirmed" ? "회수 실패" : "진행 중",
       result_source: "user",
       is_dummy: "N",
     }
@@ -269,6 +275,7 @@ export function CaseWizardScreen() {
               <label className="field"><span>부동산 단서</span><select value={signals.known_real_estate} onChange={(event) => setSignal("known_real_estate", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
               <label className="field"><span>차량 단서</span><select value={signals.known_vehicle} onChange={(event) => setSignal("known_vehicle", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></select></label>
             </div>
+            <div className="form-grid"><label className="field"><span>예상 비용 구간</span><select value={signals.expected_cost_band} onChange={(event) => setSignal("expected_cost_band", event.target.value)}><option value="Unknown">모름</option><option value="under-10">10만 원 미만</option><option value="10-30">10만~30만 원</option><option value="30-50">30만~50만 원</option><option value="over-50">50만 원 이상</option></select></label><label className="field"><span>선순위 권리 확인 결과</span><select value={signals.priority_right_risk} onChange={(event) => setSignal("priority_right_risk", event.target.value)}><option value="Unknown">모름 / 확인 중</option><option value="Y">있음</option><option value="N">없음 (사용자 확인)</option></select></label></div>
             <section className="wizard-subsection" aria-labelledby="case-progress-heading">
               <h3 id="case-progress-heading">현재 상태는 어떤가요?</h3>
               <p>재산 단서와 별개로, 지금까지의 집행 진행·회수 상황을 선택해 주세요.</p>
@@ -287,7 +294,7 @@ export function CaseWizardScreen() {
             <dl className="review-list submit-review-list">
               {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </dl>
-            <Notice tone="info" title="추가 정보가 필요한 경우">이번 데모에서는 입력 요약과 미확인 항목을 표시합니다. 실익 점수·회수 가능성 판단은 아직 제공하지 않습니다.</Notice>
+            <Notice tone="info" title="추가 정보가 필요한 경우">입력 정보에 따라 확인 우선순위와 검토할 집행 수단이 달라집니다. 회수 확률은 산출하지 않습니다.</Notice>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
           </div>
         )}
@@ -326,7 +333,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
     const sync = () => {
     try { setRecord(readDrafts().find((item) => item.case_id === caseId) || null); setLoadError(false) } catch { setLoadError(true) }
     setLoaded(true)
-    }; sync(); window.addEventListener("mvp-case-updated", sync); return () => window.removeEventListener("mvp-case-updated", sync)
+    }; sync(); window.addEventListener("mvp-case-updated", sync); window.addEventListener("storage", sync); return () => { window.removeEventListener("mvp-case-updated", sync); window.removeEventListener("storage", sync) }
   }, [caseId])
   const currentCase = record ? { ...demoCase, id: record.case_id, type: record.claim_type, amount: record.claim_amount_band, status: record.process_status, updatedAt: "브라우저 저장" } : demoCase
   const active = caseTabs.find(([id]) => pathname === `/app/cases/${caseId}${id === "summary" ? "" : `/${id}`}`)?.[0] ?? section
@@ -379,7 +386,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
         <TabsContent value={active} className="case-tab-content motion-enter">
           {active === "summary" && <CaseOverview key={caseId} record={record} caseId={caseId} />}
           {active === "report" && <DemoReport record={record} caseId={caseId} />}
-          {active === "plan" && <PlanView key={caseId} caseId={caseId} />}
+          {active === "plan" && <PlanView key={caseId} caseId={caseId} record={record} />}
           {active === "status" && <StatusView key={caseId} />}
           {active === "result" && <ResultView key={caseId} />}
           {active === "data" && <DataView caseId={caseId} record={record} />}
@@ -398,6 +405,7 @@ const reportSample: DraftCase = {
 
 function CaseOverview({ record, caseId }: { record: DraftCase | null; caseId: string }) {
   const current = record || reportSample
+  const { assessment, loaded } = useAssessment(record, caseId)
   const { saved: progress } = useCaseRecordForm("status")
   const { saved: result } = useCaseRecordForm("result")
   const recent = [
@@ -410,33 +418,59 @@ function CaseOverview({ record, caseId }: { record: DraftCase | null; caseId: st
       <section className="panel"><div className="panel-heading"><h2>사건 기본 정보</h2><StatusBadge>{record ? "직접 입력" : "예시"}</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>{current.claim_type}</dd></div><div><dt>채권 금액</dt><dd>{current.claim_amount_band}</dd></div><div><dt>지역</dt><dd>{current.region}</dd></div></dl></section>
       <section className="panel"><h2>현재 진행 상태</h2><StatusBadge tone="info">{current.process_status}</StatusBadge><p>진행 상황과 회수 결과를 각각 기록하고 다시 확인할 수 있습니다.</p><div className="case-actions"><Link className="button button-outline button-small" href={`/app/cases/${caseId}/status`}>진행 기록</Link><Link className="button button-outline button-small" href={`/app/cases/${caseId}/result`}>결과 수정</Link></div></section>
     </div>
-    <section className="next-action-card compact"><div><p className="eyebrow">지금 할 일</p><h2>다음 판단에 필요한 확인사항을 살펴보세요</h2><p>리포트에서 확인 이유를 살펴보고, 집행 계획에 확인한 내용을 기록할 수 있습니다.</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/report`}>리포트 보기</Link></section>
+    <section className="next-action-card compact"><div><p className="eyebrow">지금 할 일</p><h2>{loaded ? assessment.title : "확인사항을 불러오는 중입니다"}</h2><p>{loaded ? assessment.explanation : "입력 정보와 집행 기록을 확인합니다."}</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/report`}>리포트 보기</Link></section>
     <section className="panel"><div className="panel-heading"><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></div>{recent.length ? <ol className="activity-list">{recent.map((item) => <li key={item.section}><span /><div><strong>{item.title}</strong><p>{item.text}</p><small>{item.date}</small></div></li>)}</ol> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</section>
   </>
 }
 
+const planChangedEvent = "mvp-plan-changed"
+function useAssessment(record: DraftCase | null, caseId: string) {
+  const [entries, setEntries] = useState<RuleEntries>({})
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const value: unknown = JSON.parse(localStorage.getItem(`mvp-plan-${caseId}`) || "{}")
+        if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid plan")
+        for (const group of Object.values(value)) if (!Array.isArray(group)) throw new Error("Invalid records")
+        setEntries(value as RuleEntries); setError(false)
+      } catch { setError(true) }
+      setLoaded(true)
+    }
+    sync(); window.addEventListener(planChangedEvent, sync); window.addEventListener("storage", sync)
+    return () => { window.removeEventListener(planChangedEvent, sync); window.removeEventListener("storage", sync) }
+  }, [caseId])
+  return { assessment: assessCase(record || reportSample, entries), loaded, error }
+}
+
 function DemoReport({ record, caseId }: { record: DraftCase | null; caseId: string }) {
-  const current = record || reportSample
-  const unknown = (key: string) => !current[key] || ["Unknown", "모름", "미확인"].includes(String(current[key]))
-  const checks = [
-    ...(current.enforcement_title_confirmed !== "Y" ? [{ id: "judgment", title: "집행권원 확인", reason: "집행의 전제가 되는 문서와 확인 상태를 먼저 정리하기 위한 항목입니다.", action: "문서 확인 기록" }] : []),
-    ...(unknown("service_status") || current.service_status === "불명" ? [{ id: "judgment", title: "송달 상태 확인", reason: "현재 송달 상태가 확인되지 않아 절차 검토에 필요한 정보가 부족합니다.", action: "송달 확인 기록" }] : []),
-    ...(!["known_bank", "known_employer", "known_real_estate", "known_vehicle"].some((key) => current[key] === "Y") ? [{ id: "target", title: "집행 대상 단서 정리", reason: "은행·근무처·부동산·차량 중 알고 있는 단서를 정리해 검토할 수단을 좁히기 위한 항목입니다. 모든 단서를 확보해야 한다는 뜻은 아닙니다.", action: "대상·수단 검토" }] : []),
-    { id: "cost", title: "예상 비용 확인", reason: "채권 금액과 비교할 비용 정보가 아직 없습니다. 검토 중인 절차의 예상 지출과 확인 근거를 기록해 주세요.", action: "비용 확인·기록" },
-    { id: "priority", title: "선순위 권리 확인", reason: "선순위 권리의 확인 기록이 아직 없습니다. 집행 대상에 맞는 확인 내용과 근거를 정리해 주세요.", action: "권리 확인·기록" },
-  ]
+  const { assessment, loaded, error } = useAssessment(record, caseId)
+  function saveInput(patch: Record<string, string>) {
+    try {
+      const records = readDrafts()
+      if (!records.some((item) => item.case_id === caseId)) throw new Error("Missing case")
+      localStorage.setItem("mvp-case-drafts", JSON.stringify(records.map((item) => item.case_id === caseId ? { ...item, ...patch } : item)))
+      window.dispatchEvent(new Event("mvp-case-updated"))
+      toast.success("입력 정보와 판단 결과를 갱신했습니다.")
+    } catch { toast.error("정보를 저장하지 못했습니다. 기존 입력은 유지됩니다.") }
+  }
+  if (!loaded) return <p role="status">입력과 집행 기록을 확인하고 있습니다.</p>
+  if (error) return <Notice tone="warning" title="집행 기록 확인 필요">저장된 집행 기록을 불러오지 못해 판단을 갱신할 수 없습니다. 브라우저 저장 데이터를 확인해 주세요.</Notice>
   return <>
-    <Notice tone="info" title="입력 정보 확인 단계">현재는 판단에 사용할 정보와 다음 확인사항을 정리합니다. 실익 점수·회수 확률은 아직 제공하지 않습니다.</Notice>
-    <section className="panel"><div className="panel-heading"><h2>판단 상태</h2><StatusBadge tone="warning">확인사항 검토 필요</StatusBadge></div><p>아래 항목은 미입력·미확인 정보에 따른 안내입니다. 회수 가능성이나 집행 착수 여부를 판정한 결과는 아닙니다.</p></section>
-    <section className="panel"><h2>다음 판단을 위해 확인할 사항</h2><p>항목별 확인 이유를 살펴보고 집행 계획에서 내용을 기록하세요.</p><ul className="report-check-list">{checks.map((item) => <li key={item.title}><div><h3>{item.title}</h3><p>{item.reason}</p></div><Link className="button button-outline button-small" href={`/app/cases/${caseId}/plan#plan-${item.id}`}>{item.action}</Link></li>)}</ul><p className="report-check-note">이 목록은 등록 당시 입력을 기준으로 합니다. 집행 계획에 추가한 기록의 검증과 리포트 자동 갱신은 아직 연결하지 않았습니다.</p></section>
-    <section className="panel"><h2>판단에 사용할 입력 정보</h2><p>사용자 진술 기준이며 증빙 확인 결과와 구분됩니다.</p><dl className="review-list">{Object.entries(signalLabels).filter(([key]) => key !== "debtor_type" && key !== "judgment_elapsed_band").map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{unknown(key) ? "모름" : current[key] === "Y" ? "알고 있음 / 확인함" : current[key] === "N" ? "미확인 / 알지 못함" : String(current[key])}</dd></div>)}</dl></section>
-    <section className="report-action"><div><h2>확인한 내용은 집행 계획에 기록하세요</h2><p>문서·비용·권리·집행 수단별로 확인 근거를 남길 수 있습니다.</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/plan`}>집행 계획 열기</Link></section>
+    <Notice tone="info" title="입력 기반 검토 안내">사용자 입력과 최근 집행 기록에 따른 검토 순서입니다. 회수 확률이나 법률상 집행 가능 여부를 판정하지 않습니다.</Notice>
+    <section className="panel" aria-live="polite"><div className="panel-heading"><h2>{assessment.title}</h2><StatusBadge tone={assessment.status === "ready" || assessment.status === "closed" ? "info" : "warning"}>규칙 {assessment.version}</StatusBadge></div><p>{assessment.explanation}</p></section>
+    <section className="panel"><h2>이렇게 안내한 이유</h2><ul className="rule-reasons">{assessment.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul><p className="report-check-note">사용한 정보: {assessment.sources.join(" · ")}</p></section>
+    {assessment.status !== "closed" && <section className="panel"><h2>입력 단서로 검토할 수단</h2>{assessment.candidates.length ? <ul className="rule-reasons">{assessment.candidates.map((item) => <li key={item}>{item}</li>)}</ul> : <p>구체적인 단서가 없어 특정 수단을 제시하지 않습니다.</p>}<p className="report-check-note">단서에 따른 후보이며, 수단별 착수 권고나 회수 보장은 아닙니다.</p></section>}
+    <section className="panel"><h2>다음 판단을 위해 확인할 사항</h2>{assessment.checks.length ? <ol className="report-check-list">{assessment.checks.map((item) => <li key={item.id}><div><h3>{item.title}</h3><p>{item.reason}</p></div><Link className="button button-outline button-small" href={`/app/cases/${caseId}/plan#plan-${item.id}`}>{item.action}</Link></li>)}</ol> : <p>{assessment.status === "closed" ? "전액 회수 기록을 결과 화면에서 확인하세요." : "기본 정보의 미확인 항목은 없습니다. 아래 집행 계획에서 실제 확인 근거와 검토 결과를 정리하세요."}</p>}</section>
+    {record ? <CaseInputEditor record={record} onSave={saveInput} /> : <Notice tone="info" title="예시 사건">입력값을 바꾸며 비교하려면 새 가상 사건을 등록해 주세요.</Notice>}
+    <section className="report-action"><div><h2>{assessment.status === "closed" ? "회수 결과 확인" : "확인 순서에 맞춰 기록하세요"}</h2><p>{assessment.status === "closed" ? "전액 회수 여부와 결과 기록을 확인할 수 있습니다." : "리포트와 집행 계획은 같은 규칙을 사용하며, 기록을 수정하거나 삭제하면 다시 계산합니다."}</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/${assessment.status === "closed" ? "result" : "plan"}`}>{assessment.status === "closed" ? "결과 확인" : "집행 계획 열기"}</Link></section>
   </>
 }
 
 type PlanRecordType = "progress" | "cost" | "recovery"
 type PlanEntry = {
-  id: string; note: string; reference: string; updatedAt: string
+  id: string; note: string; reference: string; updatedAt: string; savedAt?: number
   type?: PlanRecordType; amount?: number; occurredOn?: string; category?: string; details?: Record<string,string>
   attachmentName?: string; attachmentType?: string
 }
@@ -488,7 +522,7 @@ const planItems: PlanItem[] = [
   { id: "target", title: "우선 검토할 집행 수단 선택", description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.", action: "집행 수단 관리", initialStatus: "대기", guide: "통장·급여·차량·부동산 등 검토 중인 수단과 그 이유를 기록하세요. 실제 착수 결정은 별도 판단이 필요합니다." },
 ]
 
-function PlanView({ caseId }: { caseId: string }) {
+function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null }) {
   const planStorageKey = `mvp-plan-${caseId}`
   const [entries, setEntries] = useState<Record<string, PlanEntry[]>>({})
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -516,6 +550,7 @@ function PlanView({ caseId }: { caseId: string }) {
     try {
       window.localStorage.setItem(planStorageKey, JSON.stringify(next))
       setEntries(next)
+      window.dispatchEvent(new Event(planChangedEvent))
       return true
     } catch {
       toast.error("저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
@@ -553,7 +588,7 @@ function PlanView({ caseId }: { caseId: string }) {
     const amount = activeId === "cost" ? Number(data.get("amount")) : undefined
     if (activeId === "cost" && (!Number.isSafeInteger(amount) || amount! <= 0)) { toast.error("유효한 금액을 입력해 주세요."); return }
     if (editFile && (!["application/pdf","image/jpeg","image/png"].includes(editFile.type) || editFile.size > 10485760)) { toast.error("PDF·JPG·PNG, 최대 10MB만 첨부할 수 있습니다."); return }
-    const nextEntry: PlanEntry = { ...original, note: note.trim(), reference: reference.trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: editFile?.name || (removeFile ? undefined : original.attachmentName), attachmentType: editFile?.type || (removeFile ? undefined : original.attachmentType) }
+    const nextEntry: PlanEntry = { ...original, savedAt: Date.now(), note: note.trim(), reference: reference.trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: editFile?.name || (removeFile ? undefined : original.attachmentName), attachmentType: editFile?.type || (removeFile ? undefined : original.attachmentType) }
     try {
       if (editFile) await writePlanFile(editingId, editFile)
       if (persist({ ...entries, [activeId]: entries[activeId].map((item) => item.id === editingId ? nextEntry : item) })) {
@@ -577,7 +612,7 @@ function PlanView({ caseId }: { caseId: string }) {
     const file = fileValue instanceof File && fileValue.size > 0 ? fileValue : undefined
     if (file && (!["application/pdf","image/jpeg","image/png"].includes(file.type) || file.size > 10485760)) { toast.error("PDF·JPG·PNG, 최대 10MB만 첨부할 수 있습니다."); return }
     const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now())
-    const entry: PlanEntry = { id, note: noteValue, reference: String(data.get("reference") || "").trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: file?.name, attachmentType: file?.type }
+    const entry: PlanEntry = { id, savedAt: Date.now(), note: noteValue, reference: String(data.get("reference") || "").trim(), details, amount, occurredOn: String(data.get("occurredOn") || ""), updatedAt: new Date().toLocaleDateString("ko-KR"), attachmentName: file?.name, attachmentType: file?.type }
     try {
       if (file) await writePlanFile(id, file)
       if (persist({ ...entries, [activeId]: [...(entries[activeId] || []), entry] })) { toast.success("기록을 등록했습니다."); form.reset() }
@@ -616,6 +651,7 @@ function PlanView({ caseId }: { caseId: string }) {
     if (!window.confirm("이 브라우저에 저장된 집행 계획 시연 기록을 모두 초기화할까요?")) return
     try {
       window.localStorage.removeItem(planStorageKey)
+      window.dispatchEvent(new Event(planChangedEvent))
       for (const item of Object.values(entries).flat()) void deletePlanFile(item.id).catch(() => toast.error("일부 첨부파일 삭제에 실패했습니다."))
       setEntries({})
       setActiveId(null)
@@ -628,22 +664,26 @@ function PlanView({ caseId }: { caseId: string }) {
     }
   }
 
+  const assessment = assessCase(record || reportSample, entries)
+  const orderedItems = assessment.planOrder.map((id) => planItems.find((item) => item.id === id)!)
   const activeItem = planItems.find((item) => item.id === activeId)
   const completedCount = 0 // 실제 검증 완료 데이터가 연결되기 전에는 완료로 표시하지 않음
   return (
     <>
+      <Notice tone="info" title={assessment.title}>{assessment.explanation} · 규칙 {assessment.version}</Notice>
+      {assessment.status !== "closed" && <section className="panel"><h2>입력 단서에 따른 검토 후보</h2>{assessment.candidates.length ? <ul className="rule-reasons">{assessment.candidates.map((candidate) => <li key={candidate}>{candidate}</li>)}</ul> : <p>구체적 대상 단서를 먼저 정리해 주세요.</p>}<p className="report-check-note">후보는 입력 단서 기준이며, 실제 집행 가능 여부를 확정하지 않습니다.</p></section>}
       <div className="plan-heading"><div><p className="eyebrow">집행 수단 검토 · 데모</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>시연 기록 초기화</button></div></div>
       <Progress value={(completedCount / planItems.length) * 100} />
       <section className="checklist-panel">
-        {planItems.map((item, index) => {
+        {orderedItems.map((item, index) => {
           const count = (entries[item.id] || []).length
-          const status = count > 0 ? "검토중" : item.initialStatus
+          const status = count > 0 ? "검토중" : assessment.status === "closed" || assessment.status === "paused" ? "대기" : assessment.checks.some((check) => check.id === item.id) ? "확인 필요" : "대기"
           return (
             <div className="plan-item" id={`plan-${item.id}`} key={item.id}>
               <span className="plan-index">{index + 1}</span>
               <div className="plan-item-content">
                 <strong>{item.title}</strong>
-                <small>{item.description}</small>
+                <small>{assessment.checks.find((check) => check.id === item.id)?.reason || item.description}</small>
                 {count > 0 && <small>등록된 기록 {count}건 · {status === "검토중" ? "확인 대기" : "기록 있음"}</small>}
                 <button className="text-link" type="button" onClick={() => openItem(item.id)}>{count ? "기록 관리" : item.action}</button>
               </div>
@@ -652,7 +692,7 @@ function PlanView({ caseId }: { caseId: string }) {
           )
         })}
       </section>
-      <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">기록을 등록하면 검토중으로 표시합니다. 사용자가 직접 완료 처리하지 않으며, 완료는 운영 검증 이후 반영할 예정입니다. 현재 기록은 이 브라우저에만 임시 저장됩니다.</Notice>
+      <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">기록을 등록하면 검토중으로 표시합니다. 사용자가 직접 완료 처리하지 않으며, 완료는 운영 검증 이후 반영할 예정입니다. 입력 기록은 리포트 검토 순서에 반영되며, 검증 완료를 뜻하지 않습니다.</Notice>
       <Dialog open={Boolean(activeItem)} onOpenChange={(open) => { if (!open) { setActiveId(null); setEditingId(null); setNote(""); setReference("") } }}>
         <DialogContent className="plan-manage-dialog">
           <DialogHeader className="plan-manage-header">
@@ -731,7 +771,7 @@ function useCaseRecordForm(kind: string) {
     const next = { ...values, status, reasons: reasons.join(", "), updatedAt: new Date().toLocaleString("ko-KR") }
     try {
       localStorage.setItem(key, JSON.stringify(next))
-      const records = readDrafts().map((record) => record.case_id === caseId ? { ...record, outcome_status: status, process_status: status === "in_progress" ? "진행 중" : status === "abandoned" ? "중단" : "완료" } : record)
+      const records = readDrafts().map((record) => record.case_id === caseId ? { ...record, outcome_status: status, process_status: status === "abandoned" ? "중단" : status === "success_full" ? "완료" : status === "success_partial" ? "일부 회수" : status === "fail_confirmed" ? "회수 실패" : "진행 중" } : record)
       localStorage.setItem("mvp-case-drafts", JSON.stringify(records))
       window.dispatchEvent(new Event("mvp-case-updated"))
       setSaved(next)
