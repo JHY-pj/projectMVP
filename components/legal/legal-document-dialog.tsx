@@ -1,5 +1,6 @@
 "use client"
 
+import { uiClass, LegalConsentWarning } from "@/components/legal/legal-ui"
 import { Button } from "@/components/ui/button"
 
 import { legalContent, LegalDocumentContent, type LegalType } from "@/components/legal/legal-content"
@@ -16,13 +17,13 @@ export function LegalDocumentDialog({
   const document = legalContent[type]
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="legal-consent-dialog">
+      <DialogContent >
         <DialogHeader>
           <DialogTitle>{document.title}</DialogTitle>
           <DialogDescription>{document.lead}</DialogDescription>
         </DialogHeader>
         <DialogBody tabIndex={0}>
-          <p className="legal-consent-warning">MVP 초안 · 법률 및 개인정보 전문가 검토 전</p>
+          <LegalConsentWarning >MVP 초안 · 법률 및 개인정보 전문가 검토 전</LegalConsentWarning>
           <LegalDocumentContent type={type} />
         </DialogBody>
         <DialogFooter>

@@ -21,10 +21,10 @@
   --color-border:var(--border);
   --color-input:var(--input);
   --color-ring:var(--ring);
-  --radius-sm:calc(var(--radius) - 0.1875rem);
-  --radius-md:var(--radius);
-  --radius-lg:calc(var(--radius) + 0.25rem);
-  --radius-xl:calc(var(--radius) + 0.625rem);
+  --radius-sm:var(--ui-radius-small);
+  --radius-md:var(--ui-radius-control);
+  --radius-lg:var(--ui-radius-panel);
+  --radius-xl:var(--ui-radius-panel);
   --font-sans:"Pretendard","Noto Sans KR","Apple SD Gothic Neo",Arial,sans-serif;
 }
 
@@ -69,7 +69,10 @@ h3{font-weight:500}
   --border:#d7e2d8;
   --input:#aebfb4;
   --ring:#1f7a5a;
-  --radius:1rem;
+  --ui-radius-small:0.375rem;
+  --ui-radius-control:0.5rem;
+  --ui-radius-panel:0.875rem;
+  --radius:var(--ui-radius-control);
   --navy-950:#103a2e;
   --navy-900:#14523f;
   --navy-800:#175b49;

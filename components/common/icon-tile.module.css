@@ -1,0 +1,6 @@
+.tile { width: 2.75rem; height: 2.75rem; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; }
+.info { background: var(--blue-100); color: var(--blue-700); }
+.negative { background: var(--red-100); color: var(--red-700); }
+.warning { background: var(--amber-100); color: var(--amber-700); }
+
+.neutral { background: var(--gray-100); color: var(--gray-700); }

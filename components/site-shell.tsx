@@ -1,17 +1,29 @@
 "use client"
 
-import "./site-shell.css"
-
+import {
+  NavigationLink,
+  BottomNavigationLink,
+  uiClass,
+  BrandMark,
+  BrandCopy,
+  BottomNavigation,
+  ShellFrame,
+  SiteHeader,
+  HeaderInner,
+  HeaderBrand,
+  DemoLabel,
+  DesktopNav,
+  HeaderActions,
+  MobileMenu,
+  AdminBand,
+  DemoBanner,
+  SiteFooter,
+  FooterInner,
+} from "@/components/shell/shell-ui"
 import { Button } from "@/components/ui/button"
 
 import { MotionLayer } from "@/components/motion-layer"
-import {
-  faBars,
-  faCompass,
-  faFileLines,
-  faHouse,
-  faShieldHalved,
-} from "@fortawesome/free-solid-svg-icons"
+import { faBars, faCompass, faFileLines, faHouse, faShieldHalved } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@/lib/fontawesome"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -48,20 +60,20 @@ function isCurrentPath(pathname: string, href: string) {
 }
 
 function closeMobileMenu(target: HTMLElement) {
-  target.closest(".site-shell")?.querySelector<HTMLDetailsElement>("details.mobile-menu")?.removeAttribute("open")
+  target.closest("[data-shell]")?.querySelector<HTMLDetailsElement>("[data-mobile-menu]")?.removeAttribute("open")
 }
 
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
-    <Link className="brand" href="/" aria-label="집행나침반 홈">
-      <span className="brand-mark" aria-hidden="true">
+    <Link className={uiClass("brand")} href="/" aria-label="집행나침반 홈">
+      <BrandMark  aria-hidden="true">
         <FontAwesomeIcon icon={faCompass} />
-      </span>
+      </BrandMark>
       {!compact && (
-        <span className="brand-copy">
+        <BrandCopy>
           <strong>집행나침반</strong>
           <small>판결 다음의 방향</small>
-        </span>
+        </BrandCopy>
       )}
     </Link>
   )
@@ -74,15 +86,15 @@ function NavLinks({ items }: { items: string[][] }) {
       {items.map(([label, href]) => {
         const active = isCurrentPath(pathname, href)
         return (
-          <Link
-            className={active ? "nav-link is-active" : "nav-link"}
+          <NavigationLink
+            active={active}
             href={href}
             key={href}
             aria-current={active ? "page" : undefined}
             onClick={(event) => closeMobileMenu(event.currentTarget)}
           >
             {label}
-          </Link>
+          </NavigationLink>
         )
       })}
     </>
@@ -93,12 +105,12 @@ function MobileBottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="mobile-bottom-nav" aria-label="데모 바로가기">
+    <BottomNavigation  aria-label="데모 바로가기">
       {mobileBottomNav.map(([label, href, icon]) => {
         const active = isCurrentPath(pathname, href)
         return (
-          <Link
-            className={active ? "is-active" : undefined}
+          <BottomNavigationLink
+            active={active}
             href={href}
             key={href}
             aria-current={active ? "page" : undefined}
@@ -106,10 +118,10 @@ function MobileBottomNav() {
           >
             <FontAwesomeIcon icon={icon} />
             <span>{label}</span>
-          </Link>
+          </BottomNavigationLink>
         )
       })}
-    </nav>
+    </BottomNavigation>
   )
 }
 
@@ -135,19 +147,19 @@ export function SiteShell({
       : memberNav
 
   return (
-    <div className={`site-shell shell-${mode}`}>
+    <ShellFrame data-shell className={uiClass(`site-shell shell-${mode}`)}>
       <MotionLayer />
-      <header className="site-header">
-        <div className="header-inner">
-          <div className="header-brand"><Brand />{mode === "member" && <span className="demo-label">DEMO</span>}</div>
-          <nav className="desktop-nav" aria-label="주요 메뉴">
+      <SiteHeader>
+        <HeaderInner>
+          <HeaderBrand><Brand />{mode === "member" && <DemoLabel>DEMO</DemoLabel>}</HeaderBrand>
+          <DesktopNav  aria-label="주요 메뉴">
             <NavLinks items={items} />
-          </nav>
-          {isPublic && <div className="header-actions">
+          </DesktopNav>
+          {isPublic && <HeaderActions>
             <Button asChild variant="ghost" size="default"><Link href="/app/cases">데모 둘러보기</Link></Button>
             <Button asChild variant="default" size="default"><Link href="/app/cases/new">내 사건 분석하기</Link></Button>
-          </div>}
-          <details className="mobile-menu" ref={menuRef}>
+          </HeaderActions>}
+          <MobileMenu data-mobile-menu  ref={menuRef}>
             <summary aria-label="메뉴 열기">
               <FontAwesomeIcon icon={faBars} />
             </summary>
@@ -159,21 +171,21 @@ export function SiteShell({
                 </Link></Button>
               )}
             </nav>
-          </details>
-        </div>
-      </header>
+          </MobileMenu>
+        </HeaderInner>
+      </SiteHeader>
       {mode === "admin" && (
-        <div className="admin-band">
-          <div className="content-width">
+        <AdminBand>
+          <div className={uiClass("content-width")}>
             <FontAwesomeIcon icon={faShieldHalved} /> 관리자 모드 · 비식별 데이터만 표시
           </div>
-        </div>
+        </AdminBand>
       )}
-      {mode === "member" && <div className="demo-banner" role="note">가상 사건으로 체험해 주세요. 입력·기록은 현재 브라우저에만 저장됩니다.</div>}
+      {mode === "member" && <DemoBanner  role="note">가상 사건으로 체험해 주세요. 입력·기록은 현재 브라우저에만 저장됩니다.</DemoBanner>}
       {children}
       {mode === "member" && <MobileBottomNav />}
-      <footer className="site-footer">
-        <div className="footer-inner">
+      <SiteFooter>
+        <FooterInner>
           <div>
             <Brand compact />
             <p>집행나침반은 법률 자문이나 채권 회수를 보장하지 않습니다.</p>
@@ -185,8 +197,8 @@ export function SiteShell({
             <Link href="/data-policy">데이터 처리 원칙</Link>
           </nav>
           <small>© 2026 집행나침반 · MVP</small>
-        </div>
-      </footer>
-    </div>
+        </FooterInner>
+      </SiteFooter>
+    </ShellFrame>
   )
 }

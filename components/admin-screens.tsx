@@ -1,8 +1,18 @@
 "use client"
 
-import "./admin-screens.css"
-
-import { PageLayout, Surface, PanelHeading, Input, Select, Field, Textarea, CheckboxRow , ResponsiveGrid } from "@/components/common/primitives"
+import { SearchInput } from "@/components/common/search-input"
+import { ActionBar } from "@/components/common/primitives"
+import { IconTile } from "@/components/common/icon-tile"
+import {
+  uiClass,
+  AdminMetrics,
+  SecurityChecks,
+  Toolbar,
+  ReviewWorkspace,
+  DocumentPlaceholder,
+  LabelSummary,
+} from "@/components/admin/admin-ui"
+import { PageLayout, Surface, PanelHeading, Input, Select, Field, Textarea, CheckboxRow, ResponsiveGrid } from "@/components/common/primitives"
 
 import { Button } from "@/components/ui/button"
 
@@ -16,20 +26,12 @@ import {
   faFileCircleQuestion,
   faFileShield,
   faListCheck,
-  faMagnifyingGlass,
   faShieldHalved,
   faSliders,
   faUserShield,
 } from "@fortawesome/free-solid-svg-icons"
 import { toast } from "sonner"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
 
 const queues = [
@@ -41,15 +43,15 @@ const queues = [
 
 export function AdminDashboardScreen() {
   return (
-    <PageLayout id="main-content" className="admin-main">
+    <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="운영 대시보드" title="오늘 처리할 일을 확인하세요" description="원문 접근과 역할 권한을 최소화하고, 비식별 데이터 검수와 권리 요청을 우선 처리합니다." />
-      <section className="admin-metrics motion-enter">
-        {queues.map(([label, value, hint, icon, tone]) => <article key={label}><span className={`metric-icon metric-${tone}`}><FontAwesomeIcon icon={icon} /></span><div><small>{label}</small><strong>{value}</strong><p>{hint}</p></div></article>)}
-      </section>
+      <AdminMetrics className={uiClass("motion-enter")}>
+        {queues.map(([label, value, hint, icon, tone]) => <article key={label}><IconTile tone={tone as "info" | "negative" | "warning" | "neutral"}><FontAwesomeIcon icon={icon} /></IconTile><div><small>{label}</small><strong>{value}</strong><p>{hint}</p></div></article>)}
+      </AdminMetrics>
       <ResponsiveGrid balance="wide-left">
-        <Surface className="motion-enter">
-          <PanelHeading><div><p className="eyebrow">우선 처리</p><h2>검수 대기 사건</h2></div><Link href="/admin/cases">전체 보기</Link></PanelHeading>
-          <Table className="admin-table">
+        <Surface className={uiClass("motion-enter")}>
+          <PanelHeading><div><p className={uiClass("eyebrow")}>우선 처리</p><h2>검수 대기 사건</h2></div><Link href="/admin/cases">전체 보기</Link></PanelHeading>
+          <Table className={uiClass("admin-table")}>
             <TableHeader><TableRow><TableHead>사건 ID</TableHead><TableHead>단계</TableHead><TableHead>상태</TableHead><TableHead>대기</TableHead><TableHead /></TableRow></TableHeader>
             <TableBody>
               <TableRow><TableCell>EC-2026-0012</TableCell><TableCell>비식별 변수</TableCell><TableCell><StatusBadge tone="warning">검수 대기</StatusBadge></TableCell><TableCell>2시간</TableCell><TableCell><Link href="/admin/review">검수</Link></TableCell></TableRow>
@@ -58,7 +60,7 @@ export function AdminDashboardScreen() {
             </TableBody>
           </Table>
         </Surface>
-        <Surface as="aside" className="motion-enter"><PanelHeading><h2>보안 운영 상태</h2><StatusBadge tone="positive">정상</StatusBadge></PanelHeading><ul className="security-checks"><li><FontAwesomeIcon icon={faShieldHalved} /><span><strong>공개 테이블 RLS</strong><small>5/5 적용</small></span></li><li><FontAwesomeIcon icon={faFileShield} /><span><strong>원문 폐기 확인</strong><small>대기 1건</small></span></li><li><FontAwesomeIcon icon={faUserShield} /><span><strong>권한 변경</strong><small>최근 변경 없음</small></span></li></ul><Button asChild variant="link" size="sm"><Link href="/admin/audit-logs">감사 로그 확인 <FontAwesomeIcon icon={faArrowRight} /></Link></Button></Surface>
+        <Surface as="aside" className={uiClass("motion-enter")}><PanelHeading><h2>보안 운영 상태</h2><StatusBadge tone="positive">정상</StatusBadge></PanelHeading><SecurityChecks><li><FontAwesomeIcon icon={faShieldHalved} /><span><strong>공개 테이블 RLS</strong><small>5/5 적용</small></span></li><li><FontAwesomeIcon icon={faFileShield} /><span><strong>원문 폐기 확인</strong><small>대기 1건</small></span></li><li><FontAwesomeIcon icon={faUserShield} /><span><strong>권한 변경</strong><small>최근 변경 없음</small></span></li></SecurityChecks><Button asChild variant="link" size="sm"><Link href="/admin/audit-logs">감사 로그 확인 <FontAwesomeIcon icon={faArrowRight} /></Link></Button></Surface>
       </ResponsiveGrid>
       <Notice tone="warning" title="관리자 권한 분리 필요">프로토타입 화면입니다. 운영 배포 전 `profiles.role`의 `app_metadata` 기반 서버 검증과 관리자 라우트 가드를 연결해야 합니다.</Notice>
     </PageLayout>
@@ -67,11 +69,11 @@ export function AdminDashboardScreen() {
 
 export function AdminCasesScreen() {
   return (
-    <PageLayout id="main-content" className="admin-main">
+    <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="사건 관리" title="비식별 사건 검수" description="직접식별정보 없이 처리 상태, 분석 변수, 검수 이력을 확인합니다." />
-      <div className="toolbar motion-enter"><label className="search-field"><FontAwesomeIcon icon={faMagnifyingGlass} /><Input placeholder="사건 ID 검색" /></label><Select aria-label="처리 상태"><option>모든 처리 상태</option><option>검수 대기</option><option>분석 가능</option><option>지원 제외</option></Select><Select aria-label="결과 상태"><option>모든 결과 상태</option><option>진행 중</option><option>확정 결과</option><option>미확정</option></Select><Button variant="outline" size="default"><FontAwesomeIcon icon={faSliders} /> 필터</Button></div>
-      <Surface className="motion-enter">
-        <Table className="admin-table">
+      <Toolbar className={uiClass("motion-enter")}><SearchInput aria-label="사건 ID 검색" placeholder="사건 ID 검색" /><Select aria-label="처리 상태"><option>모든 처리 상태</option><option>검수 대기</option><option>분석 가능</option><option>지원 제외</option></Select><Select aria-label="결과 상태"><option>모든 결과 상태</option><option>진행 중</option><option>확정 결과</option><option>미확정</option></Select><Button variant="outline" size="default"><FontAwesomeIcon icon={faSliders} /> 필터</Button></Toolbar>
+      <Surface className={uiClass("motion-enter")}>
+        <Table className={uiClass("admin-table")}>
           <TableHeader><TableRow><TableHead>사건 ID</TableHead><TableHead>유형·금액</TableHead><TableHead>처리 상태</TableHead><TableHead>결과 상태</TableHead><TableHead>출처</TableHead><TableHead>등록일</TableHead><TableHead /></TableRow></TableHeader>
           <TableBody>
             {[['EC-2026-0012','대여금 · 300~500만','검수 대기','진행 중','사용자','08.29'],['EC-2026-0009','매매대금 · 100~300만','파싱 오류','미확정','문서','08.29'],['EC-2026-0007','대여금 · 100만 미만','분석 가능','일부 회수','사용자','08.28'],['EC-2026-0004','공사대금 · 300~500만','지원 제외','중단','사용자','08.26']].map((row) => <TableRow key={row[0]}>{row.map((cell,index) => <TableCell key={`${row[0]}-${index}`}>{index===2?<StatusBadge tone={cell==='분석 가능'?'positive':cell==='파싱 오류'?'negative':cell==='검수 대기'?'warning':'neutral'}>{cell}</StatusBadge>:cell}</TableCell>)}<TableCell><Link href="/admin/review">열기</Link></TableCell></TableRow>)}
@@ -84,22 +86,22 @@ export function AdminCasesScreen() {
 
 export function AdminReviewScreen() {
   return (
-    <PageLayout id="main-content" className="admin-main">
+    <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="문서 처리 검수" title="EC-2026-0012" description="마스킹 상태와 비식별 변수를 확인합니다. 원문 접근은 최소 인원·단기 보관 원칙을 적용합니다." />
-      <div className="review-workspace motion-enter">
-        <section className="document-placeholder"><div><FontAwesomeIcon icon={faFileCircleQuestion} /><h2>원문 미리보기 제한</h2><p>검수 권한과 보유기간 확인 후에만 일시적으로 표시됩니다.</p><StatusBadge tone="positive">직접식별정보 마스킹 100%</StatusBadge></div></section>
-        <Surface stack><PanelHeading><h2>추출 변수</h2><StatusBadge tone="warning">확인 2건</StatusBadge></PanelHeading><Field><span>사건 유형</span><Select defaultValue="loan"><option value="loan">대여금</option><option value="other">기타</option></Select></Field><Field><span>금액 구간</span><Select defaultValue="300"><option value="300">300만~500만 원</option></Select></Field><Field><span>지역</span><Select defaultValue="capital"><option value="capital">수도권</option></Select></Field><Field><span>오류·제외 사유</span><Textarea placeholder="필요한 경우에만 기록" /></Field><CheckboxRow><Input type="checkbox" /><span>검수 완료 후 원문 폐기 상태를 확인했습니다.</span></CheckboxRow><div className="inline-actions"><Button variant="outline" size="default" onClick={()=>toast.info('수정 요청으로 저장했습니다.')}>수정 요청</Button><Button variant="default" size="default" onClick={()=>toast.success('검수가 완료되었습니다.')}>검수 완료</Button></div></Surface>
-      </div>
+      <ReviewWorkspace className={uiClass("motion-enter")}>
+        <DocumentPlaceholder><div><FontAwesomeIcon icon={faFileCircleQuestion} /><h2>원문 미리보기 제한</h2><p>검수 권한과 보유기간 확인 후에만 일시적으로 표시됩니다.</p><StatusBadge tone="positive">직접식별정보 마스킹 100%</StatusBadge></div></DocumentPlaceholder>
+        <Surface stack><PanelHeading><h2>추출 변수</h2><StatusBadge tone="warning">확인 2건</StatusBadge></PanelHeading><Field><span>사건 유형</span><Select defaultValue="loan"><option value="loan">대여금</option><option value="other">기타</option></Select></Field><Field><span>금액 구간</span><Select defaultValue="300"><option value="300">300만~500만 원</option></Select></Field><Field><span>지역</span><Select defaultValue="capital"><option value="capital">수도권</option></Select></Field><Field><span>오류·제외 사유</span><Textarea placeholder="필요한 경우에만 기록" /></Field><CheckboxRow><Input type="checkbox" /><span>검수 완료 후 원문 폐기 상태를 확인했습니다.</span></CheckboxRow><ActionBar><Button variant="outline" size="default" onClick={()=>toast.info('수정 요청으로 저장했습니다.')}>수정 요청</Button><Button variant="default" size="default" onClick={()=>toast.success('검수가 완료되었습니다.')}>검수 완료</Button></ActionBar></Surface>
+      </ReviewWorkspace>
     </PageLayout>
   )
 }
 
 export function AdminLabelsScreen() {
   return (
-    <PageLayout id="main-content" className="admin-main">
+    <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="결과·라벨 관리" title="확정 결과와 미확정 상태를 분리합니다" description="사용자 직접 입력과 추정 출처를 구분하고, 장기 미응답은 실패가 아닌 unresolved로 유지합니다." />
-      <section className="label-summary motion-enter"><article><small>확정 결과</small><strong>18</strong><StatusBadge tone="positive">학습 우선</StatusBadge></article><article><small>진행 중</small><strong>24</strong><StatusBadge tone="info">추적 중</StatusBadge></article><article><small>미확정</small><strong>9</strong><StatusBadge tone="neutral">학습 제외</StatusBadge></article></section>
-      <Surface className="motion-enter"><Table className="admin-table"><TableHeader><TableRow><TableHead>사건 ID</TableHead><TableHead>결과</TableHead><TableHead>결과 출처</TableHead><TableHead>신뢰 가중치</TableHead><TableHead>확정일</TableHead><TableHead>학습 사용</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>EC-2026-0007</TableCell><TableCell><StatusBadge tone="positive">success_partial</StatusBadge></TableCell><TableCell>user</TableCell><TableCell>1.0</TableCell><TableCell>08.28</TableCell><TableCell>포함</TableCell></TableRow><TableRow><TableCell>EC-2026-0003</TableCell><TableCell><StatusBadge>unresolved</StatusBadge></TableCell><TableCell>inferred</TableCell><TableCell>—</TableCell><TableCell>—</TableCell><TableCell>제외</TableCell></TableRow></TableBody></Table></Surface>
+      <LabelSummary className={uiClass("motion-enter")}><article><small>확정 결과</small><strong>18</strong><StatusBadge tone="positive">학습 우선</StatusBadge></article><article><small>진행 중</small><strong>24</strong><StatusBadge tone="info">추적 중</StatusBadge></article><article><small>미확정</small><strong>9</strong><StatusBadge tone="neutral">학습 제외</StatusBadge></article></LabelSummary>
+      <Surface className={uiClass("motion-enter")}><Table className={uiClass("admin-table")}><TableHeader><TableRow><TableHead>사건 ID</TableHead><TableHead>결과</TableHead><TableHead>결과 출처</TableHead><TableHead>신뢰 가중치</TableHead><TableHead>확정일</TableHead><TableHead>학습 사용</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>EC-2026-0007</TableCell><TableCell><StatusBadge tone="positive">success_partial</StatusBadge></TableCell><TableCell>user</TableCell><TableCell>1.0</TableCell><TableCell>08.28</TableCell><TableCell>포함</TableCell></TableRow><TableRow><TableCell>EC-2026-0003</TableCell><TableCell><StatusBadge>unresolved</StatusBadge></TableCell><TableCell>inferred</TableCell><TableCell>—</TableCell><TableCell>—</TableCell><TableCell>제외</TableCell></TableRow></TableBody></Table></Surface>
     </PageLayout>
   )
 }
@@ -115,5 +117,5 @@ const adminCopy: Record<string, [string,string,string]> = {
 export function AdminGenericScreen({ type }: { type: keyof typeof adminCopy }) {
   const [eyebrow,title,description] = adminCopy[type]
   const icon = type === 'reminders' ? faBell : type === 'requests' ? faUserShield : type === 'scoring' ? faSliders : faShieldHalved
-  return <PageLayout id="main-content" className="admin-main"><PageHeader eyebrow={eyebrow} title={title} description={description} /><Surface className="empty-state motion-enter"><span><FontAwesomeIcon icon={icon} /></span><h2>P1 운영 화면 골격</h2><p>사이트맵·IA에 정의된 권한과 상태를 기준으로 화면 구조를 준비했습니다. 실제 목록 데이터와 서버 액션은 다음 구현 단계에서 연결합니다.</p><Button asChild variant="outline" size="default"><Link href="/admin">운영 대시보드로</Link></Button></Surface></PageLayout>
+  return <PageLayout id="main-content" className={uiClass("admin-main")}><PageHeader eyebrow={eyebrow} title={title} description={description} /><Surface className={uiClass("empty-state motion-enter")}><span><FontAwesomeIcon icon={icon} /></span><h2>P1 운영 화면 골격</h2><p>사이트맵·IA에 정의된 권한과 상태를 기준으로 화면 구조를 준비했습니다. 실제 목록 데이터와 서버 액션은 다음 구현 단계에서 연결합니다.</p><Button asChild variant="outline" size="default"><Link href="/admin">운영 대시보드로</Link></Button></Surface></PageLayout>
 }

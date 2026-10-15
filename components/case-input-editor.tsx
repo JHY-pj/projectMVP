@@ -1,5 +1,6 @@
 "use client"
 
+import { uiClass } from "@/components/member/case-ui"
 import { Surface, FormStack, FormGrid, Field, Select } from "@/components/common/primitives"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +26,7 @@ export function CaseInputEditor({ record, onSave }: { record: Record<string, unk
     }
     onSave(patch)
   }
-  return <Surface as="details" className="case-input-editor" id="case-input-editor">
+  return <Surface as="details" className={uiClass("case-input-editor")} id="case-input-editor">
     <summary>판단에 사용할 정보 보완</summary>
     <p>아는 내용만 변경하고 저장하면 리포트와 집행 계획이 함께 갱신됩니다. 구체적인 집행 계획 기록이 있으면 해당 항목은 최근 기록을 우선 사용합니다.</p>
     <FormStack as="form" key={JSON.stringify(record)} onSubmit={save}>

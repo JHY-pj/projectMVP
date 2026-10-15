@@ -12,7 +12,7 @@
   padding: 0 var(--control-padding);
   gap: 0.5rem;
   border: 0.0625rem solid transparent;
-  border-radius: 0.5rem;
+  border-radius: var(--ui-radius-control);
   font-size: var(--control-font);
   font-weight: 600;
   line-height: 1.35;

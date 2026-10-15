@@ -20,16 +20,19 @@ export const PanelHeading = primitive("div", "panel-heading", styles.heading)
 export const FormStack = primitive("div", "form-stack", styles.stack)
 export const FormGrid = primitive("div", "form-grid", styles.grid)
 export const Field = primitive("label", "field", styles.field)
-export const CheckboxRow = primitive("label", "checkbox-row", styles.checkbox)
+export function CheckboxRow<T extends ElementType = "label">({ as, boxed = false, className, ...props }: BoxProps<T> & { boxed?: boolean }) {
+  const Comp: ElementType = as || "label"
+  return <Comp data-ui="checkbox-row" className={cn(styles.checkbox, boxed && styles.checkboxBox, className)} {...props} />
+}
 export const InfoList = primitive("dl", "info-list", styles.infoList)
 export const ActionBar = primitive("div", "actions", styles.actions)
 export const ActionIcon = primitive("div", "action-icon", styles.actionIcon)
-export function ActionSection<T extends ElementType = "section">({ as, className, tone = "warning", compact = false, ...props }: BoxProps<T> & { tone?: "warning" | "inverse"; compact?: boolean }) {
+export function ActionSection<T extends ElementType = "section">({ as, className, tone = "warning", compact = false, ...props }: BoxProps<T> & { tone?: "warning" | "inverse" | "danger"; compact?: boolean }) {
   const Comp: ElementType = as || "section"
-  return <Comp data-ui="action-section" className={cn(styles.callout, tone === "inverse" && styles.inverse, compact && styles.compact, className)} {...props} />
+  return <Comp data-ui="action-section" className={cn(styles.callout, tone === "inverse" && styles.inverse, tone === "danger" && styles.danger, compact && styles.compact, className)} {...props} />
 }
-export function Input({ className, type, trailingAction = false, ...props }: ComponentProps<"input"> & { trailingAction?: boolean }) {
-  return <input data-ui="input" type={type} className={cn(type === "checkbox" || type === "radio" ? styles.checkInput : styles.input, trailingAction && styles.trailingAction, className)} {...props} />
+export function Input({ className, type, trailingAction = false, leadingIcon = false, ...props }: ComponentProps<"input"> & { trailingAction?: boolean; leadingIcon?: boolean }) {
+  return <input data-ui="input" type={type} className={cn(type === "checkbox" || type === "radio" ? styles.checkInput : styles.input, trailingAction && styles.trailingAction, leadingIcon && styles.leadingIcon, className)} {...props} />
 }
 export function Select({ className, ...props }: ComponentProps<"select">) { return <select data-ui="select" className={cn(styles.input, className)} {...props} /> }
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) { return <textarea data-ui="textarea" className={cn(styles.input, styles.textarea, className)} {...props} /> }

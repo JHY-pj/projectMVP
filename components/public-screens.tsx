@@ -1,149 +1,32 @@
-import { CallToAction } from "@/components/common/call-to-action"
-import { SectionHeading } from "@/components/screen-kit"
+import { HomeHero, HowItWorks, PrivacyPrinciples, StartCase } from "@/components/public/home-sections"
+import { uiClass, CheckList, PlainList, GuideTimeline } from "@/components/public/public-ui"
+
+
 import { EligibilityBar } from "@/components/public/eligibility-bar"
 
-import "./public-screens.css"
-
-import { PageLayout, Surface , TableContainer , ResponsiveGrid } from "@/components/common/primitives"
+import { PageLayout, Surface, TableContainer, ResponsiveGrid } from "@/components/common/primitives"
 
 import { Button } from "@/components/ui/button"
 import { LegalDocumentContent, legalContent, type LegalType } from "@/components/legal/legal-content"
-"use client"
 
 import { Breadcrumbs, Notice, PageHeader, StatusBadge } from "@/components/screen-kit"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import {
-  faArrowRight,
-  faArrowTrendUp,
-  faCheck,
-  faClipboardCheck,
-  faCompass,
-  faDatabase,
-  faFileShield,
-  faLayerGroup,
-  faScaleBalanced,
-  faShieldHalved,
-  faUserLock,
-} from "@fortawesome/free-solid-svg-icons"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { faCheck } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@/lib/fontawesome"
 import Link from "next/link"
 
 export function HomeScreen() {
   return (
     <main id="main-content">
-      <section className="hero-section">
-        <div className="content-width hero-grid">
-          <div className="hero-copy">
-            <div className="eyebrow motion-enter">
-              승소 이후의 다음 판단
-            </div>
-            <h1 className="motion-enter">
-              판결은 끝났지만,
-              <br />
-              <em>회수는 아직</em>이라면
-            </h1>
-            <p className="hero-description motion-enter">
-              사건 조건과 공개 데이터를 바탕으로 집행 실익의 근거, 예상 부담,
-              다음 확인사항을 한곳에서 정리해드립니다.
-            </p>
-            <div className="hero-actions motion-enter">
-              <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
-                내 사건 분석 시작 <FontAwesomeIcon icon={faArrowRight} />
-              </Link></Button>
-              <Button asChild variant="outline" size="lg"><Link href="/guide">
-                승소 후 절차 보기
-              </Link></Button>
-            </div>
-            <p className="hero-footnote motion-enter">
-              초기 대상 · 민사 승소 판결을 보유한 500만 원 미만 개인 채권자
-            </p>
-          </div>
-          <div className="hero-compass motion-enter" aria-label="집행 판단 구성 요소">
-            <div className="compass-orbit orbit-one" />
-            <div className="compass-orbit orbit-two" />
-            <span className="axis axis-top">근거</span>
-            <span className="axis axis-right">비용</span>
-            <span className="axis axis-bottom">기간</span>
-            <span className="axis axis-left">실익</span>
-            <div className="compass-center">
-              <FontAwesomeIcon className="compass-needle" icon={faCompass} />
-              <strong>다음 행동</strong>
-              <small>착수 · 추가 확인 · 보류</small>
-            </div>
-            <div className="floating-card floating-card-top">
-              <StatusBadge tone="info">기준선</StatusBadge>
-              <strong>설명 가능한 룰 기반</strong>
-            </div>
-            <div className="floating-card floating-card-bottom">
-              <FontAwesomeIcon icon={faShieldHalved} />
-              <span>식별정보는 저장하지 않아요</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeHero />
 
       <EligibilityBar />
 
-      <section className="section content-width">
-        <SectionHeading className="motion-enter">
-          <p className="eyebrow">어떻게 작동하나요?</p>
-          <h2>점수보다 먼저, 판단의 근거를 보여드립니다</h2>
-          <p>처음부터 결과 기록까지 하나의 사건 흐름으로 연결합니다.</p>
-        </SectionHeading>
-        <div className="process-grid">
-          {[
-            ["01", faClipboardCheck, "사건 조건 입력", "판결과 집행 현황을 직접 입력하고 필요한 변수만 남깁니다."],
-            ["02", faLayerGroup, "실익 근거 확인", "유리·불리 요인, 데이터 충분도, 비용·기간의 확인 범위를 봅니다."],
-            ["03", faArrowTrendUp, "다음 행동과 결과", "착수·추가 확인·보류를 선택하고 실제 결과를 다시 기록합니다."],
-          ].map(([step, icon, title, body]) => (
-            <article className="process-card motion-enter" key={String(step)}>
-              <span className="step-number">{String(step)}</span>
-              <FontAwesomeIcon icon={icon as typeof faCompass} />
-              <h3>{String(title)}</h3>
-              <p>{String(body)}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      <HowItWorks />
 
-      <section className="section section-soft">
-        <div className="content-width trust-grid">
-          <SectionHeading className="motion-enter">
-            <p className="eyebrow">데이터 최소화 원칙</p>
-            <h2>사람을 추적하지 않고, 사건의 조건을 봅니다</h2>
-            <p>
-              특정 채무자의 자산이나 온라인 활동을 추적하지 않습니다. 이름·상세주소·원문은
-              분석 변수에 포함하지 않는 것이 기본 원칙입니다.
-            </p>
-            <Button asChild variant="link" size="sm"><Link href="/data-policy">
-              데이터 처리 원칙 자세히 보기 <FontAwesomeIcon icon={faArrowRight} />
-            </Link></Button>
-          </SectionHeading>
-          <div className="privacy-stack motion-enter">
-            <div><FontAwesomeIcon icon={faUserLock} /><span><strong>이름·주민번호</strong><small>저장하지 않음</small></span></div>
-            <div><FontAwesomeIcon icon={faDatabase} /><span><strong>정확한 금액·주소</strong><small>구간·광역 단위로 변환</small></span></div>
-            <div><FontAwesomeIcon icon={faFileShield} /><span><strong>판결문 원문</strong><small>변수 확인 후 폐기 원칙</small></span></div>
-          </div>
-        </div>
-      </section>
+      <PrivacyPrinciples />
 
-      <section className="section content-width">
-        <CallToAction className="motion-enter">
-          <div>
-            <p className="eyebrow">첫 판단을 시작하세요</p>
-            <h2>내 사건에서 지금 확인해야 할 것을 정리해보세요</h2>
-            <p>회수 가능성을 보장하지 않습니다. 대신 결정에 필요한 질문을 빠뜨리지 않게 돕습니다.</p>
-          </div>
-          <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
-            무료로 시작하기 <FontAwesomeIcon icon={faArrowRight} />
-          </Link></Button>
-        </CallToAction>
-      </section>
+      <StartCase />
     </main>
   )
 }
@@ -157,23 +40,23 @@ export function AboutScreen() {
         description="승소했지만 어디서부터 무엇을 확인해야 할지 모르는 소액 채권자가 비용을 더 쓰기 전에 판단 근거를 정리하도록 돕습니다."
       />
       <ResponsiveGrid>
-        <Surface className="motion-enter">
+        <Surface className={uiClass("motion-enter")}>
           <h2>집행나침반이 제공하는 것</h2>
-          <ul className="check-list">
+          <CheckList>
             <li><FontAwesomeIcon icon={faCheck} /> 승소 후 일반 절차와 확인사항</li>
             <li><FontAwesomeIcon icon={faCheck} /> 사건 조건 기반의 실익 점수 구간</li>
             <li><FontAwesomeIcon icon={faCheck} /> 유리·불리 요인과 데이터 한계</li>
             <li><FontAwesomeIcon icon={faCheck} /> 집행 계획과 결과 기록 흐름</li>
-          </ul>
+          </CheckList>
         </Surface>
-        <Surface muted className="motion-enter">
+        <Surface muted className={uiClass("motion-enter")}>
           <h2>집행나침반이 제공하지 않는 것</h2>
-          <ul className="plain-list">
+          <PlainList>
             <li>사건별 법률 자문 또는 강제집행 대행</li>
             <li>회수 성공률이나 특정 결과의 보장</li>
             <li>특정 채무자의 자산·SNS 자동 추적</li>
             <li>검증되지 않은 AI 판단의 단정적 표시</li>
-          </ul>
+          </PlainList>
         </Surface>
       </ResponsiveGrid>
       <Notice tone="warning" title="아직 검증 중인 MVP입니다">
@@ -200,15 +83,15 @@ export function GuideScreen() {
         description="사건마다 절차와 비용이 달라질 수 있으므로, 아래 순서를 기본 점검표로 활용하세요."
         actions={<Button asChild variant="default" size="default"><Link href="/app/cases/new">내 사건에 적용하기</Link></Button>}
       />
-      <ol className="guide-timeline">
+      <GuideTimeline>
         {guideSteps.map(([number, title, body]) => (
-          <li className="motion-enter" key={number}>
+          <li className={uiClass("motion-enter")} key={number}>
             <span>{number}</span>
             <div><h2>{title}</h2><p>{body}</p></div>
           </li>
         ))}
-      </ol>
-      <Surface className="motion-enter">
+      </GuideTimeline>
+      <Surface className={uiClass("motion-enter")}>
         <h2>주요 집행 수단 비교 전 확인사항</h2>
         <TableContainer>
           <table>
@@ -242,7 +125,7 @@ export function FaqScreen() {
     <PageLayout width="reading" id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "자주 묻는 질문" }]} />
       <PageHeader eyebrow="FAQ" title="자주 묻는 질문" description="서비스 범위, 점수, 개인정보 처리에 관한 핵심 질문을 모았습니다." />
-      <Accordion className="faq-list motion-enter" type="single" collapsible>
+      <Accordion className={uiClass("faq-list motion-enter")} type="single" collapsible>
         {faqs.map(([question, answer], index) => (
           <AccordionItem value={`faq-${index}`} key={question}>
             <AccordionTrigger>{question}</AccordionTrigger>
@@ -257,7 +140,7 @@ export function FaqScreen() {
 export function LegalScreen({ type }: { type: LegalType }) {
   const content = legalContent[type]
   return (
-    <PageLayout width="reading" id="main-content" className="legal-page">
+    <PageLayout width="reading" id="main-content" className={uiClass("legal-page")}>
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: content.title }]} />
       <PageHeader title={content.title} description={content.lead} />
       <Notice tone="warning" title="MVP 초안 · 법률 검토 전">
@@ -273,7 +156,7 @@ export function NoticesScreen() {
     <PageLayout id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "공지사항" }]} />
       <PageHeader title="공지사항" description="집행나침반 MVP의 변경사항과 운영 안내입니다." />
-      <Surface as="div" className="notice-list motion-enter">
+      <Surface as="div" className={uiClass("notice-list motion-enter")}>
         <article><StatusBadge tone="info">안내</StatusBadge><div><h2>MVP 화면 프로토타입을 공개했습니다</h2><p>2026.08.29 · 핵심 사용자 흐름과 데이터 처리 원칙을 확인할 수 있습니다.</p></div></article>
       </Surface>
     </PageLayout>

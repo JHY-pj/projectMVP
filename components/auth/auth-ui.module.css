@@ -1,7 +1,6 @@
-/* Styles unique to this screen composition; shared UI appearance lives in components. */
 .auth-aside h1{margin:0.625rem 0 1rem;font-size:clamp(2.125rem,4vw,3.25rem);line-height:1.25;letter-spacing:-.045em}
 .auth-aside p{color:#bfd3e7}
-.auth-aside .eyebrow{color:#8cc9ff}
+.auth-aside :global(.eyebrow){color:#8cc9ff}
 .auth-icon{width:3.625rem;height:3.625rem;display:grid;place-items:center;margin-bottom:1.5rem;border:0.0625rem solid rgba(255,255,255,.25);border-radius:50%;font-size:1.5625rem}
 .auth-aside ul{margin:2.5rem 0 0;padding:0;list-style:none;display:grid;gap:0.75rem}
 .auth-aside li{display:flex;align-items:center;gap:0.625rem;color:#d7e5f2}
@@ -24,6 +23,15 @@
 .eligibility-check h2{margin-bottom:0.25rem}
 .eligibility-check p{color:var(--gray-600)}
 .segmented-control{display:grid;grid-template-columns:repeat(3,1fr);margin-top:1.125rem;border:0.0625rem solid var(--input)}
+.auth-aside{padding:clamp(3.125rem,7vw,6.25rem);display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 80% 18%,rgba(144,214,166,.26) 0,transparent 16rem),linear-gradient(145deg,#103a2e,#1b6b50);color:white}
+.signup-consent{display:flex;flex-direction:column;gap:.75rem}
+.signup-consent-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem;border:0.0625rem solid var(--border);border-radius:var(--ui-radius-panel)}
+.signup-consent-row [data-slot="button"]{flex-shrink:0}
+.signup-consent-state{margin-left:.5rem;color:var(--gray-600);font-size:.875rem}
+.signup-consent-final{margin-top:.25rem}
+.auth-main{min-height:calc(100vh - 4.8125rem);display:grid;grid-template-columns:minmax(20rem,.85fr) minmax(30rem,1.15fr);background:var(--gray-50);padding-block:0}
+.auth-card{width:min(32.5rem,calc(100% - 2.5rem));margin:auto;margin-block:3rem}
+.sticky-actions{position:sticky;bottom:0;z-index:10;display:flex;justify-content:flex-end;gap:0.625rem;margin:1.875rem -1.25rem 0;padding:1rem 1.25rem;border-top:0.0625rem solid var(--border);background:rgba(255,255,255,.96)}
 @media (max-width:47.5rem){
 .auth-main{grid-template-columns:1fr}
 .auth-aside{min-height:20.625rem;padding:2.8125rem 1.5625rem}
@@ -31,20 +39,8 @@
 .auth-card{margin:1.5625rem auto}
 .segmented-control{grid-template-columns:1fr}
 }
-.auth-aside{padding:clamp(3.125rem,7vw,6.25rem);display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 80% 18%,rgba(144,214,166,.26) 0,transparent 16rem),linear-gradient(145deg,#103a2e,#1b6b50);color:white}
-@media (max-width:47.5rem){
-  .auth-card [data-slot="button"]{width:100%}
-}
-.signup-consent{display:flex;flex-direction:column;gap:.75rem}
-.signup-consent-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem;border:1px solid var(--border);border-radius:.75rem}
-.signup-consent-row [data-slot="button"]{flex-shrink:0}
-.signup-consent-state{margin-left:.5rem;color:var(--gray-600);font-size:.875rem}
-.signup-consent-final{margin-top:.25rem}
 @media(max-width:30rem){.signup-consent-row{align-items:flex-start;flex-direction:column}}
-.auth-main{min-height:calc(100vh - 4.8125rem);display:grid;grid-template-columns:minmax(20rem,.85fr) minmax(30rem,1.15fr);background:var(--gray-50);padding-block:0}
-.auth-card{width:min(32.5rem,calc(100% - 2.5rem));margin:auto;margin-block:3rem}
 @media (max-width:47.5rem){.auth-card{margin-block:1.5rem}}
-.sticky-actions{position:sticky;bottom:0;z-index:10;display:flex;justify-content:flex-end;gap:0.625rem;margin:1.875rem -1.25rem 0;padding:1rem 1.25rem;border-top:0.0625rem solid var(--border);background:rgba(255,255,255,.96)}
 @media (max-width:47.5rem){
 .sticky-actions{display:grid;grid-template-columns:1fr 2fr}
 }

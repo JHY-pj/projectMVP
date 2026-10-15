@@ -1,0 +1,6 @@
+.card { position: relative; min-width: 0; min-height: 7.5rem; display: grid; place-items: center; align-content: center; gap: 0.5rem; padding: 1.5rem 0.75rem; border: 0.125rem solid var(--border); border-radius: var(--ui-radius-control); background: var(--card); text-align: center; cursor: pointer; }
+.card > [data-slot="checkbox"], .card > [data-slot="radio-group-item"] { position: absolute; top: 0.625rem; right: 0.625rem; }
+.card > svg { width: 1.625rem; height: 1.625rem; color: var(--gray-500); }
+.card[data-selected] { border-color: var(--navy-800); background: var(--blue-50); color: var(--navy-800); }
+.card[data-selected] > svg { color: var(--blue-700); }
+.card:focus-within { outline: 0.1875rem solid #2c8b6833; outline-offset: 0.125rem; }

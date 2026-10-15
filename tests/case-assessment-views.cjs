@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const ts = require('typescript');
+const { loadUI } = require('./ui-loader.cjs');
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 function compile(file, requireFn, extra = '') {
@@ -15,7 +16,7 @@ function render(view, record, entries = {}) {
   const fakeReact = { ...React, useEffect() {}, useState(initial) { const i = index++; return [i === 0 ? entries : view === 'DemoReport' && i === 1 ? true : initial, () => {}]; } };
   const component = ({ children, href, id, className }) => React.createElement(href ? 'a' : 'div', { href, id, className }, children);
   const stubs = new Proxy({}, { get: () => component });
-  const resolver = name => name === 'react' ? fakeReact : name === 'react/jsx-runtime' ? require(name) : name === '@/lib/case-assessment' ? rules : name === '@/components/case-input-editor' ? editor : name === 'next/link' ? { default: component } : stubs;
+  const resolver = name => name === 'react' ? fakeReact : name === 'react/jsx-runtime' ? require(name) : name === '@/lib/case-assessment' ? rules : name === '@/components/member/case-ui' ? loadUI('components/member/case-ui.tsx') : name === '@/components/case-input-editor' ? editor : name === 'next/link' ? { default: component } : stubs;
   const editor = compile('components/case-input-editor.tsx', resolver);
   const views = compile('components/member-screens.tsx', resolver, '\nexports.views={DemoReport,PlanView};').views;
   return renderToStaticMarkup(React.createElement(views[view], { record, caseId: 'LOCAL-test' }));

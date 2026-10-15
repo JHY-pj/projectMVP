@@ -1,5 +1,5 @@
+import { uiClass, LegalSection } from "@/components/legal/legal-ui"
 
-import "./legal-content.css"
 export type LegalType = "terms" | "privacy" | "disclaimer" | "data-policy"
 
 export const legalContent: Record<LegalType, { title: string; lead: string; sections: Array<[string, string]> }> = {
@@ -28,10 +28,10 @@ export const legalContent: Record<LegalType, { title: string; lead: string; sect
 
 export function LegalDocumentContent({ type }: { type: LegalType }) {
   return <>{legalContent[type].sections.map(([title, body], index) => (
-    <section className="legal-section motion-enter" key={title}>
+    <LegalSection className={uiClass("motion-enter")} key={title}>
       <span>{String(index + 1).padStart(2, "0")}</span>
       <div><h2>{title}</h2><p>{body}</p></div>
-    </section>
+    </LegalSection>
   ))}</>
 }
 

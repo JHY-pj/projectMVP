@@ -1,8 +1,23 @@
 "use client"
 
+import {
+  uiClass,
+  SupportChat,
+  SupportChatHeader,
+  SupportChatTitle,
+  SupportChatIcon,
+  SupportChatActions,
+  SupportChatNotice,
+  SupportChatMessages,
+  ChatMessage,
+  ChatAvatar,
+  ChatError,
+  ChatQuickQuestions,
+  ChatComposer,
+  SupportChatFooter,
+  SupportTools,
+} from "@/components/support/chat-ui"
 import { InputAction } from "@/components/common/primitives"
-import "./support-chat-screen.css"
-
 import { PageLayout, Textarea } from "@/components/common/primitives"
 
 import { Button } from "@/components/ui/button"
@@ -146,7 +161,7 @@ export function SupportChatScreen() {
   }
 
   return (
-    <PageLayout width="reading" id="main-content" className="support-main">
+    <PageLayout width="reading" id="main-content" className={uiClass("support-main")}>
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "고객센터" }]} />
       <PageHeader
         eyebrow="고객센터 · 실시간 안내"
@@ -154,63 +169,63 @@ export function SupportChatScreen() {
         description="AI가 사건을 대신 판단하지 않습니다. 현재 상황을 듣고, 다음에 확인할 가장 중요한 한 가지를 차분히 안내합니다."
       />
 
-      <section className="support-chat motion-enter" aria-label="민사 안내 챗봇">
-        <header className="support-chat-header">
-          <div className="support-chat-title">
-            <span className="support-chat-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span>
+      <SupportChat className={uiClass("motion-enter")} aria-label="민사 안내 챗봇">
+        <SupportChatHeader>
+          <SupportChatTitle>
+            <SupportChatIcon><FontAwesomeIcon icon={faScaleBalanced} /></SupportChatIcon>
             <span><strong>민사 절차 안내</strong><small><i /> 실시간 상담 중</small></span>
-          </div>
-          <div className="support-chat-actions">
+          </SupportChatTitle>
+          <SupportChatActions>
             <Button variant="ghost" size="default" type="button" onClick={downloadConversation}>
               <FontAwesomeIcon icon={faFloppyDisk} /> 저장
             </Button>
             <Button variant="ghost" size="default" type="button" onClick={resetConversation}>
               <FontAwesomeIcon icon={faPlus} /> 새 상담
             </Button>
-          </div>
-        </header>
+          </SupportChatActions>
+        </SupportChatHeader>
 
-        <div className="support-chat-notice">
+        <SupportChatNotice>
           <FontAwesomeIcon icon={faCommentDots} />
           <span>판결·채권·계약·손해배상 등 민사 문제를 중심으로 안내합니다. 한 번에 하나씩 확인해요.</span>
-        </div>
+        </SupportChatNotice>
 
-        <div className="support-chat-messages" ref={messageListRef} aria-live="polite" aria-busy={isSending}>
+        <SupportChatMessages  ref={messageListRef} aria-live="polite" aria-busy={isSending}>
           {messages.map((message) => (
-            <article className={`chat-message chat-message-${message.role}`} key={message.id}>
-              {message.role === "assistant" && <span className="chat-avatar" aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></span>}
+            <ChatMessage role={message.role} key={message.id}>
+              {message.role === "assistant" && <ChatAvatar  aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></ChatAvatar>}
               <p>{message.content}</p>
-            </article>
+            </ChatMessage>
           ))}
           {isSending && (
-            <article className="chat-message chat-message-assistant chat-message-loading">
-              <span className="chat-avatar" aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></span>
+            <ChatMessage className={uiClass("chat-message-assistant chat-message-loading")}>
+              <ChatAvatar  aria-hidden="true"><FontAwesomeIcon icon={faScaleBalanced} /></ChatAvatar>
               <p role="status"><FontAwesomeIcon icon={faSpinner} spin /> 말씀해주신 내용을 정리하고 있어요.</p>
-            </article>
+            </ChatMessage>
           )}
-        </div>
+        </SupportChatMessages>
 
         {error && (
-          <div className="chat-error" role="alert">
+          <ChatError  role="alert">
             <FontAwesomeIcon icon={faTriangleExclamation} />
             <span>{error} Python 챗봇 서버가 실행 중인지 확인한 뒤 다시 시도해 주세요.</span>
-          </div>
+          </ChatError>
         )}
 
         {messages.length === 1 && !isSending && (
-          <div className="chat-quick-questions">
+          <ChatQuickQuestions>
             <span>이렇게 시작해 보세요</span>
             {quickQuestions.map((question) => (
               <Button variant="outline" size="sm" type="button" key={question} onClick={() => sendMessage(undefined, question)}>
                 {question}
               </Button>
             ))}
-          </div>
+          </ChatQuickQuestions>
         )}
 
-        <form className="chat-composer" onSubmit={sendMessage}>
+        <ChatComposer  onSubmit={sendMessage}>
           <InputAction>
-          <label className="sr-only" htmlFor="support-chat-input">상담 내용 입력</label>
+          <label className={uiClass("sr-only")} htmlFor="support-chat-input">상담 내용 입력</label>
           <Textarea
             id="support-chat-input"
             ref={inputRef}
@@ -230,17 +245,17 @@ export function SupportChatScreen() {
             <span>보내기</span>
           </Button>
           </InputAction>
-        </form>
-        <footer className="support-chat-footer">
+        </ChatComposer>
+        <SupportChatFooter>
           <span>이 상담은 일반적인 정보 안내이며, 사건별 법률 자문이나 결과 보장을 하지 않습니다.</span>
           <Button variant="link" size="sm" type="button" onClick={resetConversation}><FontAwesomeIcon icon={faRotateLeft} /> 대화 초기화</Button>
-        </footer>
-      </section>
+        </SupportChatFooter>
+      </SupportChat>
 
-      <section className="support-tools motion-enter" aria-label="고객센터 보조 메뉴">
+      <SupportTools className={uiClass("motion-enter")} aria-label="고객센터 보조 메뉴">
         <Link href="/faq"><FontAwesomeIcon icon={faList} /><span><strong>자주 묻는 질문</strong><small>서비스 범위와 기본 절차 확인</small></span></Link>
         <Link href="/guide"><FontAwesomeIcon icon={faFileArrowDown} /><span><strong>승소 후 절차</strong><small>집행 전 확인할 네 가지</small></span></Link>
-      </section>
+      </SupportTools>
 
       <Notice tone="warning" title="중요한 신청·기한·금액 판단 전 확인">
         법원 안내 또는 법률 전문가를 통해 실제 사건의 최신 요건과 비용을 확인해 주세요.

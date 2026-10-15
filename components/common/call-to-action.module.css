@@ -1,4 +1,4 @@
-.panel { display: flex; align-items: center; justify-content: space-between; gap: 2.5rem; min-width: 0; padding: 2.875rem 3.375rem; border-radius: 0.875rem; background: linear-gradient(120deg,#123d30,#1d6b50); color: white; box-shadow: var(--shadow-sm); }
+.panel { display: flex; align-items: center; justify-content: space-between; gap: 2.5rem; min-width: 0; padding: 2.875rem 3.375rem; border-radius: var(--ui-radius-panel); background: linear-gradient(120deg,#123d30,#1d6b50); color: white; box-shadow: var(--shadow-sm); }
 .panel > div { min-width: 0; }
 .panel > div > * { margin-block: 0; }
 .panel > div > * + * { margin-block-start: 0.75rem; }

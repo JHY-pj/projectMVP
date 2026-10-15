@@ -1,9 +1,59 @@
 "use client"
-import { InputAction } from "@/components/common/primitives"
+import {
+  WizardCard,
+  DeletionPendingCard,
+  SettingsPanel,
+  uiClass,
+  CaseList,
+  WizardSection,
+  EligibilityList,
+  ExecutionOptions,
+  WizardSubsection,
+  WizardActions,
+  CaseDeletionPendingNote,
+  CaseDeletionPendingActions,
+  CaseIdentity,
+  CaseStatusActions,
+  ActivityList,
+  RuleReasons,
+  ReportCheckNote,
+  ReportCheckList,
+  PlanHeading,
+  PlanHeadingActions,
+  ChecklistPanel,
+  PlanItem,
+  PlanIndex,
+  PlanRecordList,
+  PlanFileNotice,
+  PlanFileNoticeText,
+  ResultForm,
+  ReasonGrid,
+  DeleteRequestNotice,
+  DeleteRequestSummary,
+  NotificationList,
+  ConsentHistory,
+} from "@/components/member/case-ui"
+import { CaseListCard } from "@/components/member/case-list-card"
+import { StepProgress } from "@/components/common/step-progress"
+import { SelectionCard } from "@/components/common/selection-card"
+import { SummaryChips } from "@/components/common/summary-chips"
+import { ActionBar, InputAction } from "@/components/common/primitives"
 
-import "./member-screens.css"
-
-import { PageLayout, Surface, FormGrid, Field, Select, InfoList, PanelHeading, ActionSection, FormStack, Input, Textarea, CheckboxRow , ResponsiveGrid } from "@/components/common/primitives"
+import {
+  PageLayout,
+  Surface,
+  FormGrid,
+  Field,
+  Select,
+  InfoList,
+  PanelHeading,
+  ActionSection,
+  FormStack,
+  Input,
+  Textarea,
+  CheckboxRow,
+  ResponsiveGrid,
+} from "@/components/common/primitives"
 
 import { Button } from "@/components/ui/button"
 
@@ -31,18 +81,14 @@ import {
   faBank,
   faBell,
   faBuilding,
-  faCalendarCheck,
   faCar,
   faCheck,
-  faChevronRight,
   faCircleCheck,
   faCircleExclamation,
   faClockRotateLeft,
   faCoins,
   faFileCircleCheck,
   faFileLines,
-  faListCheck,
-  faScaleBalanced,
   faTrashCan,
   faUserShield,
   faWallet,
@@ -71,9 +117,9 @@ const demoCase = {
 }
 
 export function DashboardScreen() {
-  return <PageLayout id="main-content" className="dashboard-main">
+  return <PageLayout id="main-content" >
     <PageHeader eyebrow="데모" title="집행나침반 체험" description="가상 사건을 입력하고, 확인할 정보와 다음 행동을 정리해 보세요." />
-    <Surface><h2>어디서 시작할까요?</h2><p>새 사건을 등록하거나 준비된 예시 사건을 살펴볼 수 있습니다.</p><div className="case-actions"><Button asChild variant="default" size="default"><Link href="/app/cases/new">가상 사건 등록</Link></Button><Button asChild variant="outline" size="default"><Link href="/app/cases">사건 목록</Link></Button></div></Surface>
+    <Surface><h2>어디서 시작할까요?</h2><p>새 사건을 등록하거나 준비된 예시 사건을 살펴볼 수 있습니다.</p><ActionBar><Button asChild variant="default" size="default"><Link href="/app/cases/new">가상 사건 등록</Link></Button><Button asChild variant="outline" size="default"><Link href="/app/cases">사건 목록</Link></Button></ActionBar></Surface>
     <Notice tone="info" title="이번 데모의 범위">사건 입력 → 정보 확인 → 집행 계획 → 진행·결과 기록을 체험합니다. 입력 기반 규칙으로 검토 순서를 안내합니다. 서버 저장은 아직 연결하지 않았습니다.</Notice>
   </PageLayout>
 }
@@ -95,7 +141,7 @@ export function CaseListScreen() {
   ]
 
   return (
-    <PageLayout id="main-content" className="cases-main">
+    <PageLayout id="main-content" >
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건" }]} />
       <PageHeader
         eyebrow="내 사건"
@@ -103,29 +149,17 @@ export function CaseListScreen() {
         description="사건별 진행 상태와 다음 할 일을 확인하세요."
         actions={<Button asChild variant="default" size="default"><Link href="/app/cases/new"><FontAwesomeIcon icon={faFileLines} /> 새 사건 등록</Link></Button>}
       />
-      <div className="case-list-summary">
+      <SummaryChips>
         <span>전체 <strong>{cases.length}</strong></span>
         <span>진행 중 <strong>{cases.filter((item) => item.status === "진행 중").length}</strong></span>
         <span>완료 <strong>{cases.filter((item) => item.status === "완료").length}</strong></span>
         <span>중단 <strong>{cases.filter((item) => item.status === "중단").length}</strong></span>
-      </div>
-      <section className="case-list" aria-label="등록한 사건 목록">
+      </SummaryChips>
+      <CaseList  aria-label="등록한 사건 목록">
         {cases.map((item) => (
-          <article className="case-list-item" key={item.id}>
-            <div className="case-list-primary">
-              <span className="case-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span>
-              <div>
-                <small>{item.caseNo}</small>
-                <h2>{item.type} 청구 사건</h2>
-                <p>{item.amount}</p>
-              </div>
-            </div>
-            <div className="case-list-next"><small>다음 할 일</small><strong>{item.next}</strong></div>
-            <div className="case-list-meta"><StatusBadge tone={item.tone}>{item.status}</StatusBadge><small>최근 업데이트 {item.updatedAt}</small></div>
-            <Button asChild variant="outline" size="sm"><Link href={`/app/cases/${item.id}`}>사건 보기 <FontAwesomeIcon icon={faChevronRight} /></Link></Button>
-          </article>
+          <CaseListCard item={item} key={item.id} />
         ))}
-      </section>
+      </CaseList>
     </PageLayout>
   )
 }
@@ -157,7 +191,6 @@ export function CaseWizardScreen() {
     setSignals((current) => ({ ...current, [key]: value }))
   }
 
-  const progress = Math.round((step / wizardSteps.length) * 100)
   const displaySignal = (value: string) => value === "Unknown" ? "미확인" : value
 
   const reviewItems: Array<[string, string]> = [
@@ -223,29 +256,26 @@ export function CaseWizardScreen() {
   }
 
   return (
-    <PageLayout id="main-content" className="case-wizard">
+    <PageLayout id="main-content" >
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "새 사건 등록" }]} />
       <PageHeader eyebrow={`새 사건 등록 · ${step}/${wizardSteps.length}`} title={wizardSteps[step - 1]} description="가상 사건만 입력해 주세요. 모르는 내용은 모름으로 두고 진행할 수 있습니다. 판결문 자동 업로드는 추후 지원합니다." />
-      <div className="wizard-progress motion-enter">
-        <Progress value={progress} aria-label={`사건 등록 진행률 ${progress}%`} />
-        <ol>{wizardSteps.map((label, index) => <li className={index + 1 === step ? "is-current" : index + 1 < step ? "is-complete" : ""} key={label}><span>{index + 1 < step ? <FontAwesomeIcon icon={faCheck} /> : index + 1}</span><small>{label}</small></li>)}</ol>
-      </div>
+      <StepProgress steps={wizardSteps} current={step} className="motion-enter" />
 
-      <Surface className="wizard-card motion-enter">
+      <WizardCard className="motion-enter">
         {step === 1 && (
-          <div className="wizard-section">
+          <WizardSection>
             <h2>초기 지원 범위에 해당하나요?</h2>
             <p>현재 MVP는 다음 세 조건을 모두 충족하는 사건을 우선 지원합니다.</p>
-            <ul className="eligibility-list">
+            <EligibilityList>
               <li><FontAwesomeIcon icon={faCheck} /><div><strong>민사 승소 판결 보유</strong><span>지급명령 등 다른 집행권원은 후속 지원 예정</span></div></li>
               <li><FontAwesomeIcon icon={faCheck} /><div><strong>개인 채권자</strong><span>기업·기관의 대량 사건은 지원하지 않음</span></div></li>
               <li><FontAwesomeIcon icon={faCheck} /><div><strong>채권액 500만 원 미만</strong><span>초기 무료 검증 구간</span></div></li>
-            </ul>
+            </EligibilityList>
             <Notice tone="warning" title="서비스 한계를 확인해 주세요">법률 상담이나 회수 보장이 아니라, 집행 전 판단 요소와 다음 확인사항을 정리하는 서비스입니다.</Notice>
-          </div>
+          </WizardSection>
         )}
         {step === 2 && (
-          <div className="wizard-section">
+          <WizardSection>
             <h2>비식별 사건 정보를 입력해 주세요</h2>
             <FormGrid>
               <Field><span>사건 유형</span><Select value={caseType} onChange={(event) => setCaseType(event.target.value)}><option value="loan">대여금</option><option value="sale">매매대금</option><option value="construction">공사대금</option><option value="other">기타</option></Select></Field>
@@ -256,20 +286,20 @@ export function CaseWizardScreen() {
 
             </FormGrid>
             <Notice tone="secure" title="정확한 값은 입력하지 않습니다">채무자의 이름, 주민번호, 상세주소, 정확한 청구금액은 저장 대상이 아닙니다.</Notice>
-          </div>
+          </WizardSection>
         )}
         {step === 3 && (
-          <div className="wizard-section">
+          <WizardSection>
             <h2>어떤 집행을 시도하셨나요?</h2>
-            <div className="execution-options">
+            <ExecutionOptions>
               {[["bank", faBank, "통장 압류"], ["wage", faWallet, "급여 압류"], ["car", faCar, "차량"], ["estate", faBuilding, "부동산"], ["none", faClockRotateLeft, "아직 안 함"]].map(([value, icon, label]) => (
-                <label className={attempts.includes(String(value)) ? "execution-option is-selected" : "execution-option"} key={String(value)}>
+                <SelectionCard selected={attempts.includes(String(value))} key={String(value)}>
                   <Checkbox checked={attempts.includes(String(value))} onCheckedChange={(checked) => toggleAttempt(String(value), Boolean(checked))} />
                   <FontAwesomeIcon icon={icon as typeof faBank} />
                   <span>{String(label)}</span>
-                </label>
+                </SelectionCard>
               ))}
-            </div>
+            </ExecutionOptions>
             <h3>채무자 정보와 집행 단서</h3>
             <p>집행을 시도한 적이 있는지와 재산 단서를 알고 있는지는 별개입니다. 모르는 내용은 모름으로 선택하세요.</p>
             <FormGrid>
@@ -284,7 +314,7 @@ export function CaseWizardScreen() {
               <Field><span>차량 단서</span><Select value={signals.known_vehicle} onChange={(event) => setSignal("known_vehicle", event.target.value)}><option value="Unknown">모름</option><option value="Y">알고 있음</option><option value="N">없음 / 알지 못함</option></Select></Field>
             </FormGrid>
             <FormGrid><Field><span>예상 비용 구간</span><Select value={signals.expected_cost_band} onChange={(event) => setSignal("expected_cost_band", event.target.value)}><option value="Unknown">모름</option><option value="under-10">10만 원 미만</option><option value="10-30">10만~30만 원</option><option value="30-50">30만~50만 원</option><option value="over-50">50만 원 이상</option></Select></Field><Field><span>선순위 권리 확인 결과</span><Select value={signals.priority_right_risk} onChange={(event) => setSignal("priority_right_risk", event.target.value)}><option value="Unknown">모름 / 확인 중</option><option value="Y">있음</option><option value="N">없음 (사용자 확인)</option></Select></Field></FormGrid>
-            <section className="wizard-subsection" aria-labelledby="case-progress-heading">
+            <WizardSubsection  aria-labelledby="case-progress-heading">
               <h3 id="case-progress-heading">현재 상태는 어떤가요?</h3>
               <p>재산 단서와 별개로, 지금까지의 집행 진행·회수 상황을 선택해 주세요.</p>
               <RadioGroup layout="list" value={status} onValueChange={setStatus}>
@@ -292,25 +322,25 @@ export function CaseWizardScreen() {
                 <label key={value}><RadioGroupItem value={value} /><span><strong>{label}</strong><small>{hint}</small></span></label>
               ))}
               </RadioGroup>
-            </section>
-          </div>
+            </WizardSubsection>
+          </WizardSection>
         )}
         {step === 4 && (
-          <div className="wizard-section submit-summary">
+          <WizardSection className={uiClass("submit-summary")}>
             <h2>입력 정보를 확인하고 제출해 주세요</h2>
             <p>아래 내용을 확인한 뒤 사건을 등록할 수 있습니다. 수정할 내용이 있다면 이전 단계로 돌아가세요.</p>
-            <InfoList className="submit-review-list">
+            <InfoList className={uiClass("submit-review-list")}>
               {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </InfoList>
             <Notice tone="info" title="추가 정보가 필요한 경우">입력 정보에 따라 확인 우선순위와 검토할 집행 수단이 달라집니다. 회수 확률은 산출하지 않습니다.</Notice>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
-          </div>
+          </WizardSection>
         )}
-      </Surface>
-      <div className="wizard-actions">
+      </WizardCard>
+      <WizardActions>
         {step > 1 ? <Button variant="outline" size="default" onClick={previous}>이전</Button> : <Button asChild variant="outline" size="default"><Link href="/app">취소</Link></Button>}
         {step < wizardSteps.length ? <Button variant="default" size="default" onClick={next}>다음 <FontAwesomeIcon icon={faArrowRight} /></Button> : <Button variant="default" size="default" onClick={submitCase}>등록 완료 <FontAwesomeIcon icon={faArrowRight} /></Button>}
-      </div>
+      </WizardActions>
     </PageLayout>
   )
 }
@@ -356,16 +386,16 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
 
   if (!loaded) return <PageLayout id="main-content" aria-busy="true">사건을 불러오는 중입니다.</PageLayout>
   if (loadError || (!record && !["demo-2026"].includes(caseId))) return <PageLayout id="main-content"><h1>{loadError ? "사건을 불러오지 못했습니다" : "등록되지 않은 사건입니다"}</h1><p>현재 브라우저의 사건 목록에서 다시 선택해 주세요.</p><Button asChild variant="default" size="default"><Link href="/app/cases">사건 목록</Link></Button></PageLayout>
-  if (deletionPending === null) return <PageLayout id="main-content" className="case-detail-main" aria-busy="true" />
+  if (deletionPending === null) return <PageLayout id="main-content"  aria-busy="true" />
   if (deletionPending) return (
-    <PageLayout id="main-content" className="case-detail-main">
+    <PageLayout id="main-content" >
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases" }, { label: demoCase.id }]} />
-      <Surface className="case-deletion-pending" role="status">
+      <DeletionPendingCard role="status">
         <StatusBadge tone="warning">삭제 검토 중</StatusBadge>
         <h1>사건 삭제 요청을 검토 중입니다</h1>
         <p>해당 사건의 삭제 요청이 접수되어 검토 중입니다. 검토가 끝나거나 요청이 취소될 때까지 이 사건의 모든 상세 화면과 기록 기능을 이용할 수 없습니다.</p>
-        <p className="case-deletion-pending-note">현재는 브라우저에 저장되는 시연 상태이며 실제 운영자에게 요청이 전송되지는 않습니다.</p>
-        <div className="case-deletion-pending-actions">
+        <CaseDeletionPendingNote>현재는 브라우저에 저장되는 시연 상태이며 실제 운영자에게 요청이 전송되지는 않습니다.</CaseDeletionPendingNote>
+        <CaseDeletionPendingActions>
           <Button asChild variant="outline" size="default"><Link href="/app/cases">내 사건 목록</Link></Button>
           <Button variant="default" size="default" type="button" onClick={() => {
             if (!window.confirm("사건 삭제 요청을 취소하고 다시 이용할까요?")) return
@@ -375,23 +405,23 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
               toast.success("삭제 요청을 취소했습니다.")
             } catch { toast.error("삭제 요청 취소에 실패했습니다.") }
           }}>삭제 요청 취소</Button>
-        </div>
-      </Surface>
+        </CaseDeletionPendingActions>
+      </DeletionPendingCard>
     </PageLayout>
   )
 
   return (
-    <PageLayout id="main-content" className="case-detail-main">
+    <PageLayout id="main-content" >
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases" }, { label: demoCase.id }]} />
-      <section className="case-identity">
-        <div><div className="eyebrow">{currentCase.id}</div><h1>{currentCase.type} 청구 사건</h1><p>{currentCase.amount} · 최근 업데이트 {currentCase.updatedAt}</p></div>
-        <div className="case-status-actions"><StatusBadge tone="info" size="sm">{currentCase.status}</StatusBadge><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/result`}>결과 수정</Link></Button></div>
-      </section>
+      <CaseIdentity>
+        <div><div className={uiClass("eyebrow")}>{currentCase.id}</div><h1>{currentCase.type} 청구 사건</h1><p>{currentCase.amount} · 최근 업데이트 {currentCase.updatedAt}</p></div>
+        <CaseStatusActions><StatusBadge tone="info" size="sm">{currentCase.status}</StatusBadge><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/result`}>결과 수정</Link></Button></CaseStatusActions>
+      </CaseIdentity>
       <Tabs value={active} onValueChange={(value) => router.push(`/app/cases/${caseId}${value === "summary" ? "" : `/${value}`}`)}>
         <TabsList variant="line" layout="responsive">
           {caseTabs.map(([id, label]) => <TabsTrigger key={id} value={id}>{label}</TabsTrigger>)}
         </TabsList>
-        <TabsContent value={active} className="case-tab-content motion-enter">
+        <TabsContent value={active} className={uiClass("motion-enter")}>
           {active === "summary" && <CaseOverview key={caseId} record={record} caseId={caseId} />}
           {active === "report" && <DemoReport record={record} caseId={caseId} />}
           {active === "plan" && <PlanView key={caseId} caseId={caseId} record={record} />}
@@ -424,10 +454,10 @@ function CaseOverview({ record, caseId }: { record: DraftCase | null; caseId: st
     {!record && <Notice tone="info" title="예시 사건">화면 체험용으로 준비된 사건입니다. 직접 등록한 사건은 사건 목록에서 선택하세요.</Notice>}
     <ResponsiveGrid>
       <Surface><PanelHeading><h2>사건 기본 정보</h2><StatusBadge>{record ? "직접 입력" : "예시"}</StatusBadge></PanelHeading><InfoList><div><dt>사건 유형</dt><dd>{current.claim_type}</dd></div><div><dt>채권 금액</dt><dd>{current.claim_amount_band}</dd></div><div><dt>지역</dt><dd>{current.region}</dd></div></InfoList></Surface>
-      <Surface><h2>현재 진행 상태</h2><StatusBadge tone="info">{current.process_status}</StatusBadge><p>진행 상황과 회수 결과를 각각 기록하고 다시 확인할 수 있습니다.</p><div className="case-actions"><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/status`}>진행 기록</Link></Button><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/result`}>결과 수정</Link></Button></div></Surface>
+      <Surface><h2>현재 진행 상태</h2><StatusBadge tone="info">{current.process_status}</StatusBadge><p>진행 상황과 회수 결과를 각각 기록하고 다시 확인할 수 있습니다.</p><ActionBar><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/status`}>진행 기록</Link></Button><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/result`}>결과 수정</Link></Button></ActionBar></Surface>
     </ResponsiveGrid>
-    <ActionSection compact><div><p className="eyebrow">지금 할 일</p><h2>{loaded ? assessment.title : "확인사항을 불러오는 중입니다"}</h2><p>{loaded ? assessment.explanation : "입력 정보와 집행 기록을 확인합니다."}</p></div><Button asChild variant="default" size="sm"><Link href={`/app/cases/${caseId}/report`}>리포트 보기</Link></Button></ActionSection>
-    <Surface><PanelHeading><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></PanelHeading>{recent.length ? <ol className="activity-list">{recent.map((item) => <li key={item.section}><span /><div><strong>{item.title}</strong><p>{item.text}</p><small>{item.date}</small></div></li>)}</ol> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</Surface>
+    <ActionSection compact><div><p className={uiClass("eyebrow")}>지금 할 일</p><h2>{loaded ? assessment.title : "확인사항을 불러오는 중입니다"}</h2><p>{loaded ? assessment.explanation : "입력 정보와 집행 기록을 확인합니다."}</p></div><Button asChild variant="default" size="sm"><Link href={`/app/cases/${caseId}/report`}>리포트 보기</Link></Button></ActionSection>
+    <Surface><PanelHeading><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></PanelHeading>{recent.length ? <ActivityList>{recent.map((item) => <li key={item.section}><span /><div><strong>{item.title}</strong><p>{item.text}</p><small>{item.date}</small></div></li>)}</ActivityList> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</Surface>
   </>
 }
 
@@ -468,9 +498,9 @@ function DemoReport({ record, caseId }: { record: DraftCase | null; caseId: stri
   return <>
     <Notice tone="info" title="입력 기반 검토 안내">사용자 입력과 최근 집행 기록에 따른 검토 순서입니다. 회수 확률이나 법률상 집행 가능 여부를 판정하지 않습니다.</Notice>
     <Surface aria-live="polite"><PanelHeading><h2>{assessment.title}</h2><StatusBadge tone={assessment.status === "ready" || assessment.status === "closed" ? "info" : "warning"}>규칙 {assessment.version}</StatusBadge></PanelHeading><p>{assessment.explanation}</p></Surface>
-    <Surface><h2>이렇게 안내한 이유</h2><ul className="rule-reasons">{assessment.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul><p className="report-check-note">사용한 정보: {assessment.sources.join(" · ")}</p></Surface>
-    {assessment.status !== "closed" && <Surface><h2>입력 단서로 검토할 수단</h2>{assessment.candidates.length ? <ul className="rule-reasons">{assessment.candidates.map((item) => <li key={item}>{item}</li>)}</ul> : <p>구체적인 단서가 없어 특정 수단을 제시하지 않습니다.</p>}<p className="report-check-note">단서에 따른 후보이며, 수단별 착수 권고나 회수 보장은 아닙니다.</p></Surface>}
-    <Surface><h2>다음 판단을 위해 확인할 사항</h2>{assessment.checks.length ? <ol className="report-check-list">{assessment.checks.map((item) => <li key={item.id}><div><h3>{item.title}</h3><p>{item.reason}</p></div><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/plan#plan-${item.id}`}>{item.action}</Link></Button></li>)}</ol> : <p>{assessment.status === "closed" ? "전액 회수 기록을 결과 화면에서 확인하세요." : "기본 정보의 미확인 항목은 없습니다. 아래 집행 계획에서 실제 확인 근거와 검토 결과를 정리하세요."}</p>}</Surface>
+    <Surface><h2>이렇게 안내한 이유</h2><RuleReasons>{assessment.reasons.map((reason) => <li key={reason}>{reason}</li>)}</RuleReasons><ReportCheckNote>사용한 정보: {assessment.sources.join(" · ")}</ReportCheckNote></Surface>
+    {assessment.status !== "closed" && <Surface><h2>입력 단서로 검토할 수단</h2>{assessment.candidates.length ? <RuleReasons>{assessment.candidates.map((item) => <li key={item}>{item}</li>)}</RuleReasons> : <p>구체적인 단서가 없어 특정 수단을 제시하지 않습니다.</p>}<ReportCheckNote>단서에 따른 후보이며, 수단별 착수 권고나 회수 보장은 아닙니다.</ReportCheckNote></Surface>}
+    <Surface><h2>다음 판단을 위해 확인할 사항</h2>{assessment.checks.length ? <ReportCheckList>{assessment.checks.map((item) => <li key={item.id}><div><h3>{item.title}</h3><p>{item.reason}</p></div><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/plan#plan-${item.id}`}>{item.action}</Link></Button></li>)}</ReportCheckList> : <p>{assessment.status === "closed" ? "전액 회수 기록을 결과 화면에서 확인하세요." : "기본 정보의 미확인 항목은 없습니다. 아래 집행 계획에서 실제 확인 근거와 검토 결과를 정리하세요."}</p>}</Surface>
     {record ? <CaseInputEditor record={record} onSave={saveInput} /> : <Notice tone="info" title="예시 사건">입력값을 바꾸며 비교하려면 새 가상 사건을 등록해 주세요.</Notice>}
     <ActionSection tone="inverse"><div><h2>{assessment.status === "closed" ? "회수 결과 확인" : "확인 순서에 맞춰 기록하세요"}</h2><p>{assessment.status === "closed" ? "전액 회수 여부와 결과 기록을 확인할 수 있습니다." : "리포트와 집행 계획은 같은 규칙을 사용하며, 기록을 수정하거나 삭제하면 다시 계산합니다."}</p></div><Button asChild variant="inverse" size="sm"><Link href={`/app/cases/${caseId}/${assessment.status === "closed" ? "result" : "plan"}`}>{assessment.status === "closed" ? "결과 확인" : "집행 계획 열기"}</Link></Button></ActionSection>
   </>
@@ -679,51 +709,51 @@ function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null
   return (
     <>
       <Notice tone="info" title={assessment.title}>{assessment.explanation} · 규칙 {assessment.version}</Notice>
-      {assessment.status !== "closed" && <Surface><h2>입력 단서에 따른 검토 후보</h2>{assessment.candidates.length ? <ul className="rule-reasons">{assessment.candidates.map((candidate) => <li key={candidate}>{candidate}</li>)}</ul> : <p>구체적 대상 단서를 먼저 정리해 주세요.</p>}<p className="report-check-note">후보는 입력 단서 기준이며, 실제 집행 가능 여부를 확정하지 않습니다.</p></Surface>}
-      <div className="plan-heading"><div><p className="eyebrow">집행 계획</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><Button variant="outline" size="sm" type="button" onClick={resetDemo}>기록 초기화</Button></div></div>
+      {assessment.status !== "closed" && <Surface><h2>입력 단서에 따른 검토 후보</h2>{assessment.candidates.length ? <RuleReasons>{assessment.candidates.map((candidate) => <li key={candidate}>{candidate}</li>)}</RuleReasons> : <p>구체적 대상 단서를 먼저 정리해 주세요.</p>}<ReportCheckNote>후보는 입력 단서 기준이며, 실제 집행 가능 여부를 확정하지 않습니다.</ReportCheckNote></Surface>}
+      <PlanHeading><div><p className={uiClass("eyebrow")}>집행 계획</p><h2>집행 착수 전 확인 항목</h2></div><PlanHeadingActions><strong>{completedCount} / {planItems.length} 확인 완료</strong><Button variant="outline" size="sm" type="button" onClick={resetDemo}>기록 초기화</Button></PlanHeadingActions></PlanHeading>
       <Progress value={(completedCount / planItems.length) * 100} />
-      <section className="checklist-panel">
+      <ChecklistPanel>
         {orderedItems.map((item, index) => {
           const count = (entries[item.id] || []).length
           const status = count > 0 ? "검토중" : assessment.status === "closed" || assessment.status === "paused" ? "대기" : assessment.checks.some((check) => check.id === item.id) ? "확인 필요" : "대기"
           return (
-            <div className="plan-item" id={`plan-${item.id}`} key={item.id}>
-              <span className="plan-index">{index + 1}</span>
-              <div className="plan-item-content">
+            <PlanItem  id={`plan-${item.id}`} key={item.id}>
+              <PlanIndex>{index + 1}</PlanIndex>
+              <div >
                 <strong>{item.title}</strong>
                 <small>{assessment.checks.find((check) => check.id === item.id)?.reason || item.description}</small>
                 {count > 0 && <small>등록된 기록 {count}건 · {status === "검토중" ? "확인 대기" : "기록 있음"}</small>}
                 <Button variant="link" size="sm" type="button" onClick={() => openItem(item.id)}>{count ? "기록 관리" : item.action}</Button>
               </div>
               <StatusBadge tone={status === "확인 필요" ? "warning" : status === "검토중" ? "info" : "neutral"}>{status}</StatusBadge>
-            </div>
+            </PlanItem>
           )
         })}
-      </section>
+      </ChecklistPanel>
       <Notice tone="info" title="상태는 증빙 확인 결과에 따라 변경됩니다">기록을 등록하면 검토중으로 표시합니다. 사용자가 직접 완료 처리하지 않으며, 완료는 운영 검증 이후 반영할 예정입니다. 입력 기록은 리포트 검토 순서에 반영되며, 검증 완료를 뜻하지 않습니다.</Notice>
       <Dialog open={Boolean(activeItem)} onOpenChange={(open) => { if (!open) { setActiveId(null); setEditingId(null); setNote(""); setReference("") } }}>
-        <DialogContent className="plan-manage-dialog">
-          <DialogHeader className="plan-manage-header">
+        <DialogContent>
+          <DialogHeader>
             <DialogTitle>{activeItem?.title || "집행 계획 관리"}</DialogTitle>
             <DialogDescription>{activeItem?.guide}</DialogDescription>
           </DialogHeader>
-          <DialogBody className="plan-record-content">
+          <DialogBody className={uiClass("plan-record-content")}>
             <h3>등록된 기록</h3>
             {(activeId && entries[activeId]?.length) ? (
-              <ul className="plan-record-list">
+              <PlanRecordList>
                 {entries[activeId].map((entry) => (
                   <li key={entry.id}>
                     {editingId === entry.id ? (
-                      <FormStack as="form" key={editingId} className="plan-inline-editor" onSubmit={saveEdit}>
+                      <FormStack as="form" key={editingId} className={uiClass("plan-inline-editor")} onSubmit={saveEdit}>
                         {activeId === "judgment" && <><Field><span>집행권원 종류</span><Select name="detail_kind" defaultValue={editingDetails.kind || ""} required><option value="" disabled>선택</option><option value="판결문">판결문</option><option value="지급명령">지급명령</option><option value="조정조서">조정조서</option><option value="화해조서">화해조서</option><option value="공정증서">공정증서</option><option value="기타">기타</option></Select></Field><Field><span>확정 여부</span><Select name="detail_finality" defaultValue={editingDetails.finality || ""} required><option value="" disabled>선택</option><option value="확정">확정</option><option value="미확정">미확정</option><option value="확인 중">확인 중</option><option value="확정 불요·별도 확인">확정 불요·별도 확인</option></Select></Field></>}
 {activeId === "cost" && <><Field><span>비용 항목</span><Select name="detail_costKind" defaultValue={editingDetails.costKind || ""} required><option value="" disabled>선택</option><option value="인지대">인지대</option><option value="송달료">송달료</option><option value="집행문·증명 발급">집행문·증명 발급</option><option value="재산조회">재산조회</option><option value="법무사 수수료">법무사 수수료</option><option value="기타">기타</option></Select></Field><Field><span>지출 구분</span><Select name="detail_costStatus" defaultValue={editingDetails.costStatus || ""} required><option value="" disabled>선택</option><option value="예상">예상</option><option value="실제 지출">실제 지출</option></Select></Field><Field><span>금액 (원)</span><Input name="amount" type="number" min="1" step="1" defaultValue={editingEntry?.amount} required /></Field><Field><span>기준일·지출일</span><Input name="occurredOn" type="date" defaultValue={editingEntry?.occurredOn} required /></Field></>}
 {activeId === "priority" && <><Field><span>확인 대상</span><Select name="detail_subject" defaultValue={editingDetails.subject || ""} required><option value="" disabled>선택</option><option value="예금채권">예금채권</option><option value="급여채권">급여채권</option><option value="부동산">부동산</option><option value="차량">차량</option><option value="기타">기타</option></Select></Field><Field><span>선순위 권리</span><Select name="detail_priorityResult" defaultValue={editingDetails.priorityResult || ""} required><option value="" disabled>선택</option><option value="있음">있음</option><option value="없음">없음</option><option value="확인 중">확인 중</option></Select></Field></>}
 {activeId === "target" && <><Field><span>집행 수단</span><Select name="detail_method" defaultValue={editingDetails.method || ""} required><option value="" disabled>선택</option><option value="예금채권 압류·추심">예금채권 압류·추심</option><option value="급여채권 압류·추심">급여채권 압류·추심</option><option value="차량 집행">차량 집행</option><option value="부동산 집행">부동산 집행</option><option value="기타">기타</option></Select></Field><Field><span>검토 결과</span><Select name="detail_decision" defaultValue={editingDetails.decision || ""} required><option value="" disabled>선택</option><option value="우선 검토">우선 검토</option><option value="추가 확인 필요">추가 확인 필요</option><option value="보류">보류</option><option value="제외">제외</option></Select></Field></>}
                         <Field><span>확인 내용 / 검토 결과</span><Textarea value={note} onChange={(event) => setNote(event.target.value)} maxLength={1000} required /></Field>
                         <Field><span>확인 근거 (선택)</span><Input value={reference} onChange={(event) => setReference(event.target.value)} maxLength={200} /></Field>
-                        {editingEntry?.attachmentName && <label className="plan-file-notice"><Input type="checkbox" checked={removeFile} onChange={(event) => setRemoveFile(event.target.checked)} /> 기존 첨부파일 삭제</label>}
+                        {editingEntry?.attachmentName && <PlanFileNotice><Input type="checkbox" checked={removeFile} onChange={(event) => setRemoveFile(event.target.checked)} /> 기존 첨부파일 삭제</PlanFileNotice>}
                         <Field><span>증빙파일 교체 (선택)</span><Input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => setEditFile(event.target.files?.[0] || null)} /></Field>
-                        <div className="plan-record-actions"><Button variant="outline" size="sm" type="button" onClick={cancelEdit}>취소</Button><Button variant="default" size="sm" type="submit">변경 저장</Button></div>
+                        <ActionBar><Button variant="outline" size="sm" type="button" onClick={cancelEdit}>취소</Button><Button variant="default" size="sm" type="submit">변경 저장</Button></ActionBar>
                       </FormStack>
                     ) : (
                       <>
@@ -736,17 +766,17 @@ function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null
                           {entry.attachmentName && <Button variant="link" size="sm" type="button" onClick={() => downloadPlanEvidence(entry)}>첨부파일: {entry.attachmentName} (다운로드)</Button>}
                           <small>{entry.updatedAt} · 사용자 입력 · 검토 필요</small>
                         </div>
-                        <div className="plan-record-actions">
+                        <ActionBar>
                           <Button variant="outline" size="sm" type="button" onClick={() => startEdit(entry)}>수정</Button>
                           <Button variant="outline" size="sm" type="button" onClick={() => deleteEntry(entry.id)}>삭제</Button>
-                        </div>
+                        </ActionBar>
                       </>
                     )}
                   </li>
                 ))}
-              </ul>
+              </PlanRecordList>
             ) : <p>아직 등록된 기록이 없습니다.</p>}
-            <Surface stack density="compact" as="form" key={activeId} className="plan-typed-entry" onSubmit={saveTypedEntry}>
+            <Surface stack density="compact" as="form" key={activeId} className={uiClass("plan-typed-entry")} onSubmit={saveTypedEntry}>
               <h3>{activeId === "judgment" ? "집행권원 확인 기록" : activeId === "cost" ? "비용 기록" : activeId === "priority" ? "선순위 권리 확인 기록" : "집행 수단 검토 기록"}</h3>
               {activeId === "judgment" && <><Field><span>집행권원 종류</span><Select name="detail_kind" defaultValue="" required><option value="" disabled>선택</option><option value="판결문">판결문</option><option value="지급명령">지급명령</option><option value="조정조서">조정조서</option><option value="화해조서">화해조서</option><option value="공정증서">공정증서</option><option value="기타">기타</option></Select></Field><Field><span>확정 여부</span><Select name="detail_finality" defaultValue="" required><option value="" disabled>선택</option><option value="확정">확정</option><option value="미확정">미확정</option><option value="확인 중">확인 중</option><option value="확정 불요·별도 확인">확정 불요·별도 확인</option></Select></Field></>}
 {activeId === "cost" && <><Field><span>비용 항목</span><Select name="detail_costKind" defaultValue="" required><option value="" disabled>선택</option><option value="인지대">인지대</option><option value="송달료">송달료</option><option value="집행문·증명 발급">집행문·증명 발급</option><option value="재산조회">재산조회</option><option value="법무사 수수료">법무사 수수료</option><option value="기타">기타</option></Select></Field><Field><span>지출 구분</span><Select name="detail_costStatus" defaultValue="" required><option value="" disabled>선택</option><option value="예상">예상</option><option value="실제 지출">실제 지출</option></Select></Field><Field><span>금액 (원)</span><Input name="amount" type="number" min="1" step="1"  required /></Field><Field><span>기준일·지출일</span><Input name="occurredOn" type="date"  required /></Field></>}
@@ -754,7 +784,7 @@ function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null
 {activeId === "target" && <><Field><span>집행 수단</span><Select name="detail_method" defaultValue="" required><option value="" disabled>선택</option><option value="예금채권 압류·추심">예금채권 압류·추심</option><option value="급여채권 압류·추심">급여채권 압류·추심</option><option value="차량 집행">차량 집행</option><option value="부동산 집행">부동산 집행</option><option value="기타">기타</option></Select></Field><Field><span>검토 결과</span><Select name="detail_decision" defaultValue="" required><option value="" disabled>선택</option><option value="우선 검토">우선 검토</option><option value="추가 확인 필요">추가 확인 필요</option><option value="보류">보류</option><option value="제외">제외</option></Select></Field></>}
               <Field><span>확인 근거 (선택)</span><Input name="reference" maxLength={200} placeholder="확인한 자료나 경로" /></Field>
               <Field><span>증빙자료 (선택)</span><Input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png" /></Field>
-              <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 파일은 이 브라우저에만 저장됩니다. 민감정보를 가린 후 첨부하세요.</p>
+              <PlanFileNoticeText>PDF·JPG·PNG, 최대 10MB. 파일은 이 브라우저에만 저장됩니다. 민감정보를 가린 후 첨부하세요.</PlanFileNoticeText>
               <Field htmlFor="plan-record-description">{activeId === "target" ? "선택 이유 / 검토 내용" : "확인 내용 / 검토 결과"}</Field>
               <InputAction><Textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="확인한 사실과 판단 근거를 입력하세요." /><Button variant="default" size="sm" type="submit">등록</Button></InputAction>
             </Surface>
@@ -798,7 +828,7 @@ function StatusView() {
   return (
     <ResponsiveGrid balance="wide-left">
       <Surface as="form" stack onSubmit={save}>
-        <div><p className="eyebrow">현재 상태 갱신</p><h2>이 사건은 지금 어떻게 진행되고 있나요?</h2></div>
+        <div><p className={uiClass("eyebrow")}>현재 상태 갱신</p><h2>이 사건은 지금 어떻게 진행되고 있나요?</h2></div>
         <RadioGroup layout="list" value={status} onValueChange={setStatus}>
           {["진행 중", "전액 회수", "일부 회수", "회수 실패", "중단함"].map((label, index) => { const values = ["in_progress", "success_full", "success_partial", "fail_confirmed", "abandoned"]; return <label key={label}><RadioGroupItem value={values[index]} /><span><strong>{label}</strong><small>{index === 0 ? "현재 진행 상황을 기록합니다." : "회수·중단 상태를 기록합니다."}</small></span></label> })}
         </RadioGroup>
@@ -806,7 +836,7 @@ function StatusView() {
         <Field><span>메모 (선택)</span><Textarea key={saved.updatedAt} name="memo" defaultValue={saved.memo || ""} placeholder="진행 중 확인한 내용을 식별정보 없이 기록하세요." /></Field>
         <Button variant="default" size="lg" type="submit">상태 저장</Button>
       </Surface>
-      <Surface as="aside"><h2>진행 기록</h2><ol className="activity-list"><li><span /><div><strong>{saved.status ? "진행 상태 저장됨" : "아직 저장된 진행 기록이 없습니다"}</strong><small>{saved.updatedAt || "상태를 선택하고 저장하세요."}</small></div></li><li><span /><div><strong>자동 알림은 추후 지원 예정</strong><small>미응답은 실패로 확정하지 않습니다.</small></div></li></ol></Surface>
+      <Surface as="aside"><h2>진행 기록</h2><ActivityList><li><span /><div><strong>{saved.status ? "진행 상태 저장됨" : "아직 저장된 진행 기록이 없습니다"}</strong><small>{saved.updatedAt || "상태를 선택하고 저장하세요."}</small></div></li><li><span /><div><strong>자동 알림은 추후 지원 예정</strong><small>미응답은 실패로 확정하지 않습니다.</small></div></li></ActivityList></Surface>
     </ResponsiveGrid>
   )
 }
@@ -819,19 +849,19 @@ function ResultView() {
   useEffect(() => { const restore = () => { if (saved.status) setResult(saved.status); setReasons(saved.reasons ? saved.reasons.split(", ") : []) }; restore() }, [saved])
   function save(event: FormEvent) { if (persist(event, result, reasons)) router.push("/app/cases") }
   return (
-    <form className="result-form" onSubmit={save}>
+    <ResultForm  onSubmit={save}>
       <Surface stack>
-        <div><p className="eyebrow">최종 결과</p><h2>회수 결과는 어땠나요?</h2><p>직접 확인한 결과만 선택해 주세요. 진행 중이면 최종 결과를 입력하지 않아도 됩니다.</p></div>
-        <RadioGroup className="result-choice-grid" value={result} onValueChange={setResult}>
-          {[["success_full", "전액 회수", faCircleCheck], ["success_partial", "일부 회수", faCoins], ["fail_confirmed", "회수 실패", faCircleExclamation], ["abandoned", "중도 포기", faClockRotateLeft]].map(([value, label, icon]) => <label className={result === value ? "is-selected" : ""} key={String(value)}><RadioGroupItem value={String(value)} /><FontAwesomeIcon icon={icon as typeof faCircleCheck} /><strong>{String(label)}</strong></label>)}
+        <div><p className={uiClass("eyebrow")}>최종 결과</p><h2>회수 결과는 어땠나요?</h2><p>직접 확인한 결과만 선택해 주세요. 진행 중이면 최종 결과를 입력하지 않아도 됩니다.</p></div>
+        <RadioGroup className={uiClass("result-choice-grid")} value={result} onValueChange={setResult}>
+          {[["success_full", "전액 회수", faCircleCheck], ["success_partial", "일부 회수", faCoins], ["fail_confirmed", "회수 실패", faCircleExclamation], ["abandoned", "중도 포기", faClockRotateLeft]].map(([value, label, icon]) => <SelectionCard selected={result === value} key={String(value)}><RadioGroupItem value={String(value)} /><FontAwesomeIcon icon={icon as typeof faCircleCheck} /><strong>{String(label)}</strong></SelectionCard>)}
         </RadioGroup>
         {result === "success_partial" && <Field><span>회수 금액 구간</span><Select key={saved.updatedAt} name="recoveryBand" defaultValue={saved.recoveryBand}><option>청구액의 25% 미만</option><option>25% 이상 ~ 50% 미만</option><option>50% 이상 ~ 75% 미만</option><option>75% 이상</option></Select></Field>}
-        {(result === "fail_confirmed" || result === "abandoned") && <Field as="div" className="result-reason-field"><span>실패·중단 이유 (복수 선택)</span><div className="reason-grid">{["재산 없음", "소재 불명", "비용 부담", "시간 오래 걸림", "기타"].map((reason) => <CheckboxRow key={reason}><Checkbox checked={reasons.includes(reason)} onCheckedChange={(value) => setReasons((current) => value ? [...current, reason] : current.filter((item) => item !== reason))} /><span>{reason}</span></CheckboxRow>)}</div></Field>}
+        {(result === "fail_confirmed" || result === "abandoned") && <Field as="div" className={uiClass("result-reason-field")}><span>실패·중단 이유 (복수 선택)</span><ReasonGrid>{["재산 없음", "소재 불명", "비용 부담", "시간 오래 걸림", "기타"].map((reason) => <CheckboxRow boxed key={reason}><Checkbox checked={reasons.includes(reason)} onCheckedChange={(value) => setReasons((current) => value ? [...current, reason] : current.filter((item) => item !== reason))} /><span>{reason}</span></CheckboxRow>)}</ReasonGrid></Field>}
         <FormGrid><Field><span>총 소요 기간</span><Select key={saved.updatedAt} name="durationBand" defaultValue={saved.durationBand}><option>1개월 미만</option><option>1~3개월</option><option>3~6개월</option><option>6개월~1년</option><option>1년 이상</option></Select></Field><Field><span>집행 비용 구간</span><Select key={saved.updatedAt} name="costBand" defaultValue={saved.costBand}><option>10만 원 미만</option><option>10만~30만 원</option><option>30만~50만 원</option><option>50만 원 이상</option></Select></Field></FormGrid>
       </Surface>
       <Notice tone="secure" title="성공과 실패를 같은 기준으로 기록합니다">직접 확인한 결과만 기록해 주세요. 응답이 없다는 이유로 회수 실패로 처리하지 않습니다.</Notice>
       <Button variant="default" size="lg" type="submit">결과 저장</Button>
-    </form>
+    </ResultForm>
   )
 }
 
@@ -840,14 +870,14 @@ function DataView({ caseId, record }: { caseId: string; record: DraftCase | null
   return (
     <>
       <Surface><PanelHeading><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></PanelHeading><InfoList><div><dt>사건 유형</dt><dd>{record?.claim_type || "대여금 (예시)"}</dd></div><div><dt>금액</dt><dd>{record?.claim_amount_band || demoCase.amount}</dd></div><div><dt>지역</dt><dd>{record?.region || "수도권 (예시)"}</dd></div><div><dt>경과 기간</dt><dd>{String(record?.judgment_elapsed_band || "1년 미만 (예시)")}</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></InfoList></Surface>
-      <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><Button variant="danger-outline" size="default"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><DialogBody><div className="delete-request-notice"><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></div><p className="delete-request-summary">삭제 요청은 운영 검토 후 처리됩니다.</p></DialogBody><DialogFooter><Button variant="destructive" size="default" onClick={() => {
+      <ActionSection tone="danger"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><Button variant="danger-outline" size="default"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><DialogBody><DeleteRequestNotice><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></DeleteRequestNotice><DeleteRequestSummary>삭제 요청은 운영 검토 후 처리됩니다.</DeleteRequestSummary></DialogBody><DialogFooter><Button variant="destructive" size="default" onClick={() => {
           try {
             window.localStorage.setItem(caseDeletionKey(caseId), "requested")
             window.dispatchEvent(new Event(caseDeletionEvent))
             toast.success("삭제 요청이 접수되었습니다.")
             setDeleteDialogOpen(false)
           } catch { toast.error("삭제 요청을 저장하지 못했습니다.") }
-        }}>삭제 요청 접수</Button></DialogFooter></DialogContent></Dialog></section>
+        }}>삭제 요청 접수</Button></DialogFooter></DialogContent></Dialog></ActionSection>
     </>
   )
 }
@@ -856,10 +886,10 @@ export function NotificationsScreen() {
   return (
     <PageLayout width="reading" id="main-content">
       <PageHeader eyebrow="알림" title="알림함" description="상태 확인 요청과 처리 결과를 모아봅니다." />
-      <section className="notification-list motion-enter">
-        <article className="is-unread"><span><FontAwesomeIcon icon={faBell} /></span><div><StatusBadge tone="warning">상태 확인</StatusBadge><h2>집행 결과가 나왔나요?</h2><p>1분이면 입력할 수 있습니다. 당신의 결과는 다음 사람의 판단 기준이 됩니다.</p><small>오늘</small></div><Button asChild variant="default" size="default"><Link href="/app/cases/demo-2026/status">상태 입력</Link></Button></article>
+      <NotificationList className={uiClass("motion-enter")}>
+        <article className={uiClass("is-unread")}><span><FontAwesomeIcon icon={faBell} /></span><div><StatusBadge tone="warning">상태 확인</StatusBadge><h2>집행 결과가 나왔나요?</h2><p>1분이면 입력할 수 있습니다. 당신의 결과는 다음 사람의 판단 기준이 됩니다.</p><small>오늘</small></div><Button asChild variant="default" size="default"><Link href="/app/cases/demo-2026/status">상태 입력</Link></Button></article>
         <article><span><FontAwesomeIcon icon={faFileCircleCheck} /></span><div><StatusBadge tone="info">리포트</StatusBadge><h2>실익 리포트가 준비되었습니다</h2><p>점수보다 판단 근거와 데이터 한계를 먼저 확인하세요.</p><small>2026.08.29</small></div><Button asChild variant="outline" size="default"><Link href="/app/cases/demo-2026/report">리포트 보기</Link></Button></article>
-      </section>
+      </NotificationList>
     </PageLayout>
   )
 }
@@ -868,11 +898,11 @@ export function SettingsScreen() {
   return (
     <PageLayout id="main-content">
       <PageHeader eyebrow="내 정보" title="계정·동의 설정" description="프로필, 알림, 동의 내역과 개인정보 권리 요청을 관리합니다." />
-      <Tabs defaultValue="profile" className="settings-tabs motion-enter">
+      <Tabs defaultValue="profile" className={uiClass("settings-tabs motion-enter")}>
         <TabsList variant="line"><TabsTrigger value="profile">프로필</TabsTrigger><TabsTrigger value="consent">동의 내역</TabsTrigger><TabsTrigger value="notification">알림 설정</TabsTrigger><TabsTrigger value="rights">데이터·탈퇴</TabsTrigger></TabsList>
         <TabsContent value="profile"><Surface stack><div><h2>프로필</h2><p>이메일은 Supabase Auth에서 관리하며 프로필 테이블에 중복 저장하지 않습니다.</p></div><Field><span>이름 또는 별칭</span><Input defaultValue="지현" /></Field><Field><span>이메일</span><Input defaultValue="jihyun@example.com" disabled /></Field><Button variant="default" size="default" onClick={() => toast.success("프로필이 저장되었습니다.")}>변경사항 저장</Button></Surface></TabsContent>
-        <TabsContent value="consent"><Surface><PanelHeading><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></PanelHeading><div className="consent-history">{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <div key={String(title)}><div><strong>{String(title)}</strong><small>버전 {String(version)} · {String(required)}</small></div><StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge></div>)}</div></Surface></TabsContent>
-        <TabsContent value="notification"><Surface className="setting-list"><div><span><strong>사건 상태 알림</strong><small>30일·60일 상태 확인</small></span><Switch defaultChecked /></div><div><span><strong>처리 결과 알림</strong><small>삭제·정정·문의 처리 결과</small></span><Switch defaultChecked /></div><div><span><strong>마케팅 알림</strong><small>서비스 소식과 참여 안내</small></span><Switch /></div></Surface></TabsContent>
+        <TabsContent value="consent"><Surface><PanelHeading><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></PanelHeading><ConsentHistory>{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <div key={String(title)}><div><strong>{String(title)}</strong><small>버전 {String(version)} · {String(required)}</small></div><StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge></div>)}</ConsentHistory></Surface></TabsContent>
+        <TabsContent value="notification"><SettingsPanel><div><span><strong>사건 상태 알림</strong><small>30일·60일 상태 확인</small></span><Switch defaultChecked /></div><div><span><strong>처리 결과 알림</strong><small>삭제·정정·문의 처리 결과</small></span><Switch defaultChecked /></div><div><span><strong>마케팅 알림</strong><small>서비스 소식과 참여 안내</small></span><Switch /></div></SettingsPanel></TabsContent>
         <TabsContent value="rights"><ResponsiveGrid><ActionCard icon={<FontAwesomeIcon icon={faUserShield} />} title="내 데이터 요청" description="열람·정정·다운로드 요청을 접수할 수 있습니다." action={<Button variant="outline" size="sm" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</Button>} /><ActionCard danger icon={<FontAwesomeIcon icon={faTrashCan} />} title="회원 탈퇴" description="탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다." action={<Button variant="danger-outline" size="sm">탈퇴 요청</Button>} /></ResponsiveGrid></TabsContent>
       </Tabs>
     </PageLayout>
