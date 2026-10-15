@@ -30,7 +30,7 @@ import {
   faShieldHalved,
   faUserLock,
 } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@/lib/fontawesome"
 import Link from "next/link"
 
 export function HomeScreen() {

@@ -21,7 +21,7 @@ import {
   faLock,
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@/lib/fontawesome"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { FormEvent, useState } from "react"

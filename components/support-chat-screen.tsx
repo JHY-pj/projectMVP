@@ -20,7 +20,7 @@ import {
   faSpinner,
   faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@/lib/fontawesome"
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 

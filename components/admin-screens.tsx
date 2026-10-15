@@ -7,7 +7,7 @@ import { PageLayout, Surface, PanelHeading, Input, Select, Field, Textarea, Chec
 import { Button } from "@/components/ui/button"
 
 import Link from "next/link"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@/lib/fontawesome"
 import {
   faArrowRight,
   faBell,

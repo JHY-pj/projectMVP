@@ -47,7 +47,7 @@ import {
   faUserShield,
   faWallet,
 } from "@fortawesome/free-solid-svg-icons"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { FontAwesomeIcon } from "@/lib/fontawesome"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { FormEvent, useEffect, useState } from "react"

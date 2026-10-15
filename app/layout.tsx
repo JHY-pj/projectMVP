@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
