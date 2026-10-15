@@ -1,5 +1,4 @@
 /* Styles unique to this screen composition; shared UI appearance lives in components. */
-.sticky-actions{position:sticky;bottom:0;z-index:10;display:flex;justify-content:flex-end;gap:0.625rem;margin:1.875rem -1.25rem 0;padding:1rem 1.25rem;border-top:0.0625rem solid var(--border);background:rgba(255,255,255,.96)}
 .dashboard-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem}
 .dashboard-metrics article{display:flex;align-items:center;gap:1.125rem;padding:1.375rem;border:0.0625rem solid var(--border);background:white}
 .dashboard-metrics article>span{width:3rem;height:3rem;display:grid;place-items:center;border-radius:50%;background:var(--blue-100);color:var(--blue-700)}
@@ -117,7 +116,6 @@
 .execution-options{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:47.5rem){
-.sticky-actions{display:grid;grid-template-columns:1fr 2fr}
 .dashboard-metrics{grid-template-columns:1fr}
 .case-summary{grid-template-columns:1fr;gap:0.625rem}
 .case-actions{display:grid;grid-template-columns:1fr 1fr}
@@ -314,3 +312,39 @@
 .status-journey .is-done span{background:var(--teal-700);border-color:var(--teal-700);color:white}
 .status-journey .is-current span{background:var(--navy-800);border-color:var(--navy-800);color:white}
 .checklist-panel{margin-top:1.375rem;border-top:0.125rem solid var(--navy-800)}
+.eligibility-list{margin:1.75rem 0;padding:0;display:grid;gap:0.75rem;list-style:none}
+.eligibility-list li{display:flex;gap:0.9375rem;padding:1.1875rem;border:0.0625rem solid var(--border)}
+.eligibility-list li>svg{width:1.25rem;margin-top:0.3125rem;color:var(--teal-700)}
+.eligibility-list li div{display:grid}
+.eligibility-list li span{color:var(--gray-500);font-size:0.875rem}
+.consent-history{border-top:0.0625rem solid var(--border)}
+.consent-history>div{min-height:4.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:0.0625rem solid var(--border)}
+.consent-history>div>div{display:grid}
+.consent-history small{color:var(--gray-500)}
+.delete-request-notice {
+  display: grid;
+  gap: 0.25rem;
+  text-align: left;
+}
+.delete-request-notice > strong {
+  display: block;
+  color: var(--navy-950);
+}
+.delete-request-notice ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.delete-request-notice li {
+  display: list-item;
+  margin: 0.375rem 0;
+  padding-left: 0.125rem;
+  line-height: 1.55;
+}
+.delete-request-notice li::marker {
+  font-size: 0.8em;
+}
+.delete-request-notice h2 {
+  margin-bottom: 0.75rem;
+}
+.delete-request-summary{margin:0;color:var(--gray-600)}

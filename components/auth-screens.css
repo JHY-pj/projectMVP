@@ -1,10 +1,4 @@
 /* Styles unique to this screen composition; shared UI appearance lives in components. */
-.eligibility-grid{min-height:6.625rem;display:grid;grid-template-columns:repeat(3,1fr);align-items:center}
-.eligibility-grid>div{display:flex;align-items:center;gap:1rem;padding:0 1.75rem;border-right:0.0625rem solid rgba(255,255,255,.18)}
-.eligibility-grid>div:first-child{padding-left:0}
-.eligibility-grid>div:last-child{border-right:0}
-.eligibility-grid span{display:grid;font-weight:600}
-.eligibility-grid small{color:#a9bfd5;font-weight:500}
 .auth-aside h1{margin:0.625rem 0 1rem;font-size:clamp(2.125rem,4vw,3.25rem);line-height:1.25;letter-spacing:-.045em}
 .auth-aside p{color:#bfd3e7}
 .auth-aside .eyebrow{color:#8cc9ff}
@@ -30,28 +24,13 @@
 .eligibility-check h2{margin-bottom:0.25rem}
 .eligibility-check p{color:var(--gray-600)}
 .segmented-control{display:grid;grid-template-columns:repeat(3,1fr);margin-top:1.125rem;border:0.0625rem solid var(--input)}
-.eligibility-list{margin:1.75rem 0;padding:0;display:grid;gap:0.75rem;list-style:none}
-.eligibility-list li{display:flex;gap:0.9375rem;padding:1.1875rem;border:0.0625rem solid var(--border)}
-.eligibility-list li>svg{width:1.25rem;margin-top:0.3125rem;color:var(--teal-700)}
-.eligibility-list li div{display:grid}
-.eligibility-list li span{color:var(--gray-500);font-size:0.875rem}
-.consent-history{border-top:0.0625rem solid var(--border)}
-.consent-history>div{min-height:4.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:0.0625rem solid var(--border)}
-.consent-history>div>div{display:grid}
-.consent-history small{color:var(--gray-500)}
 @media (max-width:47.5rem){
-.eligibility-grid{grid-template-columns:1fr;padding-block:0.75rem}
-.eligibility-grid>div{min-height:4.1875rem;padding:0 0.625rem;border-right:0;border-bottom:0.0625rem solid rgba(255,255,255,.15)}
-.eligibility-grid>div:first-child{padding-left:0.625rem}
-.eligibility-grid>div:last-child{border-bottom:0}
 .auth-main{grid-template-columns:1fr}
 .auth-aside{min-height:20.625rem;padding:2.8125rem 1.5625rem}
 .auth-aside ul{display:none}
 .auth-card{margin:1.5625rem auto}
 .segmented-control{grid-template-columns:1fr}
 }
-.eligibility-bar{background:linear-gradient(120deg,#123d30,#1d6b50);color:white}
-.eligibility-grid svg{width:1.5625rem;height:1.5625rem;color:#c5ecd2}
 .auth-aside{padding:clamp(3.125rem,7vw,6.25rem);display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(circle at 80% 18%,rgba(144,214,166,.26) 0,transparent 16rem),linear-gradient(145deg,#103a2e,#1b6b50);color:white}
 @media (max-width:47.5rem){
   .auth-card [data-slot="button"]{width:100%}
@@ -65,3 +44,7 @@
 .auth-main{min-height:calc(100vh - 4.8125rem);display:grid;grid-template-columns:minmax(20rem,.85fr) minmax(30rem,1.15fr);background:var(--gray-50);padding-block:0}
 .auth-card{width:min(32.5rem,calc(100% - 2.5rem));margin:auto;margin-block:3rem}
 @media (max-width:47.5rem){.auth-card{margin-block:1.5rem}}
+.sticky-actions{position:sticky;bottom:0;z-index:10;display:flex;justify-content:flex-end;gap:0.625rem;margin:1.875rem -1.25rem 0;padding:1rem 1.25rem;border-top:0.0625rem solid var(--border);background:rgba(255,255,255,.96)}
+@media (max-width:47.5rem){
+.sticky-actions{display:grid;grid-template-columns:1fr 2fr}
+}

@@ -54,4 +54,4 @@
 @media (max-width:47.5rem){
 .label-summary{grid-template-columns:1fr 1fr}
 }
-.floating-card,.privacy-stack>div,.label-summary article{border-radius:1.125rem;border-color:#dbe7dd;box-shadow:var(--shadow-sm)}
+.label-summary article{border-radius:1.125rem;border-color:#dbe7dd;box-shadow:var(--shadow-sm)}

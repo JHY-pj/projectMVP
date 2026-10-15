@@ -1,3 +1,6 @@
+import { CallToAction } from "@/components/common/call-to-action"
+import { SectionHeading } from "@/components/screen-kit"
+import { EligibilityBar } from "@/components/public/eligibility-bar"
 
 import "./public-screens.css"
 
@@ -17,7 +20,6 @@ import {
 import {
   faArrowRight,
   faArrowTrendUp,
-  faBuildingColumns,
   faCheck,
   faClipboardCheck,
   faCompass,
@@ -85,20 +87,14 @@ export function HomeScreen() {
         </div>
       </section>
 
-      <section className="eligibility-bar">
-        <div className="content-width eligibility-grid">
-          <div><FontAwesomeIcon icon={faScaleBalanced} /><span><small>대상</small>민사 승소 채권자</span></div>
-          <div><FontAwesomeIcon icon={faBuildingColumns} /><span><small>초기 범위</small>채권액 500만 원 미만</span></div>
-          <div><FontAwesomeIcon icon={faFileShield} /><span><small>이용 방식</small>MVP 핵심 기능 무료</span></div>
-        </div>
-      </section>
+      <EligibilityBar />
 
       <section className="section content-width">
-        <div className="section-heading motion-enter">
+        <SectionHeading className="motion-enter">
           <p className="eyebrow">어떻게 작동하나요?</p>
           <h2>점수보다 먼저, 판단의 근거를 보여드립니다</h2>
           <p>처음부터 결과 기록까지 하나의 사건 흐름으로 연결합니다.</p>
-        </div>
+        </SectionHeading>
         <div className="process-grid">
           {[
             ["01", faClipboardCheck, "사건 조건 입력", "판결과 집행 현황을 직접 입력하고 필요한 변수만 남깁니다."],
@@ -117,7 +113,7 @@ export function HomeScreen() {
 
       <section className="section section-soft">
         <div className="content-width trust-grid">
-          <div className="section-heading motion-enter">
+          <SectionHeading className="motion-enter">
             <p className="eyebrow">데이터 최소화 원칙</p>
             <h2>사람을 추적하지 않고, 사건의 조건을 봅니다</h2>
             <p>
@@ -127,7 +123,7 @@ export function HomeScreen() {
             <Button asChild variant="link" size="sm"><Link href="/data-policy">
               데이터 처리 원칙 자세히 보기 <FontAwesomeIcon icon={faArrowRight} />
             </Link></Button>
-          </div>
+          </SectionHeading>
           <div className="privacy-stack motion-enter">
             <div><FontAwesomeIcon icon={faUserLock} /><span><strong>이름·주민번호</strong><small>저장하지 않음</small></span></div>
             <div><FontAwesomeIcon icon={faDatabase} /><span><strong>정확한 금액·주소</strong><small>구간·광역 단위로 변환</small></span></div>
@@ -136,15 +132,17 @@ export function HomeScreen() {
         </div>
       </section>
 
-      <section className="section content-width cta-panel motion-enter">
-        <div>
-          <p className="eyebrow">첫 판단을 시작하세요</p>
-          <h2>내 사건에서 지금 확인해야 할 것을 정리해보세요</h2>
-          <p>회수 가능성을 보장하지 않습니다. 대신 결정에 필요한 질문을 빠뜨리지 않게 돕습니다.</p>
-        </div>
-        <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
-          무료로 시작하기 <FontAwesomeIcon icon={faArrowRight} />
-        </Link></Button>
+      <section className="section content-width">
+        <CallToAction className="motion-enter">
+          <div>
+            <p className="eyebrow">첫 판단을 시작하세요</p>
+            <h2>내 사건에서 지금 확인해야 할 것을 정리해보세요</h2>
+            <p>회수 가능성을 보장하지 않습니다. 대신 결정에 필요한 질문을 빠뜨리지 않게 돕습니다.</p>
+          </div>
+          <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
+            무료로 시작하기 <FontAwesomeIcon icon={faArrowRight} />
+          </Link></Button>
+        </CallToAction>
       </section>
     </main>
   )

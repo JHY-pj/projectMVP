@@ -18,3 +18,10 @@
 .notice strong + div { margin-block-start: 0.25rem; }
 
 .header h1:not(:first-child) { margin-block-start: 0.75rem; }
+
+.sectionHeading { max-width: 45rem; }
+.sectionHeading > * { margin-block: 0; }
+.sectionHeading > * + * { margin-block-start: 0.75rem; }
+.sectionHeading > h2 { color: var(--navy-950); font-size: clamp(1.75rem,2.75vw,2.375rem); line-height: 1.45; font-weight: 700; letter-spacing: -.035em; overflow-wrap: break-word; }
+.sectionHeading > p { color: var(--gray-600); font-size: 1rem; line-height: 1.7; }
+.sectionHeading > :global(.eyebrow) { color: var(--teal-700); font-size: 0.875rem; font-weight: 600; }

@@ -27,3 +27,30 @@ assert(select.includes('selected=""')); assert(select.includes('name="kind"'));
 const page = renderToStaticMarkup(React.createElement(PageLayout, { width: 'reading', id: 'main-content' }, '내용'));
 assert(page.startsWith('<main ')); assert(page.includes('reading')); assert(page.includes('id="main-content"'));
 console.log('PASS style ownership and shared form/page semantics: no screen CSS in globals, no page appearance overrides, native form/field/input behavior preserved.');
+
+// A stylesheet must not hide another screen's only copy of its styles.
+const owners = {
+  'public-screens': ['components/public-screens.tsx'],
+  'auth-screens': ['components/auth-screens.tsx', 'components/auth/signup-consent.tsx'],
+  'member-screens': ['components/member-screens.tsx', 'components/case-input-editor.tsx'],
+  'admin-screens': ['components/admin-screens.tsx'],
+  'site-shell': ['components/site-shell.tsx'],
+  'support-chat-screen': ['components/support-chat-screen.tsx'],
+  'legal/legal-content': ['components/legal/legal-content.tsx', 'components/legal/legal-document-dialog.tsx'],
+};
+const classes = {};
+for (const [owner, sources] of Object.entries(owners)) {
+  classes[owner] = new Set();
+  for (const source of sources) for (const match of fs.readFileSync(source, 'utf8').matchAll(/className="([^"]+)"/g)) for (const name of match[1].split(/\s+/)) classes[owner].add(name);
+}
+for (const owner of Object.keys(owners)) postcss.parse(fs.readFileSync(`components/${owner}.css`, 'utf8')).walkRules(rule => {
+  for (const selector of rule.selectors) {
+    const name = selector.match(/^\.([\w-]+)/)?.[1];
+    if (!name || classes[owner].has(name)) continue;
+    const actual = Object.keys(classes).filter(key => classes[key].has(name));
+    assert(actual.length !== 1, `Style ${name} belongs to ${actual[0]}, not ${owner}`);
+  }
+});
+assert(fs.readFileSync('components/public/eligibility-bar.tsx', 'utf8').includes('import styles from "./eligibility-bar.module.css"'));
+assert(fs.readFileSync('components/public-screens.tsx', 'utf8').includes('<EligibilityBar />'));
+console.log('PASS screen stylesheet ownership and home eligibility component/style dependency.');

@@ -1,3 +1,5 @@
+import type { ComponentProps } from "react"
+import { cn } from "@/lib/utils"
 import styles from "@/components/common/screen-kit.module.css"
 
 import { Button } from "@/components/ui/button"
@@ -85,4 +87,8 @@ export function BackLink({ href, label = "이전으로" }: { href: string; label
       <FontAwesomeIcon icon={faArrowLeft} /> {label}
     </Link></Button>
   )
+}
+
+export function SectionHeading({ className, ...props }: ComponentProps<"div">) {
+  return <div data-ui="section-heading" className={cn(styles.sectionHeading, className)} {...props} />
 }
