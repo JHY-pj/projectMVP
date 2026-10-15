@@ -143,3 +143,12 @@ for (const width of [375, 768, 1280]) {
 assert.equal(declarationsAt('components/common/primitives.module.css', '.inputAction > :global([data-slot="button"])', 375).height, 'auto');
 assert.equal(declarationsAt('components/shell/shell-ui.module.css', '.nav-link', 1280)['border-radius'], 'var(--ui-radius-control)');
 console.log('PASS responsive declaration cascade at 375/768/1280px and input/button alignment.');
+
+const tabCss = 'components/ui/tabs.module.css';
+assert.equal(declarationsAt(tabCss, '.responsive', 375).display, 'flex');
+assert.equal(declarationsAt(tabCss, '.responsive', 375)['flex-wrap'], 'nowrap');
+assert.equal(declarationsAt(tabCss, '.responsive', 375)['overflow-x'], 'auto');
+assert.equal(declarationsAt(tabCss, '.responsive', 375)['overflow-y'], 'hidden');
+assert.equal(declarationsAt(tabCss, '.trigger', 375)['white-space'], 'nowrap');
+assert.equal(declarationsAt(tabCss, '.responsive', 1280).display, 'grid');
+console.log('PASS mobile tabs stay on one horizontal scrolling row without vertical overflow.');

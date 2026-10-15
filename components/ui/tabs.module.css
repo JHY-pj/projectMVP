@@ -12,6 +12,9 @@
 .trigger:focus-visible { outline: 0.1875rem solid #d6a43a; outline-offset: -0.1875rem; }
 .responsive { display: grid; grid-template-columns: repeat(var(--tab-columns,6),minmax(0,1fr)); width: 100%; }
 .content { min-width: 0; padding-top: 1rem; outline: none; }
-@media(max-width:40rem) { .responsive { grid-template-columns: repeat(3,minmax(0,1fr)); } .trigger { font-size: 0.8125rem; padding-inline: 0.5rem; } }
+@media(max-width:47.5rem) {
+  .list, .responsive { display: flex; flex-wrap: nowrap; width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+  .trigger { flex: 1 0 auto; min-width: max-content; white-space: nowrap; font-size: 0.8125rem; padding-inline: 0.875rem; }
+}
 
 .content[hidden] { display: none; }
