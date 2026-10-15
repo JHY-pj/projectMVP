@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Tabs as TabsPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import styles from "./tabs.module.css"
+import layoutStyles from "@/components/common/primitives.module.css"
 function Tabs({ className, orientation = "horizontal", ...props }: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return <TabsPrimitive.Root data-slot="tabs" data-orientation={orientation} orientation={orientation} className={cn(styles.root, className)} {...props} />
 }
@@ -12,5 +13,5 @@ function TabsList({ className, variant = "default", layout = "flow", columns = 6
   return <TabsPrimitive.List data-slot="tabs-list" data-variant={variant} className={cn(tabsListVariants({ variant }), layout === "responsive" && styles.responsive, className)} style={{ "--tab-columns": columns, ...style } as React.CSSProperties} {...props} />
 }
 function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Trigger>) { return <TabsPrimitive.Trigger data-slot="tabs-trigger" className={cn(styles.trigger, className)} {...props} /> }
-function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) { return <TabsPrimitive.Content data-slot="tabs-content" className={cn(styles.content, className)} {...props} /> }
+function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) { return <TabsPrimitive.Content data-slot="tabs-content" className={cn(styles.content, layoutStyles.sectionStack, className)} {...props} /> }
 export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }

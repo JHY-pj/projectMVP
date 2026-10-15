@@ -10,7 +10,7 @@ function primitive<D extends ElementType>(defaultTag: D, slot: string, style: st
   }
 }
 export function PageLayout({ width = "wide", className, ...props }: ComponentProps<"main"> & { width?: "wide" | "reading" }) {
-  return <main data-ui="page" className={cn(styles.page, width === "reading" && styles.reading, className)} {...props} />
+  return <main data-ui="page" className={cn(styles.page, styles.sectionStack, width === "reading" && styles.reading, className)} {...props} />
 }
 export function Surface<T extends ElementType = "section">({ as, className, stack = false, muted = false, density = "default", ...props }: BoxProps<T> & { stack?: boolean; muted?: boolean; density?: "default" | "compact" | "flush" }) {
   const Comp: ElementType = as || "section"
@@ -43,3 +43,5 @@ export function ResponsiveGrid<T extends ElementType = "div">({ as, className, b
   const Comp: ElementType = as || "div"
   return <Comp data-ui="responsive-grid" className={cn(styles.grid, balance === "wide-left" && styles.wideLeft, className)} {...props} />
 }
+
+export const SectionStack = primitive("div", "section-stack", styles.sectionStack)

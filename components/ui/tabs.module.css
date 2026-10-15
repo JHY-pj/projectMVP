@@ -13,3 +13,5 @@
 .responsive { display: grid; grid-template-columns: repeat(var(--tab-columns,6),minmax(0,1fr)); width: 100%; }
 .content { min-width: 0; padding-top: 1rem; outline: none; }
 @media(max-width:40rem) { .responsive { grid-template-columns: repeat(3,minmax(0,1fr)); } .trigger { font-size: 0.8125rem; padding-inline: 0.5rem; } }
+
+.content[hidden] { display: none; }

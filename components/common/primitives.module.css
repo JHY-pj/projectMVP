@@ -1,9 +1,9 @@
 .page { width: min(var(--layout-wide), calc(100% - (var(--layout-gutter) * 2))); min-width: 0; margin-inline: auto; padding-block: 2.375rem 3rem; }
 .reading { max-width: 57.5rem; }
 .surface { min-width: 0; padding: 1.5rem; border: 0.0625rem solid var(--border); border-radius: 0.875rem; background: var(--card); }
-.surface h2 { margin: 0 0 0.75rem; font-size: 1.25rem; line-height: 1.45; letter-spacing: -.02em; }
+.surface h2 { margin: 0; font-size: 1.25rem; line-height: 1.45; letter-spacing: -.02em; }
 .muted { background: var(--gray-50); }
-.heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
+.heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0; }
 .heading h2 { margin: 0; }
 .stack { display: grid; align-content: start; gap: 1.125rem; }
 .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.125rem; }
@@ -23,9 +23,9 @@
 .infoList dt { color: var(--gray-600); font-size: 0.875rem; }
 .infoList dd { margin: 0; font-size: 0.9375rem; font-weight: 600; overflow-wrap: anywhere; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.75rem; }
-.callout { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-block: 1.25rem; padding: 1.5rem; border: 0.0625rem solid #e7c78c; border-left-width: 0.25rem; border-radius: 0.875rem; background: #fffaf0; }
+.callout { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-block: 0; padding: 1.5rem; border: 0.0625rem solid #e7c78c; border-left-width: 0.25rem; border-radius: 0.875rem; background: #fffaf0; }
 .callout > div { min-width: 0; }
-.callout h2 { margin: 0 0 0.75rem; font-size: 1.25rem; line-height: 1.45; }
+.callout h2 { margin: 0; font-size: 1.25rem; line-height: 1.45; }
 .callout p { margin: 0; font-size: 0.9375rem; line-height: 1.65; }
 .inverse { background: var(--navy-800); border-color: var(--navy-800); color: #fff; }
 .compact { margin-top: 0; }
@@ -47,15 +47,28 @@
 .completion p { color: var(--gray-600); }
 .completion [data-slot="button"] { margin-top: 1rem; }
 
-.tableContainer { max-width: 100%; overflow-x: auto; margin-top: 1.25rem; -webkit-overflow-scrolling: touch; }
+.tableContainer { max-width: 100%; overflow-x: auto; margin-top: 0; -webkit-overflow-scrolling: touch; }
 .tableContainer table { width: 100%; border-collapse: collapse; }
 .tableContainer th, .tableContainer td { padding: 0.875rem 0.75rem; border-bottom: 0.0625rem solid var(--border); text-align: left; vertical-align: top; }
 .tableContainer th { background: var(--gray-50); font-size: 0.8125rem; }
 .tableContainer td { font-size: 0.875rem; }
-.completionIcon { width: 4rem; height: 4rem; display: grid; place-items: center; margin: 0 auto 1.25rem; border-radius: 50%; background: var(--teal-100); color: var(--teal-700); font-size: 1.75rem; }
+.completionIcon { width: 4rem; height: 4rem; display: grid; place-items: center; margin: 0 auto; border-radius: 50%; background: var(--teal-100); color: var(--teal-700); font-size: 1.75rem; }
 
 .compactSurface { padding: 1.125rem; }
 .wideLeft { grid-template-columns: minmax(0,1.5fr) minmax(0,1fr); }
 @media(max-width:64rem) { .wideLeft { grid-template-columns: minmax(0,1fr); } }
 
 .flush { padding: 0; overflow: hidden; }
+
+.sectionStack { display: flex; flex-direction: column; gap: 0; }
+.sectionStack > :not(style) { margin-block: 0; }
+
+/* Spacing belongs to the following visible block, never the preceding block. */
+.sectionStack > :not(style):not([hidden]) ~ :not(style):not([hidden]) { margin-block-start: var(--layout-section-gap, 1.25rem); }
+.surface:not(.stack) > :not(style) { margin-block: 0; }
+.surface:not(.stack) > :not(style):not([hidden]) ~ :not(style):not([hidden]) { margin-block-start: 1rem; }
+.callout > div > :not(style) { margin-block: 0; }
+.callout > div > :not(style) ~ :not(style) { margin-block-start: 0.75rem; }
+.tableContainer:not(:first-child) { margin-block-start: 1.25rem; }
+.completion > :not(style) { margin-block: 0; }
+.completion > :not(style) ~ :not(style) { margin-block-start: 1rem; }
