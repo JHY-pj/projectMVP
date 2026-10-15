@@ -377,7 +377,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
           {caseTabs.map(([id, label]) => <TabsTrigger key={id} value={id}>{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value={active} className="case-tab-content motion-enter">
-          {active === "summary" && <DemoReport record={record} caseId={caseId} />}
+          {active === "summary" && <CaseOverview key={caseId} record={record} caseId={caseId} />}
           {active === "report" && <DemoReport record={record} caseId={caseId} />}
           {active === "plan" && <PlanView key={caseId} caseId={caseId} />}
           {active === "status" && <StatusView key={caseId} />}
@@ -389,14 +389,48 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
   )
 }
 
-function DemoReport({ record, caseId }: { record: DraftCase | null; caseId: string }) {
-  const missing = record ? Object.entries(record).filter(([, value]) => value === "Unknown" || value === "모름").map(([key]) => ({ judgment_elapsed_band: "판결 후 경과 기간", region: "지역", debtor_contact_status: "연락 상태", asset_signal: "재산 단서", income_signal: "소득 단서", enforcement_title_confirmed: "집행권원", service_status: "송달 상태", known_bank: "은행", known_employer: "근무처", known_real_estate: "부동산", known_vehicle: "차량", claim_amount_band: "채권 금액" } as Record<string, string>)[key] || key) : []
+const reportSample: DraftCase = {
+  case_id: "demo-2026", claim_type: "대여금", claim_amount_band: demoCase.amount,
+  region: "수도권", outcome_status: "in_progress", process_status: "진행 중",
+  enforcement_title_confirmed: "Unknown", service_status: "Unknown",
+  known_bank: "Unknown", known_employer: "Unknown", known_real_estate: "Unknown", known_vehicle: "Unknown",
+}
+
+function CaseOverview({ record, caseId }: { record: DraftCase | null; caseId: string }) {
+  const current = record || reportSample
+  const { saved: progress } = useCaseRecordForm("status")
+  const { saved: result } = useCaseRecordForm("result")
+  const recent = [
+    ...(progress.updatedAt ? [{ title: "진행 상태 저장", date: progress.updatedAt, text: progress.memo || "진행 상태를 기록했습니다.", section: "status" }] : []),
+    ...(result.updatedAt ? [{ title: "회수 결과 저장", date: result.updatedAt, text: "입력한 결과를 확인하거나 수정할 수 있습니다.", section: "result" }] : []),
+  ].sort((a, b) => b.date.localeCompare(a.date, "ko"))
   return <>
-    <Notice tone="info" title="입력 정보 확인 단계">현재는 입력 정보와 다음 확인사항을 정리하는 단계입니다. 실익 판단 로직은 다음 구현 단계에서 연결합니다.</Notice>
-    <section className="panel"><h2>판단 상태</h2><StatusBadge tone="warning">추가 확인 필요</StatusBadge><p>아직 실익 점수나 회수 확률을 산출하지 않습니다.</p></section>
-    <section className="panel"><h2>판단에 사용할 입력 정보</h2><dl className="review-list"><div><dt>사건 유형</dt><dd>{record?.claim_type || "대여금 (예시)"}</dd></div><div><dt>채권 금액</dt><dd>{record?.claim_amount_band || demoCase.amount}</dd></div><div><dt>지역</dt><dd>{record?.region || "수도권 (예시)"}</dd></div>{record && Object.entries(signalLabels).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{record[key] === "Unknown" ? "모름" : record[key] === "Y" ? "확인함 / 알고 있음" : record[key] === "N" ? "미확인 / 알지 못함" : String(record[key] || "모름")}</dd></div>)}</dl><p>입력 내용은 사용자 진술이며, 증빙 검증은 아직 이루어지지 않았습니다.</p></section>
-    <section className="panel"><h2>부족한 정보</h2>{missing.length ? <ul>{missing.map((label) => <li key={label}>{label}</li>)}</ul> : <p>신청 비용·선순위 권리·집행 대상의 확인이 필요합니다.</p>}</section>
-    <section className="report-action"><div><h2>다음 행동</h2><p>집행권원、費用、優先権、対象財産をチェックリストで確認してください。</p></div><Link className="button button-primary" href={`/app/cases/${caseId}/plan`}>집행 계획 확인</Link></section>
+    {!record && <Notice tone="info" title="예시 사건">화면 체험용으로 준비된 사건입니다. 직접 등록한 사건은 사건 목록에서 선택하세요.</Notice>}
+    <div className="case-overview-grid">
+      <section className="panel"><div className="panel-heading"><h2>사건 기본 정보</h2><StatusBadge>{record ? "직접 입력" : "예시"}</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>{current.claim_type}</dd></div><div><dt>채권 금액</dt><dd>{current.claim_amount_band}</dd></div><div><dt>지역</dt><dd>{current.region}</dd></div></dl></section>
+      <section className="panel"><h2>현재 진행 상태</h2><StatusBadge tone="info">{current.process_status}</StatusBadge><p>진행 상황과 회수 결과를 각각 기록하고 다시 확인할 수 있습니다.</p><div className="case-actions"><Link className="button button-outline button-small" href={`/app/cases/${caseId}/status`}>진행 기록</Link><Link className="button button-outline button-small" href={`/app/cases/${caseId}/result`}>결과 수정</Link></div></section>
+    </div>
+    <section className="next-action-card compact"><div><p className="eyebrow">지금 할 일</p><h2>다음 판단에 필요한 확인사항을 살펴보세요</h2><p>리포트에서 확인 이유를 살펴보고, 집행 계획에 확인한 내용을 기록할 수 있습니다.</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/report`}>리포트 보기</Link></section>
+    <section className="panel"><div className="panel-heading"><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></div>{recent.length ? <ol className="activity-list">{recent.map((item) => <li key={item.section}><span /><div><strong>{item.title}</strong><p>{item.text}</p><small>{item.date}</small></div></li>)}</ol> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</section>
+  </>
+}
+
+function DemoReport({ record, caseId }: { record: DraftCase | null; caseId: string }) {
+  const current = record || reportSample
+  const unknown = (key: string) => !current[key] || ["Unknown", "모름", "미확인"].includes(String(current[key]))
+  const checks = [
+    ...(current.enforcement_title_confirmed !== "Y" ? [{ id: "judgment", title: "집행권원 확인", reason: "집행의 전제가 되는 문서와 확인 상태를 먼저 정리하기 위한 항목입니다.", action: "문서 확인 기록" }] : []),
+    ...(unknown("service_status") || current.service_status === "불명" ? [{ id: "judgment", title: "송달 상태 확인", reason: "현재 송달 상태가 확인되지 않아 절차 검토에 필요한 정보가 부족합니다.", action: "송달 확인 기록" }] : []),
+    ...(!["known_bank", "known_employer", "known_real_estate", "known_vehicle"].some((key) => current[key] === "Y") ? [{ id: "target", title: "집행 대상 단서 정리", reason: "은행·근무처·부동산·차량 중 알고 있는 단서를 정리해 검토할 수단을 좁히기 위한 항목입니다. 모든 단서를 확보해야 한다는 뜻은 아닙니다.", action: "대상·수단 검토" }] : []),
+    { id: "cost", title: "예상 비용 확인", reason: "채권 금액과 비교할 비용 정보가 아직 없습니다. 검토 중인 절차의 예상 지출과 확인 근거를 기록해 주세요.", action: "비용 확인·기록" },
+    { id: "priority", title: "선순위 권리 확인", reason: "선순위 권리의 확인 기록이 아직 없습니다. 집행 대상에 맞는 확인 내용과 근거를 정리해 주세요.", action: "권리 확인·기록" },
+  ]
+  return <>
+    <Notice tone="info" title="입력 정보 확인 단계">현재는 판단에 사용할 정보와 다음 확인사항을 정리합니다. 실익 점수·회수 확률은 아직 제공하지 않습니다.</Notice>
+    <section className="panel"><div className="panel-heading"><h2>판단 상태</h2><StatusBadge tone="warning">확인사항 검토 필요</StatusBadge></div><p>아래 항목은 미입력·미확인 정보에 따른 안내입니다. 회수 가능성이나 집행 착수 여부를 판정한 결과는 아닙니다.</p></section>
+    <section className="panel"><h2>다음 판단을 위해 확인할 사항</h2><p>항목별 확인 이유를 살펴보고 집행 계획에서 내용을 기록하세요.</p><ul className="report-check-list">{checks.map((item) => <li key={item.title}><div><h3>{item.title}</h3><p>{item.reason}</p></div><Link className="button button-outline button-small" href={`/app/cases/${caseId}/plan#plan-${item.id}`}>{item.action}</Link></li>)}</ul><p className="report-check-note">이 목록은 등록 당시 입력을 기준으로 합니다. 집행 계획에 추가한 기록의 검증과 리포트 자동 갱신은 아직 연결하지 않았습니다.</p></section>
+    <section className="panel"><h2>판단에 사용할 입력 정보</h2><p>사용자 진술 기준이며 증빙 확인 결과와 구분됩니다.</p><dl className="review-list">{Object.entries(signalLabels).filter(([key]) => key !== "debtor_type" && key !== "judgment_elapsed_band").map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{unknown(key) ? "모름" : current[key] === "Y" ? "알고 있음 / 확인함" : current[key] === "N" ? "미확인 / 알지 못함" : String(current[key])}</dd></div>)}</dl></section>
+    <section className="report-action"><div><h2>확인한 내용은 집행 계획에 기록하세요</h2><p>문서·비용·권리·집행 수단별로 확인 근거를 남길 수 있습니다.</p></div><Link className="button button-primary button-small" href={`/app/cases/${caseId}/plan`}>집행 계획 열기</Link></section>
   </>
 }
 
@@ -605,7 +639,7 @@ function PlanView({ caseId }: { caseId: string }) {
           const count = (entries[item.id] || []).length
           const status = count > 0 ? "검토중" : item.initialStatus
           return (
-            <div className="plan-item" key={item.id}>
+            <div className="plan-item" id={`plan-${item.id}`} key={item.id}>
               <span className="plan-index">{index + 1}</span>
               <div className="plan-item-content">
                 <strong>{item.title}</strong>

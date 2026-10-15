@@ -1305,3 +1305,13 @@ body:has(.auth-signup) .site-footer{margin-top:0}
 .case-identity h1, .case-identity .eyebrow { overflow-wrap: anywhere; }
 .support-chat-messages { min-height: 0; overflow-y: auto; scroll-padding-bottom: 1rem; }
 .app-dialog-layout { min-height: 0; max-height: inherit; }
+
+.report-check-list { list-style: none; padding: 0; margin: 1.25rem 0; display: grid; }
+.report-check-list li { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; padding: 1.25rem 0; border-bottom: 0.0625rem solid var(--border); }
+.report-check-list li:first-child { padding-top: 0; }
+.report-check-list h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.report-check-list p { margin: 0; color: var(--gray-600); max-width: 46rem; line-height: 1.7; }
+.report-check-list .button { flex-shrink: 0; }
+.report-check-note { color: var(--gray-500); font-size: 0.875rem; }
+.plan-item[id] { scroll-margin-top: 7rem; }
+@media (max-width: 40rem) { .report-check-list li { align-items: flex-start; flex-direction: column; gap: 0.75rem; } }
