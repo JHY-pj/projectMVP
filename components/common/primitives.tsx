@@ -45,3 +45,7 @@ export function ResponsiveGrid<T extends ElementType = "div">({ as, className, b
 }
 
 export const SectionStack = primitive("div", "section-stack", styles.sectionStack)
+
+export function InputAction({ className, ...props }: ComponentProps<"div">) {
+  return <div data-ui="input-action" className={cn(styles.inputAction, className)} {...props} />
+}

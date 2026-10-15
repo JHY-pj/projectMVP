@@ -1,5 +1,6 @@
 "use client"
 
+import { InputAction } from "@/components/common/primitives"
 import "./support-chat-screen.css"
 
 import { PageLayout, Textarea } from "@/components/common/primitives"
@@ -208,6 +209,7 @@ export function SupportChatScreen() {
         )}
 
         <form className="chat-composer" onSubmit={sendMessage}>
+          <InputAction>
           <label className="sr-only" htmlFor="support-chat-input">상담 내용 입력</label>
           <Textarea
             id="support-chat-input"
@@ -227,6 +229,7 @@ export function SupportChatScreen() {
             <FontAwesomeIcon icon={faArrowUp} />
             <span>보내기</span>
           </Button>
+          </InputAction>
         </form>
         <footer className="support-chat-footer">
           <span>이 상담은 일반적인 정보 안내이며, 사건별 법률 자문이나 결과 보장을 하지 않습니다.</span>

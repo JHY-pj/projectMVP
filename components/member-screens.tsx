@@ -1,4 +1,5 @@
 "use client"
+import { InputAction } from "@/components/common/primitives"
 
 import "./member-screens.css"
 
@@ -755,7 +756,7 @@ function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null
               <Field><span>증빙자료 (선택)</span><Input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png" /></Field>
               <p className="plan-file-notice">PDF·JPG·PNG, 최대 10MB. 파일은 이 브라우저에만 저장됩니다. 민감정보를 가린 후 첨부하세요.</p>
               <Field htmlFor="plan-record-description">{activeId === "target" ? "선택 이유 / 검토 내용" : "확인 내용 / 검토 결과"}</Field>
-              <div className="plan-input-action"><Textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="확인한 사실과 판단 근거를 입력하세요." /><Button variant="default" size="sm" stretch type="submit">등록</Button></div>
+              <InputAction><Textarea id="plan-record-description" name="description" maxLength={1000} required placeholder="확인한 사실과 판단 근거를 입력하세요." /><Button variant="default" size="sm" type="submit">등록</Button></InputAction>
             </Surface>
 
           </DialogBody>
