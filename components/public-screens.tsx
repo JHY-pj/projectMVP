@@ -1,3 +1,9 @@
+
+import "./public-screens.css"
+
+import { PageLayout, Surface , TableContainer , ResponsiveGrid } from "@/components/common/primitives"
+
+import { Button } from "@/components/ui/button"
 import { LegalDocumentContent, legalContent, type LegalType } from "@/components/legal/legal-content"
 "use client"
 
@@ -44,12 +50,12 @@ export function HomeScreen() {
               다음 확인사항을 한곳에서 정리해드립니다.
             </p>
             <div className="hero-actions motion-enter">
-              <Link className="button button-primary button-large" href="/app/cases/new">
+              <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
                 내 사건 분석 시작 <FontAwesomeIcon icon={faArrowRight} />
-              </Link>
-              <Link className="button button-outline button-large" href="/guide">
+              </Link></Button>
+              <Button asChild variant="outline" size="lg"><Link href="/guide">
                 승소 후 절차 보기
-              </Link>
+              </Link></Button>
             </div>
             <p className="hero-footnote motion-enter">
               초기 대상 · 민사 승소 판결을 보유한 500만 원 미만 개인 채권자
@@ -118,9 +124,9 @@ export function HomeScreen() {
               특정 채무자의 자산이나 온라인 활동을 추적하지 않습니다. 이름·상세주소·원문은
               분석 변수에 포함하지 않는 것이 기본 원칙입니다.
             </p>
-            <Link className="text-link" href="/data-policy">
+            <Button asChild variant="link" size="sm"><Link href="/data-policy">
               데이터 처리 원칙 자세히 보기 <FontAwesomeIcon icon={faArrowRight} />
-            </Link>
+            </Link></Button>
           </div>
           <div className="privacy-stack motion-enter">
             <div><FontAwesomeIcon icon={faUserLock} /><span><strong>이름·주민번호</strong><small>저장하지 않음</small></span></div>
@@ -136,9 +142,9 @@ export function HomeScreen() {
           <h2>내 사건에서 지금 확인해야 할 것을 정리해보세요</h2>
           <p>회수 가능성을 보장하지 않습니다. 대신 결정에 필요한 질문을 빠뜨리지 않게 돕습니다.</p>
         </div>
-        <Link className="button button-primary button-large" href="/app/cases/new">
+        <Button asChild variant="default" size="lg"><Link href="/app/cases/new">
           무료로 시작하기 <FontAwesomeIcon icon={faArrowRight} />
-        </Link>
+        </Link></Button>
       </section>
     </main>
   )
@@ -146,14 +152,14 @@ export function HomeScreen() {
 
 export function AboutScreen() {
   return (
-    <main id="main-content" className="content-width page-main">
+    <PageLayout id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "서비스 소개" }]} />
       <PageHeader
         title="판결과 회수 사이의 정보 공백을 줄입니다"
         description="승소했지만 어디서부터 무엇을 확인해야 할지 모르는 소액 채권자가 비용을 더 쓰기 전에 판단 근거를 정리하도록 돕습니다."
       />
-      <div className="two-column-feature">
-        <section className="panel motion-enter">
+      <ResponsiveGrid>
+        <Surface className="motion-enter">
           <h2>집행나침반이 제공하는 것</h2>
           <ul className="check-list">
             <li><FontAwesomeIcon icon={faCheck} /> 승소 후 일반 절차와 확인사항</li>
@@ -161,8 +167,8 @@ export function AboutScreen() {
             <li><FontAwesomeIcon icon={faCheck} /> 유리·불리 요인과 데이터 한계</li>
             <li><FontAwesomeIcon icon={faCheck} /> 집행 계획과 결과 기록 흐름</li>
           </ul>
-        </section>
-        <section className="panel panel-muted motion-enter">
+        </Surface>
+        <Surface muted className="motion-enter">
           <h2>집행나침반이 제공하지 않는 것</h2>
           <ul className="plain-list">
             <li>사건별 법률 자문 또는 강제집행 대행</li>
@@ -170,12 +176,12 @@ export function AboutScreen() {
             <li>특정 채무자의 자산·SNS 자동 추적</li>
             <li>검증되지 않은 AI 판단의 단정적 표시</li>
           </ul>
-        </section>
-      </div>
+        </Surface>
+      </ResponsiveGrid>
       <Notice tone="warning" title="아직 검증 중인 MVP입니다">
         실제 사용자 결과가 축적되기 전에는 예측 확률이 아니라 설명 가능한 시범 점수와 구간을 제공합니다.
       </Notice>
-    </main>
+    </PageLayout>
   )
 }
 
@@ -188,13 +194,13 @@ const guideSteps = [
 
 export function GuideScreen() {
   return (
-    <main id="main-content" className="content-width page-main">
+    <PageLayout id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "승소 후 절차" }]} />
       <PageHeader
         eyebrow="승소 후 절차 안내"
         title="강제집행 전에 확인할 네 가지"
         description="사건마다 절차와 비용이 달라질 수 있으므로, 아래 순서를 기본 점검표로 활용하세요."
-        actions={<Link className="button button-primary" href="/app/cases/new">내 사건에 적용하기</Link>}
+        actions={<Button asChild variant="default" size="default"><Link href="/app/cases/new">내 사건에 적용하기</Link></Button>}
       />
       <ol className="guide-timeline">
         {guideSteps.map(([number, title, body]) => (
@@ -204,9 +210,9 @@ export function GuideScreen() {
           </li>
         ))}
       </ol>
-      <section className="panel motion-enter">
+      <Surface className="motion-enter">
         <h2>주요 집행 수단 비교 전 확인사항</h2>
-        <div className="responsive-table">
+        <TableContainer>
           <table>
             <thead><tr><th>수단</th><th>먼저 확인할 정보</th><th>비용·기간 검토</th></tr></thead>
             <tbody>
@@ -215,12 +221,12 @@ export function GuideScreen() {
               <tr><td>차량·부동산</td><td>소유·담보·선순위 권리</td><td>집행 비용과 실제 배당 가능성</td></tr>
             </tbody>
           </table>
-        </div>
-      </section>
+        </TableContainer>
+      </Surface>
       <Notice tone="warning" title="법률 전문가 확인이 필요한 정보입니다">
         이 화면의 내용은 일반적인 절차 이해를 위한 UI 예시입니다. 실제 신청 전에는 법원 안내 또는 법률 전문가를 통해 최신 요건과 비용을 확인하세요.
       </Notice>
-    </main>
+    </PageLayout>
   )
 }
 
@@ -235,7 +241,7 @@ const faqs = [
 
 export function FaqScreen() {
   return (
-    <main id="main-content" className="content-width page-main narrow-main">
+    <PageLayout width="reading" id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "자주 묻는 질문" }]} />
       <PageHeader eyebrow="FAQ" title="자주 묻는 질문" description="서비스 범위, 점수, 개인정보 처리에 관한 핵심 질문을 모았습니다." />
       <Accordion className="faq-list motion-enter" type="single" collapsible>
@@ -246,32 +252,32 @@ export function FaqScreen() {
           </AccordionItem>
         ))}
       </Accordion>
-    </main>
+    </PageLayout>
   )
 }
 
 export function LegalScreen({ type }: { type: LegalType }) {
   const content = legalContent[type]
   return (
-    <main id="main-content" className="content-width page-main narrow-main legal-page">
+    <PageLayout width="reading" id="main-content" className="legal-page">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: content.title }]} />
       <PageHeader title={content.title} description={content.lead} />
       <Notice tone="warning" title="MVP 초안 · 법률 검토 전">
         실제 서비스 공개 전 변호사·개인정보 전문가 검토와 운영정책 확정이 필요합니다.
       </Notice>
       <LegalDocumentContent type={type} />
-    </main>
+    </PageLayout>
   )
 }
 
 export function NoticesScreen() {
   return (
-    <main id="main-content" className="content-width page-main">
+    <PageLayout id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "공지사항" }]} />
       <PageHeader title="공지사항" description="집행나침반 MVP의 변경사항과 운영 안내입니다." />
-      <div className="notice-list panel motion-enter">
+      <Surface as="div" className="notice-list motion-enter">
         <article><StatusBadge tone="info">안내</StatusBadge><div><h2>MVP 화면 프로토타입을 공개했습니다</h2><p>2026.08.29 · 핵심 사용자 흐름과 데이터 처리 원칙을 확인할 수 있습니다.</p></div></article>
-      </div>
-    </main>
+      </Surface>
+    </PageLayout>
   )
 }

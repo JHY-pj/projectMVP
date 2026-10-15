@@ -4,16 +4,18 @@ import * as React from "react"
 import { CircleIcon } from "lucide-react"
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 
+import styles from "./radio-group.module.css"
 import { cn } from "@/lib/utils"
 
 function RadioGroup({
   className,
+  layout = "default",
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {
+}: React.ComponentProps<typeof RadioGroupPrimitive.Root> & { layout?: "default" | "list" }) {
   return (
     <RadioGroupPrimitive.Root
       data-slot="radio-group"
-      className={cn("grid gap-3", className)}
+      className={cn("grid gap-3", layout === "list" && styles.list, className)}
       {...props}
     />
   )

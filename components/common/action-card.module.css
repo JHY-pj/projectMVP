@@ -1,0 +1,8 @@
+.card { display: flex; flex-direction: column; min-height: 13rem; }
+.content { display: grid; align-content: start; gap: 0.75rem; flex: 1; }
+.content h2, .content p { margin: 0; }
+.content p { color: var(--gray-600); line-height: 1.65; }
+.icon { color: var(--primary); font-size: 1.5rem; }
+.footer { margin-top: 1.25rem; padding-top: 1rem; border-top: 0.0625rem solid var(--border); }
+.danger { background: #fff7f6; border-color: #efaaa6; }
+.danger .icon { color: var(--red-700); }

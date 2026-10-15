@@ -1,0 +1,7 @@
+.content { width: min(42rem,calc(100vw - 2rem)); max-width: calc(100vw - 2rem); max-height: min(88dvh,50rem); overflow: hidden; min-height: 0; padding: 0; }
+.layout { display: flex; flex-direction: column; min-height: 0; max-height: min(88dvh,50rem); width: 100%; }
+.header { flex: 0 0 auto; padding: 1.25rem 3rem 1rem 1.25rem; border-bottom: 0.0625rem solid var(--border); min-width: 0; text-align: left; }
+.header h2 { margin: 0 0 0.75rem; font-size: 1.125rem; line-height: 1.5; }
+.body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 1.25rem; display: grid; align-content: start; gap: 1rem; }
+.footer { flex: 0 0 auto; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 0.0625rem solid var(--border); background: var(--card); }
+@media(max-width:40rem) { .content { width: calc(100vw - 1.25rem); max-width: calc(100vw - 1.25rem); max-height: 85dvh; } .layout { max-height: 85dvh; } .header { padding: 1rem 3rem 0.875rem 1rem; } .body { padding: 1rem; } .footer { padding: 0.875rem 1rem; } }

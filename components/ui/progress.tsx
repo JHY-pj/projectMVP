@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Progress as ProgressPrimitive } from "radix-ui"
 
+import styles from "./progress.module.css"
 import { cn } from "@/lib/utils"
 
 function Progress({
@@ -15,14 +16,14 @@ function Progress({
       data-slot="progress"
       value={value}
       className={cn(
-        "app-progress relative w-full overflow-hidden",
+        styles.root,
         className
       )}
       {...props}
     >
       <ProgressPrimitive.Indicator
         data-slot="progress-indicator"
-        className="app-progress-indicator h-full transition-[width]"
+        className={styles.indicator}
         style={{ width: `${value ?? 0}%` }}
       />
     </ProgressPrimitive.Root>

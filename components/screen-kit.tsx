@@ -1,3 +1,6 @@
+import styles from "@/components/common/screen-kit.module.css"
+
+import { Button } from "@/components/ui/button"
 import {
   faArrowLeft,
   faChevronRight,
@@ -20,13 +23,13 @@ export function PageHeader({
   actions?: React.ReactNode
 }) {
   return (
-    <header className="page-heading motion-enter">
+    <header data-ui="page-header" className={styles.header}>
       <div>
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1>{title}</h1>
-        {description && <p className="page-description">{description}</p>}
+        {description && <p className={styles.description}>{description}</p>}
       </div>
-      {actions && <div className="page-actions">{actions}</div>}
+      {actions && <div className={styles.actions}>{actions}</div>}
     </header>
   )
 }
@@ -37,7 +40,7 @@ export function Breadcrumbs({
   items: Array<{ label: string; href?: string }>
 }) {
   return (
-    <nav className="breadcrumbs" aria-label="현재 위치">
+    <nav className={styles.breadcrumbs} aria-label="현재 위치">
       {items.map((item, index) => (
         <span key={`${item.label}-${index}`}>
           {index > 0 && <FontAwesomeIcon icon={faChevronRight} />}
@@ -64,7 +67,7 @@ export function Notice({
         ? faShieldHalved
         : faCircleInfo
   return (
-    <aside className={`notice notice-${tone}`}>
+    <aside data-ui="notice" className={`${styles.notice} ${styles[tone]}`}>
       <FontAwesomeIcon icon={icon} />
       <div>
         <strong>{title}</strong>
@@ -74,20 +77,12 @@ export function Notice({
   )
 }
 
-export function StatusBadge({
-  tone = "neutral",
-  children,
-}: {
-  tone?: "positive" | "warning" | "negative" | "info" | "neutral"
-  children: React.ReactNode
-}) {
-  return <span className={`status status-${tone}`}>{children}</span>
-}
+export { Badge as StatusBadge } from "@/components/ui/badge"
 
 export function BackLink({ href, label = "이전으로" }: { href: string; label?: string }) {
   return (
-    <Link className="back-link" href={href}>
+    <Button asChild variant="link" size="sm"><Link href={href}>
       <FontAwesomeIcon icon={faArrowLeft} /> {label}
-    </Link>
+    </Link></Button>
   )
 }

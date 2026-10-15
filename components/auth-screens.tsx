@@ -1,5 +1,11 @@
 "use client"
 
+import "./auth-screens.css"
+
+import { CenteredPage, CompletionCard, CompletionIcon, FormStack, Field, Input, PageLayout, Surface, CheckboxRow } from "@/components/common/primitives"
+
+import { Button } from "@/components/ui/button"
+
 import { SignupConsent } from "@/components/auth/signup-consent"
 
 import { Notice, PageHeader } from "@/components/screen-kit"
@@ -112,16 +118,16 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           <li><FontAwesomeIcon icon={faCheck} /> 동의·철회 이력 분리 보관</li>
         </ul>
       </section>
-      <section className="auth-card motion-enter">
+      <Surface className="auth-card motion-enter">
         <div className="auth-card-heading">
           <h2>{copy[mode][0]}</h2>
           <p>{mode === "login" ? "계정 정보를 입력해 주세요." : mode === "signup" ? "서비스 이용 계정을 만듭니다." : "본인 계정의 정보를 입력해 주세요."}</p>
         </div>
-        <form className="form-stack" onSubmit={handleSubmit}>
+        <FormStack as="form" onSubmit={handleSubmit}>
           {!isPasswordChange && (
-            <label className="field">
+            <Field>
               <span>이메일</span>
-              <input
+              <Input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -129,14 +135,14 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
                 autoComplete="email"
                 required
               />
-            </label>
+            </Field>
           )}
           {(mode !== "reset" || isPasswordChange) && (
-            <label className="field">
+            <Field>
               <span>비밀번호</span>
               <div className="password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
+                <Input
+                  type={showPassword ? "text" : "password"} trailingAction
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder="8자 이상 입력"
@@ -144,30 +150,30 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
                   minLength={8}
                   required
                 />
-                <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}>
+                <Button variant="ghost" size="icon-sm" type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}>
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                </button>
+                </Button>
               </div>
-            </label>
+            </Field>
           )}
           {(mode === "signup" || isPasswordChange) && (
-            <label className="field">
+            <Field>
               <span>비밀번호 확인</span>
-              <input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" required />
-            </label>
+              <Input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" required />
+            </Field>
           )}
           {mode === "signup" && <SignupConsent onChange={setTerms} />}
           {mode === "login" && <Link className="form-side-link" href="/reset-password">비밀번호를 잊으셨나요?</Link>}
-          <button className="button button-primary button-block button-large" disabled={loading || (mode === "signup" && !terms)} type="submit">
+          <Button variant="default" size="lg" fullWidth disabled={loading || (mode === "signup" && !terms)} type="submit">
             {loading ? "처리 중..." : mode === "login" ? "로그인" : mode === "signup" ? "회원가입" : isPasswordChange ? "새 비밀번호 저장" : "재설정 메일 받기"}
             {!loading && <FontAwesomeIcon icon={faArrowRight} />}
-          </button>
-        </form>
+          </Button>
+        </FormStack>
         <div className="auth-switch">
           {mode === "login" ? <>처음이신가요? <Link href="/signup">회원가입</Link></> : mode === "signup" ? <>이미 계정이 있나요? <Link href="/login">로그인</Link></> : <Link href="/login">로그인으로 돌아가기</Link>}
         </div>
         <p className="security-note"><FontAwesomeIcon icon={faLock} /> 공개 클라이언트에는 Supabase publishable key만 사용합니다.</p>
-      </section>
+      </Surface>
     </main>
   )
 }
@@ -178,15 +184,15 @@ export function VerifyEmailScreen() {
   const searchParams = useSearchParams()
   const status = searchParams.get("status")
   return (
-    <main id="main-content" className="centered-page">
-      <section className="completion-card motion-enter">
-        <span className="completion-icon"><FontAwesomeIcon icon={faEnvelopeCircleCheck} /></span>
+    <CenteredPage id="main-content">
+      <CompletionCard className="motion-enter">
+        <CompletionIcon><FontAwesomeIcon icon={faEnvelopeCircleCheck} /></CompletionIcon>
         <p className="eyebrow">이메일 인증</p>
         <h1>{status === "error" ? "인증 링크를 확인해 주세요" : "이메일을 확인해 주세요"}</h1>
         <p>{status === "error" ? "링크가 만료되었거나 이미 사용되었습니다. 로그인 화면에서 다시 시도해 주세요." : "가입한 이메일로 인증 링크를 보냈습니다. 인증을 마치면 서비스 동의 단계로 이동합니다."}</p>
-        <Link className="button button-primary button-large" href="/login">로그인으로 이동</Link>
-      </section>
-    </main>
+        <Button asChild variant="default" size="lg"><Link href="/login">로그인으로 이동</Link></Button>
+      </CompletionCard>
+    </CenteredPage>
   )
 }
 
@@ -221,42 +227,42 @@ export function OnboardingScreen() {
   }
 
   return (
-    <main id="main-content" className="content-width page-main narrow-main">
+    <PageLayout width="reading" id="main-content">
       <PageHeader eyebrow="시작 전 확인 · 1/2" title="어떤 정보를 왜 처리하는지 먼저 알려드릴게요" description="필수 동의와 선택 동의를 구분하고, 동의·철회 이력은 덮어쓰지 않고 시간순으로 기록합니다." />
       <Progress value={50} className="onboarding-progress" aria-label="온보딩 진행률 50%" />
-      <section className="panel consent-panel motion-enter">
+      <Surface density="flush" className="consent-panel motion-enter">
         <div className="consent-all">
-          <label className="checkbox-row">
+          <CheckboxRow>
             <Checkbox checked={checked.length === consentItems.length} onCheckedChange={(value) => setChecked(value ? consentItems.map(([id]) => id) : [])} />
             <span><strong>필수 항목 전체 동의</strong><small>서비스 이용에 필요한 개인정보 처리와 사건·결과 데이터 활용 동의입니다.</small></span>
-          </label>
+          </CheckboxRow>
         </div>
         {consentItems.map(([id, title, description]) => (
           <div className="consent-row" key={id}>
-            <label className="checkbox-row">
+            <CheckboxRow>
               <Checkbox checked={checked.includes(id)} onCheckedChange={(value) => toggleItem(id, Boolean(value))} />
               <span><strong>{title}</strong><small>{description}</small></span>
-            </label>
+            </CheckboxRow>
             <Link href={id === "terms" ? "/terms" : id === "privacy" ? "/privacy" : "/data-policy"}>내용 보기</Link>
           </div>
         ))}
-      </section>
-      <section className="panel eligibility-check motion-enter">
+      </Surface>
+      <Surface className="eligibility-check motion-enter">
         <h2>초기 서비스 대상 확인</h2>
         <p>민사 승소 판결을 보유했고, 채권액이 500만 원 미만인가요?</p>
         <div className="segmented-control" role="radiogroup" aria-label="서비스 대상 여부">
-          <button className={eligible === "yes" ? "is-selected" : ""} onClick={() => setEligible("yes")} role="radio" aria-checked={eligible === "yes"}>예</button>
-          <button className={eligible === "no" ? "is-selected" : ""} onClick={() => setEligible("no")} role="radio" aria-checked={eligible === "no"}>아니요</button>
-          <button className={eligible === "unknown" ? "is-selected" : ""} onClick={() => setEligible("unknown")} role="radio" aria-checked={eligible === "unknown"}>잘 모르겠어요</button>
+          <Button variant="outline" size="default" className={eligible === "yes" ? "is-selected" : ""} onClick={() => setEligible("yes")} role="radio" aria-checked={eligible === "yes"}>예</Button>
+          <Button variant="outline" size="default" className={eligible === "no" ? "is-selected" : ""} onClick={() => setEligible("no")} role="radio" aria-checked={eligible === "no"}>아니요</Button>
+          <Button variant="outline" size="default" className={eligible === "unknown" ? "is-selected" : ""} onClick={() => setEligible("unknown")} role="radio" aria-checked={eligible === "unknown"}>잘 모르겠어요</Button>
         </div>
-      </section>
+      </Surface>
       <Notice tone="secure" title="권한은 분리되어 있습니다">
         회원은 자신의 프로필·설정·동의 이력만 조회할 수 있으며, 역할과 계정 상태는 직접 수정할 수 없습니다.
       </Notice>
       <div className="sticky-actions">
-        <Link className="button button-outline" href="/">취소</Link>
-        <button className="button button-primary button-large" onClick={continueOnboarding}>확인하고 사건 등록 <FontAwesomeIcon icon={faArrowRight} /></button>
+        <Button asChild variant="outline" size="default"><Link href="/">취소</Link></Button>
+        <Button variant="default" size="lg" onClick={continueOnboarding}>확인하고 사건 등록 <FontAwesomeIcon icon={faArrowRight} /></Button>
       </div>
-    </main>
+    </PageLayout>
   )
 }

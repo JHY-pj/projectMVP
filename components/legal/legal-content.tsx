@@ -1,3 +1,5 @@
+
+import "./legal-content.css"
 export type LegalType = "terms" | "privacy" | "disclaimer" | "data-policy"
 
 export const legalContent: Record<LegalType, { title: string; lead: string; sections: Array<[string, string]> }> = {

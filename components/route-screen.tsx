@@ -1,3 +1,6 @@
+import { CenteredPage, CompletionCard } from "@/components/common/primitives"
+
+import { Button } from "@/components/ui/button"
 import { redirect } from "next/navigation"
 import { demoRedirectFor, isDemoAppPath } from "@/lib/demo-routing"
 import Link from "next/link"
@@ -22,7 +25,7 @@ import {
 const legalRoutes = ["terms", "privacy", "disclaimer", "data-policy"] as const
 
 function NotFoundScreen() {
-  return <main id="main-content" className="centered-page"><section className="completion-card"><p className="eyebrow">404</p><h1>페이지를 찾을 수 없습니다</h1><p>주소를 확인하거나 홈에서 다시 시작해 주세요.</p><Link className="button button-primary" href="/">홈으로</Link></section></main>
+  return <CenteredPage id="main-content"><CompletionCard><p className="eyebrow">404</p><h1>페이지를 찾을 수 없습니다</h1><p>주소를 확인하거나 홈에서 다시 시작해 주세요.</p><Button asChild variant="default" size="default"><Link href="/">홈으로</Link></Button></CompletionCard></CenteredPage>
 }
 
 export function RouteScreen({ segments }: { segments: string[] }) {

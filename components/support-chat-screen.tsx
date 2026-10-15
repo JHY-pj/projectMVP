@@ -1,5 +1,11 @@
 "use client"
 
+import "./support-chat-screen.css"
+
+import { PageLayout, Textarea } from "@/components/common/primitives"
+
+import { Button } from "@/components/ui/button"
+
 import { Breadcrumbs, Notice, PageHeader } from "@/components/screen-kit"
 import {
   faArrowUp,
@@ -139,7 +145,7 @@ export function SupportChatScreen() {
   }
 
   return (
-    <main id="main-content" className="content-width page-main narrow-main support-main">
+    <PageLayout width="reading" id="main-content" className="support-main">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "고객센터" }]} />
       <PageHeader
         eyebrow="고객센터 · 실시간 안내"
@@ -154,12 +160,12 @@ export function SupportChatScreen() {
             <span><strong>민사 절차 안내</strong><small><i /> 실시간 상담 중</small></span>
           </div>
           <div className="support-chat-actions">
-            <button className="button button-ghost" type="button" onClick={downloadConversation}>
+            <Button variant="ghost" size="default" type="button" onClick={downloadConversation}>
               <FontAwesomeIcon icon={faFloppyDisk} /> 저장
-            </button>
-            <button className="button button-ghost" type="button" onClick={resetConversation}>
+            </Button>
+            <Button variant="ghost" size="default" type="button" onClick={resetConversation}>
               <FontAwesomeIcon icon={faPlus} /> 새 상담
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -194,16 +200,16 @@ export function SupportChatScreen() {
           <div className="chat-quick-questions">
             <span>이렇게 시작해 보세요</span>
             {quickQuestions.map((question) => (
-              <button type="button" key={question} onClick={() => sendMessage(undefined, question)}>
+              <Button variant="outline" size="sm" type="button" key={question} onClick={() => sendMessage(undefined, question)}>
                 {question}
-              </button>
+              </Button>
             ))}
           </div>
         )}
 
         <form className="chat-composer" onSubmit={sendMessage}>
           <label className="sr-only" htmlFor="support-chat-input">상담 내용 입력</label>
-          <textarea
+          <Textarea
             id="support-chat-input"
             ref={inputRef}
             value={draft}
@@ -217,14 +223,14 @@ export function SupportChatScreen() {
             }}
             placeholder="어떤 일이 있었는지 편하게 말씀해 주세요."
           />
-          <button type="submit" className="button button-primary" disabled={!canSend} aria-label="메시지 보내기">
+          <Button variant="default" size="default" type="submit" disabled={!canSend} aria-label="메시지 보내기">
             <FontAwesomeIcon icon={faArrowUp} />
             <span>보내기</span>
-          </button>
+          </Button>
         </form>
         <footer className="support-chat-footer">
           <span>이 상담은 일반적인 정보 안내이며, 사건별 법률 자문이나 결과 보장을 하지 않습니다.</span>
-          <button type="button" onClick={resetConversation}><FontAwesomeIcon icon={faRotateLeft} /> 대화 초기화</button>
+          <Button variant="link" size="sm" type="button" onClick={resetConversation}><FontAwesomeIcon icon={faRotateLeft} /> 대화 초기화</Button>
         </footer>
       </section>
 
@@ -236,6 +242,6 @@ export function SupportChatScreen() {
       <Notice tone="warning" title="중요한 신청·기한·금액 판단 전 확인">
         법원 안내 또는 법률 전문가를 통해 실제 사건의 최신 요건과 비용을 확인해 주세요.
       </Notice>
-    </main>
+    </PageLayout>
   )
 }

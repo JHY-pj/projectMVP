@@ -1,5 +1,9 @@
 "use client"
 
+import "./site-shell.css"
+
+import { Button } from "@/components/ui/button"
+
 import { MotionLayer } from "@/components/motion-layer"
 import {
   faBars,
@@ -140,8 +144,8 @@ export function SiteShell({
             <NavLinks items={items} />
           </nav>
           {isPublic && <div className="header-actions">
-            <Link className="button button-ghost" href="/app/cases">데모 둘러보기</Link>
-            <Link className="button button-primary" href="/app/cases/new">내 사건 분석하기</Link>
+            <Button asChild variant="ghost" size="default"><Link href="/app/cases">데모 둘러보기</Link></Button>
+            <Button asChild variant="default" size="default"><Link href="/app/cases/new">내 사건 분석하기</Link></Button>
           </div>}
           <details className="mobile-menu" ref={menuRef}>
             <summary aria-label="메뉴 열기">
@@ -150,9 +154,9 @@ export function SiteShell({
             <nav aria-label="모바일 메뉴">
               <NavLinks items={items} />
               {isPublic && (
-                <Link className="button button-primary" href="/app/cases/new" onClick={(event) => closeMobileMenu(event.currentTarget)}>
+                <Button asChild variant="default" size="default"><Link href="/app/cases/new" onClick={(event) => closeMobileMenu(event.currentTarget)}>
                   내 사건 분석하기
-                </Link>
+                </Link></Button>
               )}
             </nav>
           </details>
