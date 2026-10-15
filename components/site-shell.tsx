@@ -3,7 +3,6 @@
 import { MotionLayer } from "@/components/motion-layer"
 import {
   faBars,
-  faCirclePlus,
   faCompass,
   faFileLines,
   faHouse,
@@ -37,7 +36,6 @@ const adminNav = [
 const mobileBottomNav = [
   ["홈", "/app", faHouse],
   ["내 사건", "/app/cases", faFileLines],
-  ["등록", "/app/cases/new", faCirclePlus],
 ] as const
 
 function isCurrentPath(pathname: string, href: string) {
@@ -133,37 +131,19 @@ export function SiteShell({
           <nav className="desktop-nav" aria-label="주요 메뉴">
             <NavLinks items={items} />
           </nav>
-          <div className="header-actions">
-            {isPublic ? (
-              <>
-                <Link className="button button-ghost" href="/app/cases">
-                  데모 둘러보기
-                </Link>
-                <Link className="button button-primary" href="/app/cases/new" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
-                  내 사건 분석하기
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link className="button button-primary" href="/app/cases/new">
-                  <FontAwesomeIcon icon={faCirclePlus} /> 새 사건 등록
-                </Link>
-              </>
-            )}
-          </div>
+          {isPublic && <div className="header-actions">
+            <Link className="button button-ghost" href="/app/cases">데모 둘러보기</Link>
+            <Link className="button button-primary" href="/app/cases/new">내 사건 분석하기</Link>
+          </div>}
           <details className="mobile-menu">
             <summary aria-label="메뉴 열기">
               <FontAwesomeIcon icon={faBars} />
             </summary>
             <nav aria-label="모바일 메뉴">
               <NavLinks items={items} />
-              {isPublic ? (
-                <Link className="button button-primary" href="/app/cases/new">
+              {isPublic && (
+                <Link className="button button-primary" href="/app/cases/new" onClick={(event) => closeMobileMenu(event.currentTarget)}>
                   내 사건 분석하기
-                </Link>
-              ) : (
-                <Link className="nav-link" href="/app/cases" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
-                  사건 목록으로
                 </Link>
               )}
             </nav>

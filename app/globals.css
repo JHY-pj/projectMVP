@@ -536,7 +536,7 @@ h3{font-weight:500}
 .site-footer{margin-top:3.75rem;padding-bottom:4.375rem}
 .footer-inner{grid-template-columns:1fr}
 .footer-inner nav{display:grid;grid-template-columns:1fr 1fr}
-.mobile-bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:45;height:4.25rem;display:grid;grid-template-columns:repeat(5,1fr);border-top:0.0625rem solid var(--border);background:white}
+.mobile-bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:45;height:4.25rem;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);border-top:0.0625rem solid var(--border);background:white}
 .mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.1875rem;color:var(--gray-600);font-size:0.6875rem}
 .mobile-bottom-nav a svg{width:1.125rem;height:1.125rem}
 .mobile-bottom-nav .bottom-primary{color:var(--navy-800);font-weight:800}
