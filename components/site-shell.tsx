@@ -3,15 +3,11 @@
 import { MotionLayer } from "@/components/motion-layer"
 import {
   faBars,
-  faBell,
   faCirclePlus,
   faCompass,
   faFileLines,
-  faGear,
   faHouse,
-  faRightFromBracket,
   faShieldHalved,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Link from "next/link"
@@ -28,9 +24,7 @@ const publicNav = [
 
 const memberNav = [
   ["대시보드", "/app"],
-  ["내 사건", "/app/cases/demo-2026"],
-  ["알림", "/app/notifications"],
-  ["내 정보", "/app/settings"],
+  ["내 사건", "/app/cases"],
 ]
 
 const adminNav = [
@@ -42,10 +36,8 @@ const adminNav = [
 
 const mobileBottomNav = [
   ["홈", "/app", faHouse],
-  ["내 사건", "/app/cases/demo-2026", faFileLines],
+  ["내 사건", "/app/cases", faFileLines],
   ["등록", "/app/cases/new", faCirclePlus],
-  ["알림", "/app/notifications", faBell],
-  ["설정", "/app/settings", faGear],
 ] as const
 
 function isCurrentPath(pathname: string, href: string) {
@@ -98,7 +90,7 @@ function MobileBottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="mobile-bottom-nav" aria-label="회원 바로가기">
+    <nav className="mobile-bottom-nav" aria-label="데모 바로가기">
       {mobileBottomNav.map(([label, href, icon]) => {
         const active = isCurrentPath(pathname, href)
         return (
@@ -144,22 +136,15 @@ export function SiteShell({
           <div className="header-actions">
             {isPublic ? (
               <>
-                <Link className="button button-ghost" href="/login">
-                  로그인
+                <Link className="button button-ghost" href="/app/cases">
+                  데모 둘러보기
                 </Link>
-                <Link className="button button-primary" href="/signup" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
+                <Link className="button button-primary" href="/app/cases/new" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
                   내 사건 분석하기
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  className="icon-button"
-                  href={mode === "admin" ? "/app" : "/admin"}
-                  aria-label={mode === "admin" ? "회원 화면" : "관리자 화면"}
-                >
-                  <FontAwesomeIcon icon={mode === "admin" ? faUser : faShieldHalved} />
-                </Link>
                 <Link className="button button-primary" href="/app/cases/new">
                   <FontAwesomeIcon icon={faCirclePlus} /> 새 사건 등록
                 </Link>
@@ -173,12 +158,12 @@ export function SiteShell({
             <nav aria-label="모바일 메뉴">
               <NavLinks items={items} />
               {isPublic ? (
-                <Link className="button button-primary" href="/signup">
+                <Link className="button button-primary" href="/app/cases/new">
                   내 사건 분석하기
                 </Link>
               ) : (
-                <Link className="nav-link" href="/login" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
-                  <FontAwesomeIcon icon={faRightFromBracket} /> 로그아웃
+                <Link className="nav-link" href="/app/cases" onClick={(event) => event.currentTarget.closest("details.mobile-menu")?.removeAttribute("open")}>
+                  사건 목록으로
                 </Link>
               )}
             </nav>
@@ -192,6 +177,7 @@ export function SiteShell({
           </div>
         </div>
       )}
+      {mode === "member" && <div className="demo-banner" role="note">회원가입 없이 체험하는 데모입니다. 가상 사건만 입력해 주세요. 입력·기록은 이 브라우저에 저장되며 브라우저 데이터 삭제 시 사라집니다.</div>}
       {children}
       {mode === "member" && <MobileBottomNav />}
       <footer className="site-footer">

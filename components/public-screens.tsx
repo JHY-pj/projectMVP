@@ -44,7 +44,7 @@ export function HomeScreen() {
               다음 확인사항을 한곳에서 정리해드립니다.
             </p>
             <div className="hero-actions motion-enter">
-              <Link className="button button-primary button-large" href="/signup">
+              <Link className="button button-primary button-large" href="/app/cases/new">
                 내 사건 분석 시작 <FontAwesomeIcon icon={faArrowRight} />
               </Link>
               <Link className="button button-outline button-large" href="/guide">
@@ -136,7 +136,7 @@ export function HomeScreen() {
           <h2>내 사건에서 지금 확인해야 할 것을 정리해보세요</h2>
           <p>회수 가능성을 보장하지 않습니다. 대신 결정에 필요한 질문을 빠뜨리지 않게 돕습니다.</p>
         </div>
-        <Link className="button button-primary button-large" href="/signup">
+        <Link className="button button-primary button-large" href="/app/cases/new">
           무료로 시작하기 <FontAwesomeIcon icon={faArrowRight} />
         </Link>
       </section>

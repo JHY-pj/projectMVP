@@ -29,12 +29,9 @@ import {
   faCircleExclamation,
   faClockRotateLeft,
   faCoins,
-  faFileArrowUp,
   faFileCircleCheck,
   faFileLines,
-  faGaugeHigh,
   faListCheck,
-  faPenToSquare,
   faScaleBalanced,
   faTrashCan,
   faUserShield,
@@ -46,6 +43,14 @@ import { usePathname, useRouter } from "next/navigation"
 import { FormEvent, useEffect, useState } from "react"
 import { toast } from "sonner"
 
+type DraftCase = { case_id: string; claim_type: string; claim_amount_band: string; region: string; outcome_status: string; process_status: string; [key: string]: unknown }
+const signalLabels: Record<string, string> = { judgment_elapsed_band: "판결 후 경과 기간", debtor_type: "채무자 유형", debtor_contact_status: "연락 상태", asset_signal: "재산 단서", income_signal: "소득 단서", enforcement_title_confirmed: "집행권원 확인", service_status: "송달 상태", known_bank: "은행 단서", known_employer: "근무처 단서", known_real_estate: "부동산 단서", known_vehicle: "차량 단서" }
+function readDrafts(): DraftCase[] {
+  const value: unknown = JSON.parse(localStorage.getItem("mvp-case-drafts") || "[]")
+  if (!Array.isArray(value)) throw new Error("Invalid case storage")
+  return value.filter((item): item is DraftCase => Boolean(item && typeof item.case_id === "string" && typeof item.claim_type === "string"))
+}
+
 const demoCase = {
   id: "EC-2026-0001",
   type: "대여금",
@@ -53,71 +58,30 @@ const demoCase = {
   status: "진행 중",
   updatedAt: "2026.08.29",
   sufficiency: 72,
-  score: 68,
 }
 
 export function DashboardScreen() {
-  return (
-    <main id="main-content" className="content-width page-main dashboard-main">
-      <PageHeader
-        eyebrow="대시보드"
-        title="안녕하세요, 지현님"
-        description="사건의 현재 상태와 지금 해야 할 일을 확인하세요."
-        actions={<Link className="button button-primary" href="/app/cases/new"><FontAwesomeIcon icon={faFileLines} /> 새 사건 등록</Link>}
-      />
-      <section className="dashboard-metrics motion-enter" aria-label="사건 요약">
-        <article><span><FontAwesomeIcon icon={faFileCircleCheck} /></span><div><small>진행 중 사건</small><strong>1</strong></div></article>
-        <article><span className="accent"><FontAwesomeIcon icon={faCalendarCheck} /></span><div><small>결과 입력 필요</small><strong>1</strong></div></article>
-        <article><span className="success"><FontAwesomeIcon icon={faCircleCheck} /></span><div><small>완료한 사건</small><strong>0</strong></div></article>
-      </section>
-
-      <section className="next-action-card motion-enter">
-        <div className="next-action-icon"><FontAwesomeIcon icon={faBell} /></div>
-        <div>
-          <StatusBadge tone="warning">확인 필요</StatusBadge>
-          <h2>집행 진행 상태를 알려주세요</h2>
-          <p>마지막 업데이트 후 30일이 지났습니다. 1분이면 현재 상태를 기록할 수 있어요.</p>
-        </div>
-        <Link className="button button-primary" href="/app/cases/demo-2026/status">상태 갱신 <FontAwesomeIcon icon={faArrowRight} /></Link>
-      </section>
-
-      <div className="dashboard-grid">
-        <section className="panel motion-enter">
-          <div className="panel-heading"><div><p className="eyebrow">내 사건</p><h2>진행 중인 사건</h2></div><Link href="/app/cases">전체 보기</Link></div>
-          <article className="case-card">
-            <div className="case-card-top"><span className="case-icon"><FontAwesomeIcon icon={faScaleBalanced} /></span><div><small>{demoCase.id}</small><h3>{demoCase.type} 청구 사건</h3></div><StatusBadge tone="info">{demoCase.status}</StatusBadge></div>
-            <dl className="case-summary"><div><dt>채권 금액</dt><dd>{demoCase.amount}</dd></div><div><dt>데이터 충분도</dt><dd>{demoCase.sufficiency}%</dd></div><div><dt>최근 갱신</dt><dd>{demoCase.updatedAt}</dd></div></dl>
-            <Progress value={demoCase.sufficiency} aria-label={`데이터 충분도 ${demoCase.sufficiency}%`} />
-            <div className="case-actions"><Link className="button button-outline button-small" href="/app/cases/demo-2026">사건 상세</Link><Link className="button button-primary button-small" href="/app/cases/demo-2026/report">리포트 보기</Link></div>
-          </article>
-        </section>
-        <aside className="panel motion-enter trans">
-          <div className="panel-heading"><div><p className="eyebrow">최근 리포트</p><h2>실익 판단 기준선</h2></div><StatusBadge tone="warning">데모</StatusBadge></div>
-          <div className="mini-score"><strong>{demoCase.score}</strong><span>/ 100</span></div>
-          <p>현재 데이터 기준 <b>추가 확인 후 착수 검토</b> 구간입니다.</p>
-          <Link className="text-link" href="/app/cases/demo-2026/report">판단 근거 6개 확인 <FontAwesomeIcon icon={faChevronRight} /></Link>
-        </aside>
-      </div>
-      <Notice tone="info" title="점수는 성공 확률이 아닙니다">
-        현재 리포트는 룰 기반 시범 점수입니다. 회수 결과를 보장하지 않으며 데이터 충분도와 한계를 함께 확인해야 합니다.
-      </Notice>
-    </main>
-  )
+  return <main id="main-content" className="content-width page-main dashboard-main">
+    <PageHeader eyebrow="데모" title="집행나침반 체험" description="가상 사건을 입력하고, 확인할 정보와 다음 행동을 정리해 보세요." />
+    <section className="panel"><h2>어디서 시작할까요?</h2><p>새 사건을 등록하거나 준비된 예시 사건을 살펴볼 수 있습니다.</p><div className="case-actions"><Link className="button button-primary" href="/app/cases/new">가상 사건 등록</Link><Link className="button button-outline" href="/app/cases">사건 목록</Link></div></section>
+    <Notice tone="info" title="이번 데모의 범위">사건 입력 → 정보 확인 → 집행 계획 → 진행·결과 기록을 체험합니다. 실익 판단 로직과 서버 저장은 아직 연결하지 않았습니다.</Notice>
+  </main>
 }
 
-const wizardSteps = ["대상 확인", "입력 방식", "사건 정보", "집행 경험", "정보 확인 및 제출"]
+const wizardSteps = ["대상 확인", "사건 정보", "집행 경험", "정보 확인 및 제출"]
 
 const caseTypeLabels: Record<string, string> = { loan: "대여금", sale: "매매대금", construction: "공사대금", other: "기타" }
-const amountLabels: Record<string, string> = { "under-100": "100만 원 미만", "100-300": "100만~300만 원", "300-500": "300만~500만 원" }
+const amountLabels: Record<string, string> = { "under-100": "100만 원 미만", "100-300": "100만~300만 원", "300-500": "300만~500만 원", unknown: "모름" }
 const regionLabels: Record<string, string> = { capital: "수도권", metro: "광역시", other: "그 외 지역", unknown: "모름" }
 const statusLabels: Record<string, string> = { in_progress: "진행 중", success_partial: "일부 회수", fail_confirmed: "전혀 회수 못함", abandoned: "중단함" }
 const attemptLabels: Record<string, string> = { bank: "통장 압류", wage: "급여 압류", car: "차량", estate: "부동산", none: "아직 안 함" }
 
 export function CaseListScreen() {
+  const [drafts, setDrafts] = useState<DraftCase[]>([])
+  useEffect(() => { const sync = () => { try { setDrafts(readDrafts()) } catch { toast.error("저장된 사건을 불러오지 못했습니다.") } }; sync(); window.addEventListener("storage", sync); return () => window.removeEventListener("storage", sync) }, [])
   const cases = [
+    ...drafts.map((item) => ({ id: item.case_id, caseNo: item.case_id, type: item.claim_type, amount: item.claim_amount_band, status: item.process_status, next: "입력 정보와 추가 확인사항 검토", updatedAt: "브라우저 저장", tone: "info" as const })),
     { id: "demo-2026", caseNo: "EC-2026-0001", type: "대여금", amount: "300만 원 이상 ~ 500만 원 미만", status: "진행 중", next: "신청 비용·선순위 권리 확인", updatedAt: "2026.08.29", tone: "info" as const },
-    { id: "demo-2025-02", caseNo: "EC-2025-0002", type: "매매대금", amount: "100만 원 이상 ~ 300만 원 미만", status: "완료", next: "집행 결과 기록 완료", updatedAt: "2026.07.14", tone: "positive" as const },
-    { id: "demo-2025-03", caseNo: "EC-2025-0003", type: "기타", amount: "100만 원 미만", status: "중단", next: "필요 시 사건 다시 검토", updatedAt: "2026.05.02", tone: "neutral" as const },
   ]
 
   return (
@@ -159,36 +123,13 @@ export function CaseListScreen() {
 export function CaseWizardScreen() {
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const [method, setMethod] = useState("manual")
-  const [caseType, setCaseType] = useState("loan")
-  const [amount, setAmount] = useState("300-500")
-  const [region, setRegion] = useState("capital")
+  const [caseType, setCaseType] = useState("other")
+  const [amount, setAmount] = useState("unknown")
+  const [region, setRegion] = useState("unknown")
   const [attempts, setAttempts] = useState<string[]>(["none"])
   const [status, setStatus] = useState("in_progress")
-  const [documentConsent, setDocumentConsent] = useState(false)
-  const [fileName, setFileName] = useState("")
-  const [judgmentCheck, setJudgmentCheck] = useState<"idle" | "checking" | "true" | "false" | "unknown">("idle")
-  const [judgmentMessage, setJudgmentMessage] = useState("")
-  async function checkJudgment(file: File) {
-    setJudgmentCheck("checking")
-    setJudgmentMessage("판결문 형식을 확인하고 있습니다.")
-    try {
-      const payload = new FormData()
-      payload.append("file", file)
-      const response = await fetch("http://localhost:8000/documents/validate-judgment", { method: "POST", body: payload })
-      if (!response.ok) throw new Error("판별 서버 응답 오류")
-      const result = await response.json() as {result: "true" | "false" | "unknown"; reason: string}
-      setJudgmentCheck(result.result)
-      setJudgmentMessage(result.reason)
-      if (result.result !== "true") setFileName("")
-    } catch {
-      setJudgmentCheck("unknown")
-      setJudgmentMessage("판별 서버에 연결하지 못했습니다. 서버를 실행하거나 직접 입력을 선택해 주세요.")
-      setFileName("")
-    }
-  }
   const [signals, setSignals] = useState<Record<string, string>>({
-    judgment_elapsed_band: "1년 미만",
+    judgment_elapsed_band: "모름",
     debtor_type: "개인",
     debtor_contact_status: "Unknown",
     asset_signal: "Unknown",
@@ -208,7 +149,7 @@ export function CaseWizardScreen() {
   const displaySignal = (value: string) => value === "Unknown" ? "미확인" : value
 
   const reviewItems: Array<[string, string]> = [
-    ["입력 방식", method === "manual" ? "직접 입력" : "판결문 업로드"],
+    ["입력 방식", "직접 입력"],
     ["사건 유형", caseTypeLabels[caseType]],
     ["채권 금액", amountLabels[amount]],
     ["지역 범위", regionLabels[region]],
@@ -228,22 +169,6 @@ export function CaseWizardScreen() {
   ]
 
   function next() {
-    if (step === 2 && method === "upload" && judgmentCheck !== "true") {
-      toast.error(
-        judgmentCheck === "false"
-          ? "업로드한 파일이 민사 판결문 형식으로 확인되지 않았습니다. 판결문 PDF를 다시 선택해 주세요."
-          : judgmentCheck === "unknown"
-            ? "업로드한 PDF가 판결문인지 확인할 수 없습니다. 다른 PDF를 선택하거나 직접 입력해 주세요."
-            : judgmentCheck === "checking"
-              ? "판결문 PDF를 확인하고 있습니다. 잠시 후 다시 시도해 주세요."
-              : "민사 판결문 PDF를 먼저 업로드해 주세요."
-      )
-      return
-    }
-    if (step === 2 && method === "upload" && !documentConsent) {
-      toast.error("문서 처리 안내를 확인해 주세요.")
-      return
-    }
     setStep((current) => Math.min(wizardSteps.length, current + 1))
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -274,10 +199,10 @@ export function CaseWizardScreen() {
       is_dummy: "N",
     }
     try {
-      const previous = JSON.parse(window.localStorage.getItem("mvp-case-drafts") || "[]") as unknown[]
+      const previous = readDrafts()
       window.localStorage.setItem("mvp-case-drafts", JSON.stringify([...previous, record]))
-      toast.success("입력값을 이 브라우저에 임시 저장했습니다. 데모 리포트로 이동합니다.")
-      router.push("/app/cases/demo-2026/report")
+      toast.success("가상 사건을 이 브라우저에 저장했습니다.")
+      router.push(`/app/cases/${record.case_id}/report`)
     } catch {
       toast.error("임시 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.")
     }
@@ -286,7 +211,7 @@ export function CaseWizardScreen() {
   return (
     <main id="main-content" className="content-width page-main case-wizard">
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "새 사건 등록" }]} />
-      <PageHeader eyebrow={`새 사건 등록 · ${step}/${wizardSteps.length}`} title={wizardSteps[step - 1]} description="정확한 이름·주소·금액 대신 분석에 필요한 구간 정보만 입력합니다." />
+      <PageHeader eyebrow={`새 사건 등록 · ${step}/${wizardSteps.length}`} title={wizardSteps[step - 1]} description="가상 사건만 입력해 주세요. 모르는 내용은 모름으로 두고 진행할 수 있습니다. 판결문 자동 업로드는 추후 지원합니다." />
       <div className="wizard-progress motion-enter">
         <Progress value={progress} aria-label={`사건 등록 진행률 ${progress}%`} />
         <ol>{wizardSteps.map((label, index) => <li className={index + 1 === step ? "is-current" : index + 1 < step ? "is-complete" : ""} key={label}><span>{index + 1 < step ? <FontAwesomeIcon icon={faCheck} /> : index + 1}</span><small>{label}</small></li>)}</ol>
@@ -307,69 +232,19 @@ export function CaseWizardScreen() {
         )}
         {step === 2 && (
           <div className="wizard-section">
-            <h2>사건 정보를 어떻게 입력할까요?</h2>
-            <RadioGroup className="choice-grid" value={method} onValueChange={setMethod}>
-              <label className={method === "manual" ? "choice-card is-selected" : "choice-card"}>
-                <RadioGroupItem value="manual" />
-                <FontAwesomeIcon icon={faPenToSquare} />
-                <span><strong>직접 입력</strong><small>권장 · 개인정보 처리 범위가 가장 작습니다.</small></span>
-              </label>
-              <label className={method === "upload" ? "choice-card is-selected" : "choice-card"}>
-                <RadioGroupItem value="upload" />
-                <FontAwesomeIcon icon={faFileArrowUp} />
-                <span><strong>판결문 업로드</strong><small>필요 변수 확인 후 원문 폐기 흐름</small></span>
-              </label>
-            </RadioGroup>
-            {method === "upload" && (
-              <div className="upload-panel">
-                <label className="upload-zone">
-                  <FontAwesomeIcon icon={faFileArrowUp} />
-                  <strong>{fileName || "PDF 판결문을 선택하세요"}</strong>
-                  <span>PDF · 최대 10MB · 암호화 문서 제외</span>
-                  <input type="file" accept=".pdf,application/pdf" onChange={(event) => {
-                    const file = event.target.files?.[0]
-                    setJudgmentCheck("idle")
-                    setJudgmentMessage("")
-                    if (!file) { setFileName(""); return }
-                    const isPdf = file.name.toLowerCase().endsWith(".pdf") && (file.type === "application/pdf" || file.type === "")
-                    if (!isPdf) {
-                      event.target.value = ""
-                      setFileName("")
-                      toast.error("PDF 파일만 업로드할 수 있습니다.")
-                      return
-                    }
-                    if (file.size > 10 * 1024 * 1024) {
-                      event.target.value = ""
-                      setFileName("")
-                      toast.error("PDF 파일은 최대 10MB까지 선택할 수 있습니다.")
-                      return
-                    }
-                    setFileName(file.name)
-                    void checkJudgment(file)
-                  }} />
-                </label>
-                {judgmentCheck !== "idle" && <Notice tone={judgmentCheck === "true" ? "secure" : judgmentCheck === "checking" ? "info" : "warning"} title={judgmentCheck === "checking" ? "판별 중" : judgmentCheck === "true" ? "판결문 형식 확인" : "판결문 확인 필요"}>{judgmentMessage}</Notice>}
-                <label className="checkbox-row"><Checkbox checked={documentConsent} onCheckedChange={(value) => setDocumentConsent(Boolean(value))} /><span><strong>[필수]</strong> 문서 처리·식별정보 제거·원문 폐기 원칙을 확인했습니다.</span></label>
-                <Notice tone="info" title="현재는 UI 프로토타입입니다">선택한 파일은 브라우저 밖으로 전송되지 않습니다. 실제 파싱 API와 단기보관 정책 연결 전 화면 흐름만 검증합니다.</Notice>
-              </div>
-            )}
-          </div>
-        )}
-        {step === 3 && (
-          <div className="wizard-section">
             <h2>비식별 사건 정보를 입력해 주세요</h2>
             <div className="form-grid">
               <label className="field"><span>사건 유형</span><select value={caseType} onChange={(event) => setCaseType(event.target.value)}><option value="loan">대여금</option><option value="sale">매매대금</option><option value="construction">공사대금</option><option value="other">기타</option></select></label>
-              <label className="field"><span>채권 금액 구간</span><select value={amount} onChange={(event) => setAmount(event.target.value)}><option value="under-100">100만 원 미만</option><option value="100-300">100만~300만 원</option><option value="300-500">300만~500만 원</option></select></label>
-              <label className="field"><span>판결 후 경과 기간</span><select value={signals.judgment_elapsed_band} onChange={(event) => setSignal("judgment_elapsed_band", event.target.value)}><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option></select></label>
+              <label className="field"><span>채권 금액 구간</span><select value={amount} onChange={(event) => setAmount(event.target.value)}><option value="unknown">모름</option><option value="under-100">100만 원 미만</option><option value="100-300">100만~300만 원</option><option value="300-500">300만~500만 원</option></select></label>
+              <label className="field"><span>판결 후 경과 기간</span><select value={signals.judgment_elapsed_band} onChange={(event) => setSignal("judgment_elapsed_band", event.target.value)}><option>모름</option><option>1년 미만</option><option>1~3년</option><option>3~5년</option><option>5년 이상</option></select></label>
               <label className="field"><span>채무자 유형</span><select value={signals.debtor_type} onChange={(event) => setSignal("debtor_type", event.target.value)}><option>개인</option><option>개인사업자</option><option>법인</option><option>모름</option></select></label>
               <label className="field"><span>지역 범위</span><select value={region} onChange={(event) => setRegion(event.target.value)}><option value="capital">수도권</option><option value="metro">광역시</option><option value="other">그 외 지역</option><option value="unknown">모름</option></select></label>
-              <label className="field"><span>법원 급</span><select><option>지방법원</option><option>지원</option><option>기타·모름</option></select></label>
+
             </div>
             <Notice tone="secure" title="정확한 값은 입력하지 않습니다">채무자의 이름, 주민번호, 상세주소, 정확한 청구금액은 저장 대상이 아닙니다.</Notice>
           </div>
         )}
-        {step === 4 && (
+        {step === 3 && (
           <div className="wizard-section">
             <h2>어떤 집행을 시도하셨나요?</h2>
             <div className="execution-options">
@@ -405,14 +280,14 @@ export function CaseWizardScreen() {
             </section>
           </div>
         )}
-        {step === 5 && (
+        {step === 4 && (
           <div className="wizard-section submit-summary">
             <h2>입력 정보를 확인하고 제출해 주세요</h2>
             <p>아래 내용을 확인한 뒤 사건을 등록할 수 있습니다. 수정할 내용이 있다면 이전 단계로 돌아가세요.</p>
             <dl className="review-list submit-review-list">
               {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
             </dl>
-            <Notice tone="info" title="추가 정보가 필요한 경우">데이터가 부족하면 점수를 단정하지 않고, 리포트에서 먼저 확인할 항목을 안내합니다.</Notice>
+            <Notice tone="info" title="추가 정보가 필요한 경우">이번 데모에서는 입력 요약과 미확인 항목을 표시합니다. 실익 점수·회수 가능성 판단은 아직 제공하지 않습니다.</Notice>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
           </div>
         )}
@@ -444,6 +319,16 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
   const router = useRouter()
   const pathname = usePathname()
   const caseId = pathname.split("/")[3] || "demo-2026"
+  const [record, setRecord] = useState<DraftCase | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [loadError, setLoadError] = useState(false)
+  useEffect(() => {
+    const sync = () => {
+    try { setRecord(readDrafts().find((item) => item.case_id === caseId) || null); setLoadError(false) } catch { setLoadError(true) }
+    setLoaded(true)
+    }; sync(); window.addEventListener("mvp-case-updated", sync); return () => window.removeEventListener("mvp-case-updated", sync)
+  }, [caseId])
+  const currentCase = record ? { ...demoCase, id: record.case_id, type: record.claim_type, amount: record.claim_amount_band, status: record.process_status, updatedAt: "브라우저 저장" } : demoCase
   const active = caseTabs.find(([id]) => pathname === `/app/cases/${caseId}${id === "summary" ? "" : `/${id}`}`)?.[0] ?? section
   const [deletionPending, setDeletionPending] = useState<boolean | null>(null)
   useEffect(() => {
@@ -454,6 +339,8 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
     return () => { window.removeEventListener("storage", sync); window.removeEventListener(caseDeletionEvent, sync) }
   }, [caseId])
 
+  if (!loaded) return <main id="main-content" className="content-width page-main" aria-busy="true">사건을 불러오는 중입니다.</main>
+  if (loadError || (!record && !["demo-2026"].includes(caseId))) return <main id="main-content" className="content-width page-main"><h1>{loadError ? "사건을 불러오지 못했습니다" : "등록되지 않은 사건입니다"}</h1><p>현재 브라우저의 사건 목록에서 다시 선택해 주세요.</p><Link className="button button-primary" href="/app/cases">사건 목록</Link></main>
   if (deletionPending === null) return <main id="main-content" className="content-width page-main case-detail-main" aria-busy="true" />
   if (deletionPending) return (
     <main id="main-content" className="content-width page-main case-detail-main">
@@ -480,64 +367,37 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
 
   return (
     <main id="main-content" className="content-width page-main case-detail-main">
-      <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases/demo-2026" }, { label: demoCase.id }]} />
+      <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases" }, { label: demoCase.id }]} />
       <section className="case-identity">
-        <div><div className="eyebrow">{demoCase.id}</div><h1>{demoCase.type} 청구 사건</h1><p>{demoCase.amount} · 최근 업데이트 {demoCase.updatedAt}</p></div>
-        <div><StatusBadge tone="info">{demoCase.status}</StatusBadge><Link className="button button-primary button-small" href="/app/cases/demo-2026/result">결과 수정</Link></div>
+        <div><div className="eyebrow">{currentCase.id}</div><h1>{currentCase.type} 청구 사건</h1><p>{currentCase.amount} · 최근 업데이트 {currentCase.updatedAt}</p></div>
+        <div><StatusBadge tone="info">{currentCase.status}</StatusBadge><Link className="button button-primary button-small" href={`/app/cases/${caseId}/result`}>결과 수정</Link></div>
       </section>
       <Tabs value={active} onValueChange={(value) => router.push(`/app/cases/${caseId}${value === "summary" ? "" : `/${value}`}`)}>
         <TabsList variant="line" className="case-tabs">
           {caseTabs.map(([id, label]) => <TabsTrigger key={id} value={id}>{label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value={active} className="case-tab-content motion-enter">
-          {active === "summary" && <CaseSummary />}
-          {active === "report" && <ReportView />}
-          {active === "plan" && <PlanView />}
-          {active === "status" && <StatusView />}
-          {active === "result" && <ResultView />}
-          {active === "data" && <DataView caseId={caseId} />}
+          {active === "summary" && <DemoReport record={record} caseId={caseId} />}
+          {active === "report" && <DemoReport record={record} caseId={caseId} />}
+          {active === "plan" && <PlanView key={caseId} caseId={caseId} />}
+          {active === "status" && <StatusView key={caseId} />}
+          {active === "result" && <ResultView key={caseId} />}
+          {active === "data" && <DataView caseId={caseId} record={record} />}
         </TabsContent>
       </Tabs>
     </main>
   )
 }
 
-function CaseSummary() {
-  return (
-    <>
-      <div className="case-overview-grid">
-        <section className="panel">
-          <div className="panel-heading"><h2>현재 상태</h2><StatusBadge tone="info">분석 가능</StatusBadge></div>
-          <div className="status-journey"><div className="is-done"><span><FontAwesomeIcon icon={faCheck} /></span><strong>사건 등록</strong></div><div className="is-done"><span><FontAwesomeIcon icon={faCheck} /></span><strong>리포트 생성</strong></div><div className="is-current"><span>3</span><strong>진행 중</strong></div><div><span>4</span><strong>결과 확정</strong></div></div>
-        </section>
-        <section className="panel">
-          <div className="panel-heading"><h2>데이터 충분도</h2><strong>{demoCase.sufficiency}%</strong></div>
-          <Progress value={demoCase.sufficiency} />
-          <p>집행 대상의 선순위 권리와 실제 비용 정보가 추가되면 판단 근거가 더 선명해집니다.</p>
-        </section>
-      </div>
-      <section className="next-action-card compact"><div className="next-action-icon"><FontAwesomeIcon icon={faListCheck} /></div><div><p className="eyebrow">권장되는 다음 행동</p><h2>신청 비용과 선순위 권리를 먼저 확인하세요</h2><p>두 정보를 확인한 뒤 집행 착수 여부를 결정하는 흐름입니다.</p></div><Link className="button button-primary" href="/app/cases/demo-2026/plan">체크리스트 열기</Link></section>
-      <section className="panel"><div className="panel-heading"><h2>최근 기록</h2><Link href="/app/cases/demo-2026/status">전체 기록</Link></div><ol className="activity-list"><li><span /><div><strong>리포트가 생성되었습니다</strong><small>2026.08.29 · 룰 버전 MVP-0.1</small></div></li><li><span /><div><strong>사건 정보가 등록되었습니다</strong><small>2026.08.29 · 직접 입력</small></div></li></ol></section>
-    </>
-  )
-}
-
-function ReportView() {
-  return (
-    <>
-      <Notice tone="warning" title="데모용 시범 점수입니다">실제 회수 확률이 아니며, 입력된 가상 사건 정보로 화면 구조를 보여줍니다.</Notice>
-      <section className="report-hero">
-        <div className="score-dial"><span>실익 점수</span><strong>{demoCase.score}</strong><small>/ 100</small><div className="score-track"><span className="score-fill" /></div></div>
-        <div><StatusBadge tone="warning">추가 확인 후 착수 검토</StatusBadge><h2>회수 실익은 있으나 비용과 선순위 권리를 먼저 확인해야 합니다</h2><p>금액 구간과 경과 기간은 유리하지만, 재산 정보의 구체성이 낮아 판단 확신도는 중간 수준입니다.</p><div className="report-meta"><span>데이터 충분도 <b>72%</b></span><span>룰 버전 <b>MVP-0.1</b></span></div></div>
-      </section>
-      <section className="factor-grid">
-        <article className="factor-card positive"><h3><FontAwesomeIcon icon={faArrowRight} /> 유리한 요인</h3><ul><li>초기 지원 금액 구간에 해당</li><li>판결 후 경과 기간이 짧음</li><li>집행 상태를 직접 확인함</li></ul></article>
-        <article className="factor-card negative"><h3><FontAwesomeIcon icon={faCircleExclamation} /> 불리·불확실 요인</h3><ul><li>구체적인 재산 정보 없음</li><li>선순위 권리 미확인</li><li>실제 신청 비용 미입력</li></ul></article>
-      </section>
-      <section className="panel"><div className="panel-heading"><h2>예상 부담 범위</h2><StatusBadge>사건별 확인 필요</StatusBadge></div><div className="burden-grid"><div><FontAwesomeIcon icon={faCoins} /><span><small>비용</small><strong>법원·수단별 산정 필요</strong></span></div><div><FontAwesomeIcon icon={faClockRotateLeft} /><span><small>기간</small><strong>송달·재산 상태에 따라 변동</strong></span></div><div><FontAwesomeIcon icon={faGaugeHigh} /><span><small>확신도</small><strong>중간 · 정보 2개 부족</strong></span></div></div></section>
-      <section className="report-action"><div><p className="eyebrow">다음 선택</p><h2>추가 확인 후 결정하세요</h2><p>신청 비용과 선순위 권리 정보를 확보하면 착수·보류 판단을 갱신할 수 있습니다.</p></div><div><Link className="button button-primary" href="/app/cases/demo-2026/plan">확인 체크리스트</Link><Link className="button button-outline" href="/guide">일반 절차 보기</Link></div></section>
-    </>
-  )
+function DemoReport({ record, caseId }: { record: DraftCase | null; caseId: string }) {
+  const missing = record ? Object.entries(record).filter(([, value]) => value === "Unknown" || value === "모름").map(([key]) => ({ judgment_elapsed_band: "판결 후 경과 기간", region: "지역", debtor_contact_status: "연락 상태", asset_signal: "재산 단서", income_signal: "소득 단서", enforcement_title_confirmed: "집행권원", service_status: "송달 상태", known_bank: "은행", known_employer: "근무처", known_real_estate: "부동산", known_vehicle: "차량", claim_amount_band: "채권 금액" } as Record<string, string>)[key] || key) : []
+  return <>
+    <Notice tone="info" title="입력 정보 확인 단계">현재는 입력 정보와 다음 확인사항을 정리하는 단계입니다. 실익 판단 로직은 다음 구현 단계에서 연결합니다.</Notice>
+    <section className="panel"><h2>판단 상태</h2><StatusBadge tone="warning">추가 확인 필요</StatusBadge><p>아직 실익 점수나 회수 확률을 산출하지 않습니다.</p></section>
+    <section className="panel"><h2>판단에 사용할 입력 정보</h2><dl className="review-list"><div><dt>사건 유형</dt><dd>{record?.claim_type || "대여금 (예시)"}</dd></div><div><dt>채권 금액</dt><dd>{record?.claim_amount_band || demoCase.amount}</dd></div><div><dt>지역</dt><dd>{record?.region || "수도권 (예시)"}</dd></div>{record && Object.entries(signalLabels).map(([key, label]) => <div key={key}><dt>{label}</dt><dd>{record[key] === "Unknown" ? "모름" : record[key] === "Y" ? "확인함 / 알고 있음" : record[key] === "N" ? "미확인 / 알지 못함" : String(record[key] || "모름")}</dd></div>)}</dl><p>입력 내용은 사용자 진술이며, 증빙 검증은 아직 이루어지지 않았습니다.</p></section>
+    <section className="panel"><h2>부족한 정보</h2>{missing.length ? <ul>{missing.map((label) => <li key={label}>{label}</li>)}</ul> : <p>신청 비용·선순위 권리·집행 대상의 확인이 필요합니다.</p>}</section>
+    <section className="report-action"><div><h2>다음 행동</h2><p>집행권원、費用、優先権、対象財産をチェックリストで確認してください。</p></div><Link className="button button-primary" href={`/app/cases/${caseId}/plan`}>집행 계획 확인</Link></section>
+  </>
 }
 
 type PlanRecordType = "progress" | "cost" | "recovery"
@@ -593,9 +453,9 @@ const planItems: PlanItem[] = [
   { id: "priority", title: "선순위 권리 여부 확인", description: "배당 가능성을 판단하기 위해 권리관계 증빙이 필요합니다.", action: "증빙 등록", initialStatus: "확인 필요", guide: "선순위 채권·담보권 여부를 확인한 경로와 결과를 기록하세요. 상대방의 직접식별정보는 입력하지 마세요." },
   { id: "target", title: "우선 검토할 집행 수단 선택", description: "필요한 확인이 끝나면 적합한 집행 수단을 검토합니다.", action: "집행 수단 관리", initialStatus: "대기", guide: "통장·급여·차량·부동산 등 검토 중인 수단과 그 이유를 기록하세요. 실제 착수 결정은 별도 판단이 필요합니다." },
 ]
-const planStorageKey = "mvp-plan-demo-2026"
 
-function PlanView() {
+function PlanView({ caseId }: { caseId: string }) {
+  const planStorageKey = `mvp-plan-${caseId}`
   const [entries, setEntries] = useState<Record<string, PlanEntry[]>>({})
   const [activeId, setActiveId] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -608,13 +468,15 @@ function PlanView() {
 
   // Browser-only demo persistence; no evidence files or personal identifiers are stored.
   useEffect(() => {
+    const sync = () => {
     try {
       const stored = JSON.parse(window.localStorage.getItem(planStorageKey) || "{}") as Record<string, PlanEntry[]>
       if (stored && typeof stored === "object" && !Array.isArray(stored)) setEntries(stored)
     } catch {
       toast.error("저장된 집행 계획 정보를 불러오지 못했습니다.")
     }
-  }, [])
+    }; sync(); window.addEventListener("storage", sync); return () => window.removeEventListener("storage", sync)
+  }, [planStorageKey])
 
   function persist(next: Record<string, PlanEntry[]>) {
     try {
@@ -736,7 +598,7 @@ function PlanView() {
   const completedCount = 0 // 실제 검증 완료 데이터가 연결되기 전에는 완료로 표시하지 않음
   return (
     <>
-      <div className="plan-heading"><div><p className="eyebrow">통장 압류 검토 경로 · 데모</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>시연 기록 초기화</button></div></div>
+      <div className="plan-heading"><div><p className="eyebrow">집행 수단 검토 · 데모</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>시연 기록 초기화</button></div></div>
       <Progress value={(completedCount / planItems.length) * 100} />
       <section className="checklist-panel">
         {planItems.map((item, index) => {
@@ -751,7 +613,7 @@ function PlanView() {
                 {count > 0 && <small>등록된 기록 {count}건 · {status === "검토중" ? "확인 대기" : "기록 있음"}</small>}
                 <button className="text-link" type="button" onClick={() => openItem(item.id)}>{count ? "기록 관리" : item.action}</button>
               </div>
-              <StatusBadge tone={status === "완료" ? "positive" : status === "확인 필요" ? "warning" : status === "검토중" ? "info" : "neutral"}>{status}</StatusBadge>
+              <StatusBadge tone={status === "확인 필요" ? "warning" : status === "검토중" ? "info" : "neutral"}>{status}</StatusBadge>
             </div>
           )
         })}
@@ -822,30 +684,56 @@ function PlanView() {
   )
 }
 
+function useCaseRecordForm(kind: string) {
+  const pathname = usePathname()
+  const caseId = pathname.split("/")[3]
+  const key = `mvp-${kind}-${caseId}`
+  const [saved, setSaved] = useState<Record<string, string>>({})
+  useEffect(() => { const sync = () => { try { setSaved(JSON.parse(localStorage.getItem(key) || "{}")) } catch { toast.error("저장된 기록을 불러오지 못했습니다.") } }; sync(); window.addEventListener("storage", sync); return () => window.removeEventListener("storage", sync) }, [key])
+  function persist(event: FormEvent, status: string, reasons: string[] = []) {
+    event.preventDefault()
+    const form = event.currentTarget as HTMLFormElement
+    const values = Object.fromEntries(new FormData(form).entries())
+    const next = { ...values, status, reasons: reasons.join(", "), updatedAt: new Date().toLocaleString("ko-KR") }
+    try {
+      localStorage.setItem(key, JSON.stringify(next))
+      const records = readDrafts().map((record) => record.case_id === caseId ? { ...record, outcome_status: status, process_status: status === "in_progress" ? "진행 중" : status === "abandoned" ? "중단" : "완료" } : record)
+      localStorage.setItem("mvp-case-drafts", JSON.stringify(records))
+      window.dispatchEvent(new Event("mvp-case-updated"))
+      setSaved(next)
+      toast.success("이 브라우저에 기록을 저장했습니다.")
+    } catch { toast.error("기록을 저장하지 못했습니다. 브라우저 저장 공간을 확인해 주세요.") }
+  }
+  return { saved, persist }
+}
+
 function StatusView() {
   const [status, setStatus] = useState("in_progress")
-  function save(event: FormEvent) { event.preventDefault(); toast.success("진행 상태가 저장되었습니다.") }
+  const { saved, persist } = useCaseRecordForm("status")
+  useEffect(() => { const restore = () => { if (saved.status) setStatus(saved.status) }; restore() }, [saved])
+  function save(event: FormEvent) { persist(event, status) }
   return (
     <div className="form-layout">
       <form className="panel form-stack" onSubmit={save}>
         <div><p className="eyebrow">현재 상태 갱신</p><h2>이 사건은 지금 어떻게 진행되고 있나요?</h2></div>
         <RadioGroup className="radio-list" value={status} onValueChange={setStatus}>
-          {["진행 중", "전액 회수", "일부 회수", "회수 실패", "중단함"].map((label, index) => { const values = ["in_progress", "success_full", "success_partial", "fail_confirmed", "abandoned"]; return <label key={label}><RadioGroupItem value={values[index]} /><span><strong>{label}</strong><small>{index === 0 ? "다음 상태 확인 알림을 예약합니다." : "최종 결과 입력 단계로 이어집니다."}</small></span></label> })}
+          {["진행 중", "전액 회수", "일부 회수", "회수 실패", "중단함"].map((label, index) => { const values = ["in_progress", "success_full", "success_partial", "fail_confirmed", "abandoned"]; return <label key={label}><RadioGroupItem value={values[index]} /><span><strong>{label}</strong><small>{index === 0 ? "현재 진행 상황을 기록합니다." : "회수·중단 상태를 기록합니다."}</small></span></label> })}
         </RadioGroup>
-        <label className="field"><span>다음 확인일 (선택)</span><input type="date" /></label>
-        <label className="field"><span>메모 (선택)</span><textarea placeholder="진행 중 확인한 내용을 식별정보 없이 기록하세요." /></label>
+        <label className="field"><span>다음 확인일 (선택)</span><input key={saved.updatedAt} name="nextDate" type="date" defaultValue={saved.nextDate || ""} /></label>
+        <label className="field"><span>메모 (선택)</span><textarea key={saved.updatedAt} name="memo" defaultValue={saved.memo || ""} placeholder="진행 중 확인한 내용을 식별정보 없이 기록하세요." /></label>
         <button className="button button-primary button-large" type="submit">상태 저장</button>
       </form>
-      <aside className="panel"><h2>진행 기록</h2><ol className="activity-list"><li><span /><div><strong>진행 중으로 등록</strong><small>2026.08.29 · 사용자 입력</small></div></li><li><span /><div><strong>30일 확인 알림 예정</strong><small>미응답은 실패로 확정하지 않습니다.</small></div></li></ol></aside>
+      <aside className="panel"><h2>진행 기록</h2><ol className="activity-list"><li><span /><div><strong>{saved.status ? "진행 상태 저장됨" : "아직 저장된 진행 기록이 없습니다"}</strong><small>{saved.updatedAt || "상태를 선택하고 저장하세요."}</small></div></li><li><span /><div><strong>자동 알림은 추후 지원 예정</strong><small>미응답은 실패로 확정하지 않습니다.</small></div></li></ol></aside>
     </div>
   )
 }
 
 function ResultView() {
-  const router = useRouter()
   const [result, setResult] = useState("success_partial")
   const [reasons, setReasons] = useState<string[]>([])
-  function save(event: FormEvent) { event.preventDefault(); toast.success("결과 입력이 완료되었습니다."); router.push("/app/cases/demo-2026") }
+  const { saved, persist } = useCaseRecordForm("result")
+  useEffect(() => { const restore = () => { if (saved.status) setResult(saved.status); setReasons(saved.reasons ? saved.reasons.split(", ") : []) }; restore() }, [saved])
+  function save(event: FormEvent) { persist(event, result, reasons) }
   return (
     <form className="result-form" onSubmit={save}>
       <section className="panel form-stack">
@@ -853,21 +741,21 @@ function ResultView() {
         <RadioGroup className="result-choice-grid" value={result} onValueChange={setResult}>
           {[["success_full", "전액 회수", faCircleCheck], ["success_partial", "일부 회수", faCoins], ["fail_confirmed", "회수 실패", faCircleExclamation], ["abandoned", "중도 포기", faClockRotateLeft]].map(([value, label, icon]) => <label className={result === value ? "is-selected" : ""} key={String(value)}><RadioGroupItem value={String(value)} /><FontAwesomeIcon icon={icon as typeof faCircleCheck} /><strong>{String(label)}</strong></label>)}
         </RadioGroup>
-        {result === "success_partial" && <label className="field"><span>회수 금액 구간</span><select><option>청구액의 25% 미만</option><option>25% 이상 ~ 50% 미만</option><option>50% 이상 ~ 75% 미만</option><option>75% 이상</option></select></label>}
+        {result === "success_partial" && <label className="field"><span>회수 금액 구간</span><select key={saved.updatedAt} name="recoveryBand" defaultValue={saved.recoveryBand}><option>청구액의 25% 미만</option><option>25% 이상 ~ 50% 미만</option><option>50% 이상 ~ 75% 미만</option><option>75% 이상</option></select></label>}
         {(result === "fail_confirmed" || result === "abandoned") && <div className="field result-reason-field"><span>실패·중단 이유 (복수 선택)</span><div className="reason-grid">{["재산 없음", "소재 불명", "비용 부담", "시간 오래 걸림", "기타"].map((reason) => <label className="checkbox-row" key={reason}><Checkbox checked={reasons.includes(reason)} onCheckedChange={(value) => setReasons((current) => value ? [...current, reason] : current.filter((item) => item !== reason))} /><span>{reason}</span></label>)}</div></div>}
-        <div className="form-grid"><label className="field"><span>총 소요 기간</span><select><option>1개월 미만</option><option>1~3개월</option><option>3~6개월</option><option>6개월~1년</option><option>1년 이상</option></select></label><label className="field"><span>집행 비용 구간</span><select><option>10만 원 미만</option><option>10만~30만 원</option><option>30만~50만 원</option><option>50만 원 이상</option></select></label></div>
+        <div className="form-grid"><label className="field"><span>총 소요 기간</span><select key={saved.updatedAt} name="durationBand" defaultValue={saved.durationBand}><option>1개월 미만</option><option>1~3개월</option><option>3~6개월</option><option>6개월~1년</option><option>1년 이상</option></select></label><label className="field"><span>집행 비용 구간</span><select key={saved.updatedAt} name="costBand" defaultValue={saved.costBand}><option>10만 원 미만</option><option>10만~30만 원</option><option>30만~50만 원</option><option>50만 원 이상</option></select></label></div>
       </section>
-      <Notice tone="secure" title="성공과 실패를 같은 기준으로 기록합니다">사용자 직접 입력 결과는 `result_source=user`로 구분되며, 장기 미응답은 실패가 아닌 `unresolved`로 유지합니다.</Notice>
-      <button className="button button-primary button-large" type="submit">결과 저장하고 완료</button>
+      <Notice tone="secure" title="성공과 실패를 같은 기준으로 기록합니다">직접 확인한 결과만 기록해 주세요. 응답이 없다는 이유로 회수 실패로 처리하지 않습니다.</Notice>
+      {saved.updatedAt && <p role="status">최근 저장: {saved.updatedAt}</p>}<button className="button button-primary button-large" type="submit">결과 저장</button>
     </form>
   )
 }
 
-function DataView({ caseId }: { caseId: string }) {
+function DataView({ caseId, record }: { caseId: string; record: DraftCase | null }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
     <>
-      <section className="panel"><div className="panel-heading"><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>대여금</dd></div><div><dt>금액</dt><dd>300만~500만 원</dd></div><div><dt>지역</dt><dd>수도권</dd></div><div><dt>경과 기간</dt><dd>1년 미만</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></dl></section>
+      <section className="panel"><div className="panel-heading"><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></div><dl className="review-list"><div><dt>사건 유형</dt><dd>{record?.claim_type || "대여금 (예시)"}</dd></div><div><dt>금액</dt><dd>{record?.claim_amount_band || demoCase.amount}</dd></div><div><dt>지역</dt><dd>{record?.region || "수도권 (예시)"}</dd></div><div><dt>경과 기간</dt><dd>{String(record?.judgment_elapsed_band || "1년 미만 (예시)")}</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></dl></section>
       <section className="danger-zone"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><button className="button button-danger-outline"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><div className="app-dialog-body"><div className="delete-request-notice"><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></div><p className="delete-request-summary">삭제 요청은 운영 검토 후 처리됩니다.</p></div><DialogFooter><button className="button button-danger" onClick={() => {
           try {
             window.localStorage.setItem(caseDeletionKey(caseId), "requested")

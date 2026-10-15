@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation"
+import { demoRedirectFor, isDemoAppPath } from "@/lib/demo-routing"
 import Link from "next/link"
 import { SiteShell } from "@/components/site-shell"
 import { SupportChatScreen } from "@/components/support-chat-screen"
@@ -10,25 +12,12 @@ import {
   NoticesScreen,
 } from "@/components/public-screens"
 import {
-  AuthScreen,
-  OnboardingScreen,
-  VerifyEmailScreen,
-} from "@/components/auth-screens"
-import {
   CaseDetailScreen,
   CaseListScreen,
   CaseWizardScreen,
   DashboardScreen,
-  NotificationsScreen,
-  SettingsScreen,
 } from "@/components/member-screens"
-import {
-  AdminCasesScreen,
-  AdminDashboardScreen,
-  AdminGenericScreen,
-  AdminLabelsScreen,
-  AdminReviewScreen,
-} from "@/components/admin-screens"
+
 
 const legalRoutes = ["terms", "privacy", "disclaimer", "data-policy"] as const
 
@@ -38,32 +27,19 @@ function NotFoundScreen() {
 
 export function RouteScreen({ segments }: { segments: string[] }) {
   const path = segments.join("/")
+  const destination = demoRedirectFor(path)
+  if (destination) redirect(destination)
 
-  if (path.startsWith("admin")) {
-    const type = segments[1]
-    let screen = <AdminDashboardScreen />
-    if (type === "cases") screen = <AdminCasesScreen />
-    else if (type === "review") screen = <AdminReviewScreen />
-    else if (type === "labels") screen = <AdminLabelsScreen />
-    else if (["scoring", "users", "reminders", "requests", "audit-logs"].includes(type)) screen = <AdminGenericScreen type={type as "scoring"} />
-    return <SiteShell mode="admin">{screen}</SiteShell>
-  }
+  if (segments[0] === "admin") return <SiteShell><NotFoundScreen /></SiteShell>
 
-  if (path.startsWith("app")) {
+  if (segments[0] === "app") {
+    if (!isDemoAppPath(segments)) return <SiteShell><NotFoundScreen /></SiteShell>
     let screen = <DashboardScreen />
     if (path === "app/cases") screen = <CaseListScreen />
     else if (path === "app/cases/new") screen = <CaseWizardScreen />
     else if (segments[1] === "cases" && segments[2]) screen = <CaseDetailScreen section={segments[3] ?? "summary"} />
-    else if (path === "app/notifications") screen = <NotificationsScreen />
-    else if (path === "app/settings") screen = <SettingsScreen />
     return <SiteShell mode="member">{screen}</SiteShell>
   }
-
-  if (path === "login") return <SiteShell><AuthScreen mode="login" /></SiteShell>
-  if (path === "signup") return <SiteShell><AuthScreen mode="signup" /></SiteShell>
-  if (path === "reset-password") return <SiteShell><AuthScreen mode="reset" /></SiteShell>
-  if (path === "verify-email") return <SiteShell><VerifyEmailScreen /></SiteShell>
-  if (path === "onboarding") return <SiteShell><OnboardingScreen /></SiteShell>
 
   let screen: React.ReactNode
   if (path === "") screen = <HomeScreen />
