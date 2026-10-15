@@ -11,6 +11,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useRef } from "react"
 
 type ShellMode = "public" | "member" | "admin"
 
@@ -115,6 +116,13 @@ export function SiteShell({
   mode?: ShellMode
   children: React.ReactNode
 }) {
+  const menuRef = useRef<HTMLDetailsElement>(null)
+  useEffect(() => {
+    const closeOutside = (event: PointerEvent) => { if (!menuRef.current?.contains(event.target as Node)) menuRef.current?.removeAttribute("open") }
+    const closeEscape = (event: KeyboardEvent) => { if (event.key === "Escape" && menuRef.current?.open) { menuRef.current.removeAttribute("open"); menuRef.current.querySelector("summary")?.focus() } }
+    document.addEventListener("pointerdown", closeOutside); document.addEventListener("keydown", closeEscape)
+    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", closeEscape) }
+  }, [])
   const isPublic = mode === "public"
   const items = isPublic
     ? publicNav
@@ -127,7 +135,7 @@ export function SiteShell({
       <MotionLayer />
       <header className="site-header">
         <div className="header-inner">
-          <Brand />
+          <div className="header-brand"><Brand />{mode === "member" && <span className="demo-label">DEMO</span>}</div>
           <nav className="desktop-nav" aria-label="주요 메뉴">
             <NavLinks items={items} />
           </nav>
@@ -135,7 +143,7 @@ export function SiteShell({
             <Link className="button button-ghost" href="/app/cases">데모 둘러보기</Link>
             <Link className="button button-primary" href="/app/cases/new">내 사건 분석하기</Link>
           </div>}
-          <details className="mobile-menu">
+          <details className="mobile-menu" ref={menuRef}>
             <summary aria-label="메뉴 열기">
               <FontAwesomeIcon icon={faBars} />
             </summary>
@@ -157,7 +165,7 @@ export function SiteShell({
           </div>
         </div>
       )}
-      {mode === "member" && <div className="demo-banner" role="note">회원가입 없이 체험하는 데모입니다. 가상 사건만 입력해 주세요. 입력·기록은 이 브라우저에 저장되며 브라우저 데이터 삭제 시 사라집니다.</div>}
+      {mode === "member" && <div className="demo-banner" role="note">가상 사건으로 체험해 주세요. 입력·기록은 현재 브라우저에만 저장됩니다.</div>}
       {children}
       {mode === "member" && <MobileBottomNav />}
       <footer className="site-footer">

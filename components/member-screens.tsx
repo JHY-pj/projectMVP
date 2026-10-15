@@ -301,7 +301,7 @@ export function CaseWizardScreen() {
       </section>
       <div className="wizard-actions">
         {step > 1 ? <button className="button button-outline" onClick={previous}>이전</button> : <Link className="button button-outline" href="/app">취소</Link>}
-        {step < wizardSteps.length ? <button className="button button-primary button-large" onClick={next}>다음 <FontAwesomeIcon icon={faArrowRight} /></button> : <button className="button button-primary button-large" onClick={submitCase}>사건 등록하고 리포트 보기 <FontAwesomeIcon icon={faArrowRight} /></button>}
+        {step < wizardSteps.length ? <button className="button button-primary button-large" onClick={next}>다음 <FontAwesomeIcon icon={faArrowRight} /></button> : <button className="button button-primary button-large" onClick={submitCase}>등록 완료 <FontAwesomeIcon icon={faArrowRight} /></button>}
       </div>
     </main>
   )
@@ -377,7 +377,7 @@ export function CaseDetailScreen({ section = "summary" }: { section?: string }) 
       <Breadcrumbs items={[{ label: "대시보드", href: "/app" }, { label: "내 사건", href: "/app/cases" }, { label: demoCase.id }]} />
       <section className="case-identity">
         <div><div className="eyebrow">{currentCase.id}</div><h1>{currentCase.type} 청구 사건</h1><p>{currentCase.amount} · 최근 업데이트 {currentCase.updatedAt}</p></div>
-        <div><StatusBadge tone="info">{currentCase.status}</StatusBadge><Link className="button button-primary button-small" href={`/app/cases/${caseId}/result`}>결과 수정</Link></div>
+        <div className="case-status-actions"><StatusBadge tone="info">{currentCase.status}</StatusBadge><Link className="button button-outline button-small" href={`/app/cases/${caseId}/result`}>결과 수정</Link></div>
       </section>
       <Tabs value={active} onValueChange={(value) => router.push(`/app/cases/${caseId}${value === "summary" ? "" : `/${value}`}`)}>
         <TabsList variant="line" className="case-tabs">
@@ -672,7 +672,7 @@ function PlanView({ caseId, record }: { caseId: string; record: DraftCase | null
     <>
       <Notice tone="info" title={assessment.title}>{assessment.explanation} · 규칙 {assessment.version}</Notice>
       {assessment.status !== "closed" && <section className="panel"><h2>입력 단서에 따른 검토 후보</h2>{assessment.candidates.length ? <ul className="rule-reasons">{assessment.candidates.map((candidate) => <li key={candidate}>{candidate}</li>)}</ul> : <p>구체적 대상 단서를 먼저 정리해 주세요.</p>}<p className="report-check-note">후보는 입력 단서 기준이며, 실제 집행 가능 여부를 확정하지 않습니다.</p></section>}
-      <div className="plan-heading"><div><p className="eyebrow">집행 수단 검토 · 데모</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>시연 기록 초기화</button></div></div>
+      <div className="plan-heading"><div><p className="eyebrow">집행 계획</p><h2>집행 착수 전 확인 항목</h2></div><div className="plan-heading-actions"><strong>{completedCount} / {planItems.length} 확인 완료</strong><button type="button" className="button button-outline" onClick={resetDemo}>기록 초기화</button></div></div>
       <Progress value={(completedCount / planItems.length) * 100} />
       <section className="checklist-panel">
         {orderedItems.map((item, index) => {
@@ -775,8 +775,9 @@ function useCaseRecordForm(kind: string) {
       localStorage.setItem("mvp-case-drafts", JSON.stringify(records))
       window.dispatchEvent(new Event("mvp-case-updated"))
       setSaved(next)
-      toast.success("이 브라우저에 기록을 저장했습니다.")
-    } catch { toast.error("기록을 저장하지 못했습니다. 브라우저 저장 공간을 확인해 주세요.") }
+      toast.success(kind === "result" ? "결과를 저장했습니다." : "진행 상태를 저장했습니다.")
+      return true
+    } catch { toast.error("기록을 저장하지 못했습니다. 브라우저 저장 공간을 확인해 주세요."); return false }
   }
   return { saved, persist }
 }
@@ -803,11 +804,12 @@ function StatusView() {
 }
 
 function ResultView() {
+  const router = useRouter()
   const [result, setResult] = useState("success_partial")
   const [reasons, setReasons] = useState<string[]>([])
   const { saved, persist } = useCaseRecordForm("result")
   useEffect(() => { const restore = () => { if (saved.status) setResult(saved.status); setReasons(saved.reasons ? saved.reasons.split(", ") : []) }; restore() }, [saved])
-  function save(event: FormEvent) { persist(event, result, reasons) }
+  function save(event: FormEvent) { if (persist(event, result, reasons)) router.push("/app/cases") }
   return (
     <form className="result-form" onSubmit={save}>
       <section className="panel form-stack">
@@ -820,7 +822,7 @@ function ResultView() {
         <div className="form-grid"><label className="field"><span>총 소요 기간</span><select key={saved.updatedAt} name="durationBand" defaultValue={saved.durationBand}><option>1개월 미만</option><option>1~3개월</option><option>3~6개월</option><option>6개월~1년</option><option>1년 이상</option></select></label><label className="field"><span>집행 비용 구간</span><select key={saved.updatedAt} name="costBand" defaultValue={saved.costBand}><option>10만 원 미만</option><option>10만~30만 원</option><option>30만~50만 원</option><option>50만 원 이상</option></select></label></div>
       </section>
       <Notice tone="secure" title="성공과 실패를 같은 기준으로 기록합니다">직접 확인한 결과만 기록해 주세요. 응답이 없다는 이유로 회수 실패로 처리하지 않습니다.</Notice>
-      {saved.updatedAt && <p role="status">최근 저장: {saved.updatedAt}</p>}<button className="button button-primary button-large" type="submit">결과 저장</button>
+      <button className="button button-primary button-large" type="submit">결과 저장</button>
     </form>
   )
 }
