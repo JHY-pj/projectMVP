@@ -18,12 +18,19 @@ function TabsList({ className, variant = "default", layout = "flow", columns = 6
     if (!list) return
     let frame = 0
     const revealActive = () => {
-      const active = list.querySelector<HTMLElement>('[data-slot="tabs-trigger"][data-state="active"]')
-      if (!active || list.scrollWidth <= list.clientWidth) return
-      const viewport = list.getBoundingClientRect()
-      const tab = active.getBoundingClientRect()
-      const left = visibleTabScrollLeft(list.scrollLeft, viewport.left + list.clientLeft, list.clientWidth, tab.left, tab.width)
-      list.scrollLeft = Math.max(0, Math.min(left, list.scrollWidth - list.clientWidth))
+      const triggers = Array.from(list.querySelectorAll<HTMLElement>('[data-slot="tabs-trigger"]'))
+      const activeIndex = triggers.findIndex(tab => tab.dataset.state === "active")
+      if (activeIndex < 0) return
+      const viewportLeft = list.getBoundingClientRect().left + list.clientLeft
+      list.scrollLeft = visibleTabScrollLeft({
+        viewportWidth: list.clientWidth,
+        scrollWidth: list.scrollWidth,
+        activeIndex,
+        tabs: triggers.map(tab => {
+          const bounds = tab.getBoundingClientRect()
+          return { left: list.scrollLeft + bounds.left - viewportLeft, width: bounds.width }
+        }),
+      })
     }
     const schedule = () => {
       cancelAnimationFrame(frame)

@@ -154,8 +154,22 @@ assert.equal(declarationsAt(tabCss, '.responsive', 1280).display, 'grid');
 console.log('PASS mobile tabs stay on one horizontal scrolling row without vertical overflow.');
 
 const { visibleTabScrollLeft } = loadUI('lib/tab-scroll.ts');
-assert.equal(visibleTabScrollLeft(0, 20, 320, 310, 90), 60, 'Reveal clipped last tab');
-assert.equal(visibleTabScrollLeft(100, 20, 320, -20, 60), 60, 'Reveal clipped first tab');
-assert.equal(visibleTabScrollLeft(60, 20, 320, 100, 80), 60, 'Keep a fully visible tab in place');
-assert.equal(visibleTabScrollLeft(0, 20, 320, 40, 400), 20, 'Align an oversized tab to its start');
-console.log('PASS active tab horizontal visibility calculations.');
+const tabBounds = [64, 64, 84, 84, 64, 100].map((width, index, widths) => ({ left: widths.slice(0, index).reduce((sum, value) => sum + value, 0), width }));
+const tabLayout = { viewportWidth: 320, scrollWidth: 460, tabs: tabBounds };
+assert.equal(visibleTabScrollLeft({ ...tabLayout, activeIndex: 0 }), 0, 'First tab starts at the beginning');
+assert.equal(visibleTabScrollLeft({ ...tabLayout, activeIndex: 5 }), 140, 'Last tab stays fully visible');
+for (const viewportWidth of [200, 320]) for (const activeIndex of [1, 2, 3, 4]) {
+  const left = visibleTabScrollLeft({ ...tabLayout, viewportWidth, activeIndex });
+  const active = tabBounds[activeIndex];
+  const previous = tabBounds[activeIndex - 1];
+  const next = tabBounds[activeIndex + 1];
+  assert(left <= active.left && left + viewportWidth >= active.left + active.width, 'Active tab is whole');
+  assert(previous.left + previous.width > left, 'Previous tab is visibly present');
+  assert(next.left < left + viewportWidth, 'Next tab is visibly present');
+}
+assert.equal(visibleTabScrollLeft({ ...tabLayout, activeIndex: 1 }), 0, 'Returning from last to report also reveals summary');
+const wideNeighbors = [{ left: 0, width: 200 }, { left: 204, width: 100 }, { left: 308, width: 200 }];
+const middle = visibleTabScrollLeft({ viewportWidth: 200, scrollWidth: 508, activeIndex: 1, tabs: wideNeighbors });
+assert(middle <= 176 && middle + 200 >= 332, 'Reserve actual neighbour previews across gaps');
+assert.equal(visibleTabScrollLeft({ ...tabLayout, viewportWidth: 600, activeIndex: 3 }), 0, 'No scroll when all tabs fit');
+console.log('PASS first/last tab visibility and real neighbour visibility for every middle tab.');
