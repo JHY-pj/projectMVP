@@ -152,3 +152,10 @@ assert.equal(declarationsAt(tabCss, '.responsive', 375)['overflow-y'], 'hidden')
 assert.equal(declarationsAt(tabCss, '.trigger', 375)['white-space'], 'nowrap');
 assert.equal(declarationsAt(tabCss, '.responsive', 1280).display, 'grid');
 console.log('PASS mobile tabs stay on one horizontal scrolling row without vertical overflow.');
+
+const { visibleTabScrollLeft } = loadUI('lib/tab-scroll.ts');
+assert.equal(visibleTabScrollLeft(0, 20, 320, 310, 90), 60, 'Reveal clipped last tab');
+assert.equal(visibleTabScrollLeft(100, 20, 320, -20, 60), 60, 'Reveal clipped first tab');
+assert.equal(visibleTabScrollLeft(60, 20, 320, 100, 80), 60, 'Keep a fully visible tab in place');
+assert.equal(visibleTabScrollLeft(0, 20, 320, 40, 400), 20, 'Align an oversized tab to its start');
+console.log('PASS active tab horizontal visibility calculations.');
