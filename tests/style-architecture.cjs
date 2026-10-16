@@ -173,3 +173,11 @@ const middle = visibleTabScrollLeft({ viewportWidth: 200, scrollWidth: 508, acti
 assert(middle <= 176 && middle + 200 >= 332, 'Reserve actual neighbour previews across gaps');
 assert.equal(visibleTabScrollLeft({ ...tabLayout, viewportWidth: 600, activeIndex: 3 }), 0, 'No scroll when all tabs fit');
 console.log('PASS first/last tab visibility and real neighbour visibility for every middle tab.');
+
+// Exercise real CSS Module names rather than identity class mocks.
+const scopedModule = {};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('components/common/scoped-classes.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, { exports: scopedModule, require });
+const mapClasses = scopedModule.scopedClasses({ 'hero-grid': '_hero_grid_hash', 'section-soft': '_section_soft_hash' });
+assert.equal(mapClasses('hero-grid motion-enter'), '_hero_grid_hash motion-enter');
+assert.equal(mapClasses('section-soft\tcontent-width', { 'motion-enter': true }), '_section_soft_hash content-width motion-enter');
+console.log('PASS multiple local and global class names map to real scoped styles.');
