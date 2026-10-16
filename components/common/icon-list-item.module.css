@@ -1,0 +1,8 @@
+.item { display:flex; gap:0.6875rem; }
+.default > svg { margin-top:0.3125rem; color:var(--teal-700); }
+.inverse { align-items:center; gap:0.625rem; color:#d7e5f2; }
+.inverse > svg { color:#80d8c8; }
+.boxed { gap:0.9375rem; padding:1.1875rem; border:0.0625rem solid var(--border); }
+.boxed > svg { width:1.25rem; margin-top:0.3125rem; color:var(--teal-700); }
+.boxed > div { display:grid; }
+.boxed span { color:var(--gray-500); font-size:0.875rem; }

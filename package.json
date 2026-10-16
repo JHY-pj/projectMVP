@@ -10,13 +10,14 @@
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vite",
     "build": "bash scripts/build-verified.sh",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run lint && npm run typecheck && npm run test:controls && npm run test:styles && npm run test:rules && npm run build",
+    "test": "npm run lint && npm run typecheck && npm run test:controls && npm run test:styles && npm run test:rules && npm run build && npm run test:style-delivery",
     "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "bash scripts/sites-env.sh -- drizzle-kit generate",
     "test:rules": "node tests/case-assessment.cjs && node tests/case-assessment-views.cjs",
     "test:controls": "node tests/controls.cjs",
     "typecheck": "tsc --noEmit --incremental false",
-    "test:styles": "node tests/style-architecture.cjs"
+    "test:styles": "node tests/style-architecture.cjs",
+    "test:style-delivery": "node tests/style-delivery.cjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -70,5 +71,5 @@
     "wrangler": "4.92.0"
   },
   "type": "module",
-  "displayName": "집행나침반"
+  "displayName": "\uc9d1\ud589\ub098\uce68\ubc18"
 }

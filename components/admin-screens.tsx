@@ -1,5 +1,7 @@
 "use client"
 
+import { MetricCard } from "@/components/common/metric-card"
+
 import { SearchInput } from "@/components/common/search-input"
 import { ActionBar } from "@/components/common/primitives"
 import { IconTile } from "@/components/common/icon-tile"
@@ -7,6 +9,7 @@ import {
   uiClass,
   AdminMetrics,
   SecurityChecks,
+  SecurityCheck,
   Toolbar,
   ReviewWorkspace,
   DocumentPlaceholder,
@@ -46,7 +49,7 @@ export function AdminDashboardScreen() {
     <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="운영 대시보드" title="오늘 처리할 일을 확인하세요" description="원문 접근과 역할 권한을 최소화하고, 비식별 데이터 검수와 권리 요청을 우선 처리합니다." />
       <AdminMetrics className={uiClass("motion-enter")}>
-        {queues.map(([label, value, hint, icon, tone]) => <article key={label}><IconTile tone={tone as "info" | "negative" | "warning" | "neutral"}><FontAwesomeIcon icon={icon} /></IconTile><div><small>{label}</small><strong>{value}</strong><p>{hint}</p></div></article>)}
+        {queues.map(([label, value, hint, icon, tone]) => <MetricCard key={label} label={label} value={value} detail={hint} icon={<IconTile tone={tone}><FontAwesomeIcon icon={icon} /></IconTile>} />)}
       </AdminMetrics>
       <ResponsiveGrid balance="wide-left">
         <Surface className={uiClass("motion-enter")}>
@@ -60,7 +63,7 @@ export function AdminDashboardScreen() {
             </TableBody>
           </Table>
         </Surface>
-        <Surface as="aside" className={uiClass("motion-enter")}><PanelHeading><h2>보안 운영 상태</h2><StatusBadge tone="positive">정상</StatusBadge></PanelHeading><SecurityChecks><li><FontAwesomeIcon icon={faShieldHalved} /><span><strong>공개 테이블 RLS</strong><small>5/5 적용</small></span></li><li><FontAwesomeIcon icon={faFileShield} /><span><strong>원문 폐기 확인</strong><small>대기 1건</small></span></li><li><FontAwesomeIcon icon={faUserShield} /><span><strong>권한 변경</strong><small>최근 변경 없음</small></span></li></SecurityChecks><Button asChild variant="link" size="sm"><Link href="/admin/audit-logs">감사 로그 확인 <FontAwesomeIcon icon={faArrowRight} /></Link></Button></Surface>
+        <Surface as="aside" className={uiClass("motion-enter")}><PanelHeading><h2>보안 운영 상태</h2><StatusBadge tone="positive">정상</StatusBadge></PanelHeading><SecurityChecks><SecurityCheck icon={<FontAwesomeIcon icon={faShieldHalved} />} title="공개 테이블 RLS" detail="5/5 적용" /><SecurityCheck icon={<FontAwesomeIcon icon={faFileShield} />} title="원문 폐기 확인" detail="대기 1건" /><SecurityCheck icon={<FontAwesomeIcon icon={faUserShield} />} title="권한 변경" detail="최근 변경 없음" /></SecurityChecks><Button asChild variant="link" size="sm"><Link href="/admin/audit-logs">감사 로그 확인 <FontAwesomeIcon icon={faArrowRight} /></Link></Button></Surface>
       </ResponsiveGrid>
       <Notice tone="warning" title="관리자 권한 분리 필요">프로토타입 화면입니다. 운영 배포 전 `profiles.role`의 `app_metadata` 기반 서버 검증과 관리자 라우트 가드를 연결해야 합니다.</Notice>
     </PageLayout>
@@ -100,7 +103,7 @@ export function AdminLabelsScreen() {
   return (
     <PageLayout id="main-content" className={uiClass("admin-main")}>
       <PageHeader eyebrow="결과·라벨 관리" title="확정 결과와 미확정 상태를 분리합니다" description="사용자 직접 입력과 추정 출처를 구분하고, 장기 미응답은 실패가 아닌 unresolved로 유지합니다." />
-      <LabelSummary className={uiClass("motion-enter")}><article><small>확정 결과</small><strong>18</strong><StatusBadge tone="positive">학습 우선</StatusBadge></article><article><small>진행 중</small><strong>24</strong><StatusBadge tone="info">추적 중</StatusBadge></article><article><small>미확정</small><strong>9</strong><StatusBadge tone="neutral">학습 제외</StatusBadge></article></LabelSummary>
+      <LabelSummary className={uiClass("motion-enter")}><MetricCard layout="summary" label="확정 결과" value="18" status={<StatusBadge tone="positive">학습 우선</StatusBadge>} /><MetricCard layout="summary" label="진행 중" value="24" status={<StatusBadge tone="info">추적 중</StatusBadge>} /><MetricCard layout="summary" label="미확정" value="9" status={<StatusBadge tone="neutral">학습 제외</StatusBadge>} /></LabelSummary>
       <Surface className={uiClass("motion-enter")}><Table className={uiClass("admin-table")}><TableHeader><TableRow><TableHead>사건 ID</TableHead><TableHead>결과</TableHead><TableHead>결과 출처</TableHead><TableHead>신뢰 가중치</TableHead><TableHead>확정일</TableHead><TableHead>학습 사용</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>EC-2026-0007</TableCell><TableCell><StatusBadge tone="positive">success_partial</StatusBadge></TableCell><TableCell>user</TableCell><TableCell>1.0</TableCell><TableCell>08.28</TableCell><TableCell>포함</TableCell></TableRow><TableRow><TableCell>EC-2026-0003</TableCell><TableCell><StatusBadge>unresolved</StatusBadge></TableCell><TableCell>inferred</TableCell><TableCell>—</TableCell><TableCell>—</TableCell><TableCell>제외</TableCell></TableRow></TableBody></Table></Surface>
     </PageLayout>
   )

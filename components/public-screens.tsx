@@ -1,5 +1,8 @@
+import { IconListItem } from "@/components/common/icon-list-item"
+import styles from "@/components/public/public-ui.module.css"
+import { clsx } from "clsx"
 import { HomeHero, HowItWorks, PrivacyPrinciples, StartCase } from "@/components/public/home-sections"
-import { uiClass, CheckList, PlainList, GuideTimeline } from "@/components/public/public-ui"
+import { CheckList, PlainList, GuideTimeline, GuideStep } from "@/components/public/public-ui"
 
 
 import { EligibilityBar } from "@/components/public/eligibility-bar"
@@ -40,16 +43,16 @@ export function AboutScreen() {
         description="승소했지만 어디서부터 무엇을 확인해야 할지 모르는 소액 채권자가 비용을 더 쓰기 전에 판단 근거를 정리하도록 돕습니다."
       />
       <ResponsiveGrid>
-        <Surface className={uiClass("motion-enter")}>
+        <Surface className={"motion-enter"}>
           <h2>집행나침반이 제공하는 것</h2>
           <CheckList>
-            <li><FontAwesomeIcon icon={faCheck} /> 승소 후 일반 절차와 확인사항</li>
-            <li><FontAwesomeIcon icon={faCheck} /> 사건 조건 기반의 실익 점수 구간</li>
-            <li><FontAwesomeIcon icon={faCheck} /> 유리·불리 요인과 데이터 한계</li>
-            <li><FontAwesomeIcon icon={faCheck} /> 집행 계획과 결과 기록 흐름</li>
+            <IconListItem variant="default" icon={<FontAwesomeIcon icon={faCheck} />}> 승소 후 일반 절차와 확인사항</IconListItem>
+            <IconListItem variant="default" icon={<FontAwesomeIcon icon={faCheck} />}> 사건 조건 기반의 실익 점수 구간</IconListItem>
+            <IconListItem variant="default" icon={<FontAwesomeIcon icon={faCheck} />}> 유리·불리 요인과 데이터 한계</IconListItem>
+            <IconListItem variant="default" icon={<FontAwesomeIcon icon={faCheck} />}> 집행 계획과 결과 기록 흐름</IconListItem>
           </CheckList>
         </Surface>
-        <Surface muted className={uiClass("motion-enter")}>
+        <Surface muted className={"motion-enter"}>
           <h2>집행나침반이 제공하지 않는 것</h2>
           <PlainList>
             <li>사건별 법률 자문 또는 강제집행 대행</li>
@@ -85,13 +88,10 @@ export function GuideScreen() {
       />
       <GuideTimeline>
         {guideSteps.map(([number, title, body]) => (
-          <li className={uiClass("motion-enter")} key={number}>
-            <span>{number}</span>
-            <div><h2>{title}</h2><p>{body}</p></div>
-          </li>
+          <GuideStep key={number} number={number} title={title}>{body}</GuideStep>
         ))}
       </GuideTimeline>
-      <Surface className={uiClass("motion-enter")}>
+      <Surface className={"motion-enter"}>
         <h2>주요 집행 수단 비교 전 확인사항</h2>
         <TableContainer>
           <table>
@@ -125,7 +125,7 @@ export function FaqScreen() {
     <PageLayout width="reading" id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "자주 묻는 질문" }]} />
       <PageHeader eyebrow="FAQ" title="자주 묻는 질문" description="서비스 범위, 점수, 개인정보 처리에 관한 핵심 질문을 모았습니다." />
-      <Accordion className={uiClass("faq-list motion-enter")} type="single" collapsible>
+      <Accordion className={clsx(styles["faq-list"], "motion-enter")} type="single" collapsible>
         {faqs.map(([question, answer], index) => (
           <AccordionItem value={`faq-${index}`} key={question}>
             <AccordionTrigger>{question}</AccordionTrigger>
@@ -140,7 +140,7 @@ export function FaqScreen() {
 export function LegalScreen({ type }: { type: LegalType }) {
   const content = legalContent[type]
   return (
-    <PageLayout width="reading" id="main-content" className={uiClass("legal-page")}>
+    <PageLayout width="reading" id="main-content" className={styles["legal-page"]}>
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: content.title }]} />
       <PageHeader title={content.title} description={content.lead} />
       <Notice tone="warning" title="MVP 초안 · 법률 검토 전">
@@ -156,7 +156,7 @@ export function NoticesScreen() {
     <PageLayout id="main-content">
       <Breadcrumbs items={[{ label: "홈", href: "/" }, { label: "공지사항" }]} />
       <PageHeader title="공지사항" description="집행나침반 MVP의 변경사항과 운영 안내입니다." />
-      <Surface as="div" className={uiClass("notice-list motion-enter")}>
+      <Surface as="div" className={clsx(styles["notice-list"], "motion-enter")}>
         <article><StatusBadge tone="info">안내</StatusBadge><div><h2>MVP 화면 프로토타입을 공개했습니다</h2><p>2026.08.29 · 핵심 사용자 흐름과 데이터 처리 원칙을 확인할 수 있습니다.</p></div></article>
       </Surface>
     </PageLayout>

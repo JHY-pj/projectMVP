@@ -11,7 +11,7 @@ Use component props (`size`, `variant`, `width`, `density`, `balance`, `layout`)
 
 `npm test` checks types, control semantics, style ownership, case rules and the production build. Browser visual checks are still required for layout changes.
 
-## Completed ownership migration
+## Component ownership
 
 Screen composition files no longer import global screen CSS. Every component stylesheet is a CSS Module, imported by its owner. Shared appearance is not overridden from feature selectors.
 
@@ -31,7 +31,7 @@ Screen composition files no longer import global screen CSS. Every component sty
 | `support/chat-ui` | Chat panel, role/loading states, message viewport and composer |
 | `legal/legal-ui` | Legal section numbering and consent warning |
 
-Feature parts use `styledPart` to preserve the original native element, ref, form events and ARIA attributes. Stateful shared controls use props (`selected`, `active`, message `role`, step `current`), rather than page-authored state class recipes. A CSS class without any declarations was removed rather than retained as a misleading styling hook. DOM behaviour uses stable data attributes; animation utilities remain global.
+Feature parts are exported render functions that reference their CSS Module inside the function. Do not export factory-generated components with module classes captured at module scope: the development server omitted those stylesheets from server-rendered routes. Native elements, refs, form events and ARIA attributes remain forwarded. Stateful shared controls use props (`selected`, `active`, message `role`, step `current`), rather than page-authored state class recipes. A CSS class without any declarations was removed rather than retained as a misleading styling hook. DOM behaviour uses stable data attributes; animation utilities remain global.
 
 ### Deliberate feature-specific styling
 
@@ -44,3 +44,26 @@ Feature parts use `styledPart` to preserve the original native element, ref, for
 ### Verification limits
 
 `test:styles` rejects global component stylesheets, missing part styles, shared-control appearance overrides, unmanaged radii, empty selectors and baseline rules placed after responsive rules. It renders actual feature parts to check native semantics and active/selected/message states. `test:rules` renders report/plan integration using the actual case parts. These checks do not replace browser checks for visual appearance or pointer/keyboard interaction.
+
+
+## Additional repeated UI ownership
+
+| Component | Replaces |
+| --- | --- |
+| `InfoRow` | Label/value rows in registration review, case summary and data management |
+| `SummaryChip` | Case counts by status |
+| `IconListItem` | Check-icon lists in public pages, auth and eligibility (default/inverse/boxed) |
+| `MetricCard` | Admin queue and outcome metrics |
+| `ActivityEntry` | Recent records and progress history entries |
+| `SettingRow`, `ConsentHistoryRow`, `NotificationCard` | Repeated settings, consent and notification structures |
+| `ProcessCard`, `PrivacyItem`, `GuideStep`, `SecurityCheck` | Repeated content cards and feature list rows |
+
+Text-only lists, table cell contents and form labels remain ordinary content inside their shared list/table/field components. Unique compass geometry, wizard compositions and record editor layouts remain feature-owned. Reuse is determined by behavior and visual responsibility, not merely the presence of a `div` or `span`.
+
+## Verification performed in this pass
+
+- `npm test`: lint, types, control checks, style ownership, assessment/view integration, production build and HTTP stylesheet delivery.
+- `test:style-delivery` starts the development server and checks 19 public/demo routes. Every scoped class in the returned HTML must exist in a stylesheet served with HTTP 200 and a CSS content type.
+- Case detail pages initially render a loading state; the HTTP test additionally checks delivery of the CSS needed by the later detail/form/modal views. It does not execute hydration or interact with those views.
+- Auth, account settings, notifications and admin screens are not exposed by this demo router. Their authored components are included in source/type checks; this pass does not claim live route or browser coverage for them.
+- PC/mobile visual appearance, tab gestures, focus interaction and hydrated modal scrolling still require a browser. HTTP and CSS checks are not a substitute for that verification.

@@ -19,9 +19,9 @@
 .checkbox a { color: var(--primary); text-decoration: underline; }
 .checkbox small { color: var(--gray-500); }
 .infoList { margin: 0; border-top: 0.125rem solid var(--primary); }
-.infoList > div { min-height: 3.5rem; display: grid; grid-template-columns: minmax(7rem, .7fr) minmax(0,1fr); align-items: center; gap: 1rem; padding-block: 0.75rem; border-bottom: 0.0625rem solid var(--border); }
-.infoList dt { color: var(--gray-600); font-size: 0.875rem; }
-.infoList dd { margin: 0; font-size: 0.9375rem; font-weight: 600; overflow-wrap: anywhere; }
+.infoRow { min-height: 3.5rem; display: grid; grid-template-columns: minmax(7rem, .7fr) minmax(0,1fr); align-items: center; gap: 1rem; padding-block: 0.75rem; border-bottom: 0.0625rem solid var(--border); }
+.infoRow dt { color: var(--gray-600); font-size: 0.875rem; }
+.infoRow dd { margin: 0; font-size: 0.9375rem; font-weight: 600; overflow-wrap: anywhere; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0.75rem; }
 .callout { display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; margin-block: 0; padding: 1.5rem; border: 0.0625rem solid #e7c78c; border-left-width: 0.25rem; border-radius: var(--ui-radius-panel); background: #fffaf0; }
 .callout > div { min-width: 0; }
@@ -36,7 +36,7 @@
  .surface { padding: 1.125rem; }
  .surface h2, .callout h2 { font-size: 1.125rem; }
  .callout { align-items: flex-start; flex-direction: column; padding: 1.125rem; }
- .infoList > div { grid-template-columns: minmax(0,.85fr) minmax(0,1fr); gap: 0.75rem; }
+ .infoRow { grid-template-columns: minmax(0,.85fr) minmax(0,1fr); gap: 0.75rem; }
 }
 
 .trailingAction { padding-right: 3rem; }

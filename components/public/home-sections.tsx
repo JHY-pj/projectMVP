@@ -1,3 +1,4 @@
+import { ProcessCard, PrivacyItem } from "@/components/public/public-ui"
 import styles from "@/components/public/public-ui.module.css"
 import { clsx } from "clsx"
 import { CallToAction } from "@/components/common/call-to-action"
@@ -88,12 +89,7 @@ export function HowItWorks() {
             ["02", faLayerGroup, "실익 근거 확인", "유리·불리 요인, 데이터 충분도, 비용·기간의 확인 범위를 봅니다."],
             ["03", faArrowTrendUp, "다음 행동과 결과", "착수·추가 확인·보류를 선택하고 실제 결과를 다시 기록합니다."],
           ].map(([step, icon, title, body]) => (
-            <article className={clsx(styles["process-card"], "motion-enter")} key={String(step)}>
-              <span className={styles["step-number"]}>{String(step)}</span>
-              <FontAwesomeIcon icon={icon as typeof faCompass} />
-              <h3>{String(title)}</h3>
-              <p>{String(body)}</p>
-            </article>
+            <ProcessCard key={String(step)} step={String(step)} icon={<FontAwesomeIcon icon={icon as typeof faCompass} />} title={String(title)}>{String(body)}</ProcessCard>
           ))}
         </div>
       </section>)
@@ -114,9 +110,9 @@ export function PrivacyPrinciples() {
             </Link></Button>
           </SectionHeading>
           <div className={clsx(styles["privacy-stack"], "motion-enter")}>
-            <div><FontAwesomeIcon icon={faUserLock} /><span><strong>이름·주민번호</strong><small>저장하지 않음</small></span></div>
-            <div><FontAwesomeIcon icon={faDatabase} /><span><strong>정확한 금액·주소</strong><small>구간·광역 단위로 변환</small></span></div>
-            <div><FontAwesomeIcon icon={faFileShield} /><span><strong>판결문 원문</strong><small>변수 확인 후 폐기 원칙</small></span></div>
+            <PrivacyItem icon={<FontAwesomeIcon icon={faUserLock} />} title="이름·주민번호" detail="저장하지 않음" />
+            <PrivacyItem icon={<FontAwesomeIcon icon={faDatabase} />} title="정확한 금액·주소" detail="구간·광역 단위로 변환" />
+            <PrivacyItem icon={<FontAwesomeIcon icon={faFileShield} />} title="판결문 원문" detail="변수 확인 후 폐기 원칙" />
           </div>
         </div>
       </section>)

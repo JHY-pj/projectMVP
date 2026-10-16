@@ -181,3 +181,18 @@ const mapClasses = scopedModule.scopedClasses({ 'hero-grid': '_hero_grid_hash', 
 assert.equal(mapClasses('hero-grid motion-enter'), '_hero_grid_hash motion-enter');
 assert.equal(mapClasses('section-soft\tcontent-width', { 'motion-enter': true }), '_section_soft_hash content-width motion-enter');
 console.log('PASS multiple local and global class names map to real scoped styles.');
+
+// Shared repeated UI must retain native list/definition-list semantics and content.
+const shared = loadUI('components/common/primitives.tsx');
+const infoRows = renderToStaticMarkup(React.createElement(shared.InfoList, null,
+  React.createElement(shared.InfoRow, { label: '금액' }, '100만 원'),
+  React.createElement(shared.InfoRow, { label: '지역' }, '수도권')));
+assert(infoRows.startsWith('<dl '));
+assert.equal((infoRows.match(/<dt>/g) || []).length, 2);
+assert(infoRows.includes('<dd>100만 원</dd>'));
+const { IconListItem } = loadUI('components/common/icon-list-item.tsx');
+const detailItem = renderToStaticMarkup(React.createElement(IconListItem, { variant: 'boxed', icon: '✓', detail: '확인 조건' }, '대상'));
+assert(detailItem.startsWith('<li ')); assert(detailItem.includes('scoped_boxed')); assert(detailItem.includes('<strong>대상</strong><span>확인 조건</span>'));
+const notification = renderToStaticMarkup(React.createElement(parts.NotificationCard, { unread: true, icon: '!', badge: '안내', title: '상태 확인', description: '내용', date: '오늘', action: React.createElement('button', null, '확인') }));
+assert(notification.startsWith('<article ')); assert(notification.includes('scoped_is-unread')); assert(notification.includes('<button>확인</button>'));
+console.log('PASS shared row, icon-list and notification content/semantics.');

@@ -2,25 +2,52 @@ import type { ComponentProps } from "react"
 import { Surface } from "@/components/common/primitives"
 import { cn } from "@/lib/utils"
 import { scopedClasses } from "@/components/common/scoped-classes"
-import { styledPart } from "@/components/common/styled-part"
 import styles from "./auth-ui.module.css"
 
 export const uiClass = scopedClasses(styles)
 
-export const AuthMain = styledPart("main", styles["auth-main"])
-export const AuthAside = styledPart("section", styles["auth-aside"])
-export const AuthIcon = styledPart("span", styles["auth-icon"])
-export const AuthCardHeading = styledPart("div", styles["auth-card-heading"])
-export const PasswordField = styledPart("div", styles["password-field"])
-export const AuthSwitch = styledPart("div", styles["auth-switch"])
-export const SecurityNote = styledPart("p", styles["security-note"])
-export const ConsentAll = styledPart("div", styles["consent-all"])
-export const ConsentRow = styledPart("div", styles["consent-row"])
-export const SegmentedControl = styledPart("div", styles["segmented-control"])
-export const StickyActions = styledPart("div", styles["sticky-actions"])
-export const ConsentGroup = styledPart("div", styles["signup-consent"])
-export const SignupConsentRow = styledPart("div", styles["signup-consent-row"])
-export const SignupConsentState = styledPart("span", styles["signup-consent-state"])
+export function AuthMain({ className, ...props }: ComponentProps<"main">) {
+  return <main className={cn(styles["auth-main"], className)} {...props} />
+}
+export function AuthAside({ className, ...props }: ComponentProps<"section">) {
+  return <section className={cn(styles["auth-aside"], className)} {...props} />
+}
+export function AuthIcon({ className, ...props }: ComponentProps<"span">) {
+  return <span className={cn(styles["auth-icon"], className)} {...props} />
+}
+export function AuthCardHeading({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["auth-card-heading"], className)} {...props} />
+}
+export function PasswordField({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["password-field"], className)} {...props} />
+}
+export function AuthSwitch({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["auth-switch"], className)} {...props} />
+}
+export function SecurityNote({ className, ...props }: ComponentProps<"p">) {
+  return <p className={cn(styles["security-note"], className)} {...props} />
+}
+export function ConsentAll({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["consent-all"], className)} {...props} />
+}
+export function ConsentRow({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["consent-row"], className)} {...props} />
+}
+export function SegmentedControl({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["segmented-control"], className)} {...props} />
+}
+export function StickyActions({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["sticky-actions"], className)} {...props} />
+}
+export function ConsentGroup({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["signup-consent"], className)} {...props} />
+}
+export function SignupConsentRow({ className, ...props }: ComponentProps<"div">) {
+  return <div className={cn(styles["signup-consent-row"], className)} {...props} />
+}
+export function SignupConsentState({ className, ...props }: ComponentProps<"span">) {
+  return <span className={cn(styles["signup-consent-state"], className)} {...props} />
+}
 
 export function AuthCard({ className, ...props }: ComponentProps<"section">) {
   return <Surface className={cn(styles["auth-card"], className)} {...props} />

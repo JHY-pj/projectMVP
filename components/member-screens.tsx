@@ -1,8 +1,17 @@
 "use client"
+
+import { IconListItem } from "@/components/common/icon-list-item"
+
+
+import { InfoRow } from "@/components/common/primitives"
 import {
   WizardCard,
   DeletionPendingCard,
   SettingsPanel,
+  ActivityEntry,
+  SettingRow,
+  NotificationCard,
+  ConsentHistoryRow,
   uiClass,
   CaseList,
   WizardSection,
@@ -36,7 +45,7 @@ import {
 import { CaseListCard } from "@/components/member/case-list-card"
 import { StepProgress } from "@/components/common/step-progress"
 import { SelectionCard } from "@/components/common/selection-card"
-import { SummaryChips } from "@/components/common/summary-chips"
+import { SummaryChips, SummaryChip } from "@/components/common/summary-chips"
 import { ActionBar, InputAction } from "@/components/common/primitives"
 
 import {
@@ -150,10 +159,10 @@ export function CaseListScreen() {
         actions={<Button asChild variant="default" size="default"><Link href="/app/cases/new"><FontAwesomeIcon icon={faFileLines} /> 새 사건 등록</Link></Button>}
       />
       <SummaryChips>
-        <span>전체 <strong>{cases.length}</strong></span>
-        <span>진행 중 <strong>{cases.filter((item) => item.status === "진행 중").length}</strong></span>
-        <span>완료 <strong>{cases.filter((item) => item.status === "완료").length}</strong></span>
-        <span>중단 <strong>{cases.filter((item) => item.status === "중단").length}</strong></span>
+        <SummaryChip label="전체" value={cases.length} />
+        <SummaryChip label="진행 중" value={cases.filter((item) => item.status === "진행 중").length} />
+        <SummaryChip label="완료" value={cases.filter((item) => item.status === "완료").length} />
+        <SummaryChip label="중단" value={cases.filter((item) => item.status === "중단").length} />
       </SummaryChips>
       <CaseList  aria-label="등록한 사건 목록">
         {cases.map((item) => (
@@ -267,9 +276,9 @@ export function CaseWizardScreen() {
             <h2>초기 지원 범위에 해당하나요?</h2>
             <p>현재 MVP는 다음 세 조건을 모두 충족하는 사건을 우선 지원합니다.</p>
             <EligibilityList>
-              <li><FontAwesomeIcon icon={faCheck} /><div><strong>민사 승소 판결 보유</strong><span>지급명령 등 다른 집행권원은 후속 지원 예정</span></div></li>
-              <li><FontAwesomeIcon icon={faCheck} /><div><strong>개인 채권자</strong><span>기업·기관의 대량 사건은 지원하지 않음</span></div></li>
-              <li><FontAwesomeIcon icon={faCheck} /><div><strong>채권액 500만 원 미만</strong><span>초기 무료 검증 구간</span></div></li>
+              <IconListItem variant="boxed" icon={<FontAwesomeIcon icon={faCheck} />} detail="지급명령 등 다른 집행권원은 후속 지원 예정">민사 승소 판결 보유</IconListItem>
+              <IconListItem variant="boxed" icon={<FontAwesomeIcon icon={faCheck} />} detail="기업·기관의 대량 사건은 지원하지 않음">개인 채권자</IconListItem>
+              <IconListItem variant="boxed" icon={<FontAwesomeIcon icon={faCheck} />} detail="초기 무료 검증 구간">채권액 500만 원 미만</IconListItem>
             </EligibilityList>
             <Notice tone="warning" title="서비스 한계를 확인해 주세요">법률 상담이나 회수 보장이 아니라, 집행 전 판단 요소와 다음 확인사항을 정리하는 서비스입니다.</Notice>
           </WizardSection>
@@ -330,7 +339,7 @@ export function CaseWizardScreen() {
             <h2>입력 정보를 확인하고 제출해 주세요</h2>
             <p>아래 내용을 확인한 뒤 사건을 등록할 수 있습니다. 수정할 내용이 있다면 이전 단계로 돌아가세요.</p>
             <InfoList className={uiClass("submit-review-list")}>
-              {reviewItems.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+              {reviewItems.map(([label, value]) => <InfoRow key={label} label={label}>{value}</InfoRow>)}
             </InfoList>
             <Notice tone="info" title="추가 정보가 필요한 경우">입력 정보에 따라 확인 우선순위와 검토할 집행 수단이 달라집니다. 회수 확률은 산출하지 않습니다.</Notice>
             <Notice tone="warning" title="분석 결과는 법률 자문이 아닙니다">최종 집행 여부와 실행 책임은 사용자에게 있으며, 필요한 경우 법률 전문가와 상담하세요.</Notice>
@@ -453,11 +462,11 @@ function CaseOverview({ record, caseId }: { record: DraftCase | null; caseId: st
   return <>
     {!record && <Notice tone="info" title="예시 사건">화면 체험용으로 준비된 사건입니다. 직접 등록한 사건은 사건 목록에서 선택하세요.</Notice>}
     <ResponsiveGrid>
-      <Surface><PanelHeading><h2>사건 기본 정보</h2><StatusBadge>{record ? "직접 입력" : "예시"}</StatusBadge></PanelHeading><InfoList><div><dt>사건 유형</dt><dd>{current.claim_type}</dd></div><div><dt>채권 금액</dt><dd>{current.claim_amount_band}</dd></div><div><dt>지역</dt><dd>{current.region}</dd></div></InfoList></Surface>
+      <Surface><PanelHeading><h2>사건 기본 정보</h2><StatusBadge>{record ? "직접 입력" : "예시"}</StatusBadge></PanelHeading><InfoList><InfoRow label={"사건 유형"}>{current.claim_type}</InfoRow><InfoRow label={"채권 금액"}>{current.claim_amount_band}</InfoRow><InfoRow label={"지역"}>{current.region}</InfoRow></InfoList></Surface>
       <Surface><h2>현재 진행 상태</h2><StatusBadge tone="info">{current.process_status}</StatusBadge><p>진행 상황과 회수 결과를 각각 기록하고 다시 확인할 수 있습니다.</p><ActionBar><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/status`}>진행 기록</Link></Button><Button asChild variant="outline" size="sm"><Link href={`/app/cases/${caseId}/result`}>결과 수정</Link></Button></ActionBar></Surface>
     </ResponsiveGrid>
     <ActionSection compact><div><p className={uiClass("eyebrow")}>지금 할 일</p><h2>{loaded ? assessment.title : "확인사항을 불러오는 중입니다"}</h2><p>{loaded ? assessment.explanation : "입력 정보와 집행 기록을 확인합니다."}</p></div><Button asChild variant="default" size="sm"><Link href={`/app/cases/${caseId}/report`}>리포트 보기</Link></Button></ActionSection>
-    <Surface><PanelHeading><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></PanelHeading>{recent.length ? <ActivityList>{recent.map((item) => <li key={item.section}><span /><div><strong>{item.title}</strong><p>{item.text}</p><small>{item.date}</small></div></li>)}</ActivityList> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</Surface>
+    <Surface><PanelHeading><h2>최근 기록</h2><Link href={`/app/cases/${caseId}/status`}>진행 기록 보기</Link></PanelHeading>{recent.length ? <ActivityList>{recent.map((item) => <ActivityEntry key={item.section} title={item.title} description={item.text} date={item.date} />)}</ActivityList> : <p>아직 저장한 진행·결과 기록이 없습니다. 집행 계획을 확인한 뒤 진행 상황을 남겨 주세요.</p>}</Surface>
   </>
 }
 
@@ -836,7 +845,7 @@ function StatusView() {
         <Field><span>메모 (선택)</span><Textarea key={saved.updatedAt} name="memo" defaultValue={saved.memo || ""} placeholder="진행 중 확인한 내용을 식별정보 없이 기록하세요." /></Field>
         <Button variant="default" size="lg" type="submit">상태 저장</Button>
       </Surface>
-      <Surface as="aside"><h2>진행 기록</h2><ActivityList><li><span /><div><strong>{saved.status ? "진행 상태 저장됨" : "아직 저장된 진행 기록이 없습니다"}</strong><small>{saved.updatedAt || "상태를 선택하고 저장하세요."}</small></div></li><li><span /><div><strong>자동 알림은 추후 지원 예정</strong><small>미응답은 실패로 확정하지 않습니다.</small></div></li></ActivityList></Surface>
+      <Surface as="aside"><h2>진행 기록</h2><ActivityList><ActivityEntry title={saved.status ? "진행 상태 저장됨" : "아직 저장된 진행 기록이 없습니다"} date={saved.updatedAt || "상태를 선택하고 저장하세요."} /><ActivityEntry title="자동 알림은 추후 지원 예정" date="미응답은 실패로 확정하지 않습니다." /></ActivityList></Surface>
     </ResponsiveGrid>
   )
 }
@@ -869,7 +878,7 @@ function DataView({ caseId, record }: { caseId: string; record: DraftCase | null
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   return (
     <>
-      <Surface><PanelHeading><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></PanelHeading><InfoList><div><dt>사건 유형</dt><dd>{record?.claim_type || "대여금 (예시)"}</dd></div><div><dt>금액</dt><dd>{record?.claim_amount_band || demoCase.amount}</dd></div><div><dt>지역</dt><dd>{record?.region || "수도권 (예시)"}</dd></div><div><dt>경과 기간</dt><dd>{String(record?.judgment_elapsed_band || "1년 미만 (예시)")}</dd></div><div><dt>직접식별정보</dt><dd>저장 안 함</dd></div></InfoList></Surface>
+      <Surface><PanelHeading><h2>저장된 사건 변수</h2><StatusBadge tone="positive">비식별</StatusBadge></PanelHeading><InfoList><InfoRow label={"사건 유형"}>{record?.claim_type || "대여금 (예시)"}</InfoRow><InfoRow label={"금액"}>{record?.claim_amount_band || demoCase.amount}</InfoRow><InfoRow label={"지역"}>{record?.region || "수도권 (예시)"}</InfoRow><InfoRow label={"경과 기간"}>{String(record?.judgment_elapsed_band || "1년 미만 (예시)")}</InfoRow><InfoRow label={"직접식별정보"}>저장 안 함</InfoRow></InfoList></Surface>
       <ActionSection tone="danger"><div><h2>사건 데이터 관리</h2><p>삭제 요청은 본인 확인 후 운영자가 처리하고 결과를 알려드립니다.</p></div><Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}><DialogTrigger asChild><Button variant="danger-outline" size="default"><FontAwesomeIcon icon={faTrashCan} /> 사건 삭제 요청</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>사건 삭제를 요청할까요?</DialogTitle><DialogDescription>삭제 요청 내용을 확인해 주세요.</DialogDescription></DialogHeader><DialogBody><DeleteRequestNotice><strong>삭제 요청 전 반드시 확인하세요!</strong><ul><li>삭제 요청 후 운영 검토 시작</li><li>처리 전까지 삭제 요청 취소 가능</li><li>삭제 완료 시 사건 원본 및 계정과 연결된 데이터 삭제</li><li><strong>이미 비식별 처리된 데이터는 삭제되지 않으며, 동의한 범위에서 판단 기준 검증·서비스 개선에 계속 활용</strong></li></ul></DeleteRequestNotice><DeleteRequestSummary>삭제 요청은 운영 검토 후 처리됩니다.</DeleteRequestSummary></DialogBody><DialogFooter><Button variant="destructive" size="default" onClick={() => {
           try {
             window.localStorage.setItem(caseDeletionKey(caseId), "requested")
@@ -887,8 +896,8 @@ export function NotificationsScreen() {
     <PageLayout width="reading" id="main-content">
       <PageHeader eyebrow="알림" title="알림함" description="상태 확인 요청과 처리 결과를 모아봅니다." />
       <NotificationList className={uiClass("motion-enter")}>
-        <article className={uiClass("is-unread")}><span><FontAwesomeIcon icon={faBell} /></span><div><StatusBadge tone="warning">상태 확인</StatusBadge><h2>집행 결과가 나왔나요?</h2><p>1분이면 입력할 수 있습니다. 당신의 결과는 다음 사람의 판단 기준이 됩니다.</p><small>오늘</small></div><Button asChild variant="default" size="default"><Link href="/app/cases/demo-2026/status">상태 입력</Link></Button></article>
-        <article><span><FontAwesomeIcon icon={faFileCircleCheck} /></span><div><StatusBadge tone="info">리포트</StatusBadge><h2>실익 리포트가 준비되었습니다</h2><p>점수보다 판단 근거와 데이터 한계를 먼저 확인하세요.</p><small>2026.08.29</small></div><Button asChild variant="outline" size="default"><Link href="/app/cases/demo-2026/report">리포트 보기</Link></Button></article>
+        <NotificationCard unread icon={<FontAwesomeIcon icon={faBell} />} badge={<StatusBadge tone="warning">상태 확인</StatusBadge>} title="집행 결과가 나왔나요?" description="1분이면 입력할 수 있습니다. 당신의 결과는 다음 사람의 판단 기준이 됩니다." date="오늘" action={<Button asChild variant="default" size="default"><Link href="/app/cases/demo-2026/status">상태 입력</Link></Button>} />
+        <NotificationCard icon={<FontAwesomeIcon icon={faFileCircleCheck} />} badge={<StatusBadge tone="info">리포트</StatusBadge>} title="실익 리포트가 준비되었습니다" description="점수보다 판단 근거와 데이터 한계를 먼저 확인하세요." date="2026.08.29" action={<Button asChild variant="outline" size="default"><Link href="/app/cases/demo-2026/report">리포트 보기</Link></Button>} />
       </NotificationList>
     </PageLayout>
   )
@@ -901,8 +910,8 @@ export function SettingsScreen() {
       <Tabs defaultValue="profile" className={uiClass("settings-tabs motion-enter")}>
         <TabsList variant="line"><TabsTrigger value="profile">프로필</TabsTrigger><TabsTrigger value="consent">동의 내역</TabsTrigger><TabsTrigger value="notification">알림 설정</TabsTrigger><TabsTrigger value="rights">데이터·탈퇴</TabsTrigger></TabsList>
         <TabsContent value="profile"><Surface stack><div><h2>프로필</h2><p>이메일은 Supabase Auth에서 관리하며 프로필 테이블에 중복 저장하지 않습니다.</p></div><Field><span>이름 또는 별칭</span><Input defaultValue="지현" /></Field><Field><span>이메일</span><Input defaultValue="jihyun@example.com" disabled /></Field><Button variant="default" size="default" onClick={() => toast.success("프로필이 저장되었습니다.")}>변경사항 저장</Button></Surface></TabsContent>
-        <TabsContent value="consent"><Surface><PanelHeading><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></PanelHeading><ConsentHistory>{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <div key={String(title)}><div><strong>{String(title)}</strong><small>버전 {String(version)} · {String(required)}</small></div><StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge></div>)}</ConsentHistory></Surface></TabsContent>
-        <TabsContent value="notification"><SettingsPanel><div><span><strong>사건 상태 알림</strong><small>30일·60일 상태 확인</small></span><Switch defaultChecked /></div><div><span><strong>처리 결과 알림</strong><small>삭제·정정·문의 처리 결과</small></span><Switch defaultChecked /></div><div><span><strong>마케팅 알림</strong><small>서비스 소식과 참여 안내</small></span><Switch /></div></SettingsPanel></TabsContent>
+        <TabsContent value="consent"><Surface><PanelHeading><h2>동의 이력</h2><StatusBadge tone="positive">이력 보존</StatusBadge></PanelHeading><ConsentHistory>{[["이용약관", "1.0", "필수", true], ["개인정보처리방침", "1.0", "필수", true], ["판결문·사건정보 및 데이터 활용", "1.0", "필수", true]].map(([title, version, required, granted]) => <ConsentHistoryRow key={String(title)} title={String(title)} detail={<>버전 {String(version)} · {String(required)}</>} status={<StatusBadge tone={granted ? "positive" : "neutral"}>{granted ? "동의" : "미동의"}</StatusBadge>} />)}</ConsentHistory></Surface></TabsContent>
+        <TabsContent value="notification"><SettingsPanel><SettingRow title="사건 상태 알림" description="30일·60일 상태 확인"><Switch defaultChecked /></SettingRow><SettingRow title="처리 결과 알림" description="삭제·정정·문의 처리 결과"><Switch defaultChecked /></SettingRow><SettingRow title="마케팅 알림" description="서비스 소식과 참여 안내"><Switch /></SettingRow></SettingsPanel></TabsContent>
         <TabsContent value="rights"><ResponsiveGrid><ActionCard icon={<FontAwesomeIcon icon={faUserShield} />} title="내 데이터 요청" description="열람·정정·다운로드 요청을 접수할 수 있습니다." action={<Button variant="outline" size="sm" onClick={() => toast.success("권리 요청이 접수되었습니다.")}>요청 접수</Button>} /><ActionCard danger icon={<FontAwesomeIcon icon={faTrashCan} />} title="회원 탈퇴" description="탈퇴 요청 후 세션 해지와 데이터 처리 절차가 시작됩니다." action={<Button variant="danger-outline" size="sm">탈퇴 요청</Button>} /></ResponsiveGrid></TabsContent>
       </Tabs>
     </PageLayout>

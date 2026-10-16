@@ -3,8 +3,6 @@
 .auth-aside :global(.eyebrow){color:#8cc9ff}
 .auth-icon{width:3.625rem;height:3.625rem;display:grid;place-items:center;margin-bottom:1.5rem;border:0.0625rem solid rgba(255,255,255,.25);border-radius:50%;font-size:1.5625rem}
 .auth-aside ul{margin:2.5rem 0 0;padding:0;list-style:none;display:grid;gap:0.75rem}
-.auth-aside li{display:flex;align-items:center;gap:0.625rem;color:#d7e5f2}
-.auth-aside li svg{color:#80d8c8}
 .auth-card-heading{margin:1.875rem 0}
 .auth-card-heading h2{margin:0;font-size:1.9375rem}
 .auth-card-heading p{margin:0.375rem 0 0;color:var(--gray-600)}

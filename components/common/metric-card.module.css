@@ -1,0 +1,7 @@
+.card { display:flex; gap:0.875rem; padding:1.25rem; border:0.0625rem solid #dbe7dd; background:white; border-radius:var(--ui-radius-panel); box-shadow:var(--shadow-sm); }
+.card > div { display:grid; }
+.card small { color:var(--gray-500); }
+.card strong { font-size:1.625rem; }
+.card p { margin:0; color:var(--gray-500); font-size:0.75rem; }
+.summary { display:grid; grid-template-columns:1fr auto; align-items:center; padding:1.375rem; }
+.summary strong { grid-row:2; font-size:1.875rem; }

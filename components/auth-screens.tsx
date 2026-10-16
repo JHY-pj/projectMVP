@@ -1,5 +1,8 @@
 "use client"
 
+import { IconListItem } from "@/components/common/icon-list-item"
+
+
 import {
   AuthCard,
   uiClass,
@@ -128,9 +131,9 @@ export function AuthScreen({ mode }: { mode: AuthMode }) {
           <p>{copy[mode][1]}</p>
         </div>
         <ul>
-          <li><FontAwesomeIcon icon={faCheck} /> 식별정보 최소화</li>
-          <li><FontAwesomeIcon icon={faCheck} /> 본인 데이터 RLS 격리</li>
-          <li><FontAwesomeIcon icon={faCheck} /> 동의·철회 이력 분리 보관</li>
+          <IconListItem variant="inverse" icon={<FontAwesomeIcon icon={faCheck} />}> 식별정보 최소화</IconListItem>
+          <IconListItem variant="inverse" icon={<FontAwesomeIcon icon={faCheck} />}> 본인 데이터 RLS 격리</IconListItem>
+          <IconListItem variant="inverse" icon={<FontAwesomeIcon icon={faCheck} />}> 동의·철회 이력 분리 보관</IconListItem>
         </ul>
       </AuthAside>
       <AuthCard className="motion-enter">
