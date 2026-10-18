@@ -94,6 +94,19 @@ def audit_pages(browser, name, viewport, is_mobile):
             expect("페이지를 찾을 수 없습니다" not in info["screenText"], key, "Route produced not-found screen.")
             if info["documentWidth"] > viewport["width"] + 3:
                 problem("error", key + "/overflow", f"Body width {info['documentWidth']} > viewport {viewport['width']}")
+            if label in {"case-summary", "report", "plan", "status", "result", "data"}:
+                actions = page.locator('[class*="case-status-actions"]').first
+                badge = actions.locator('[data-slot="badge"]').bounding_box()
+                button = actions.locator('[data-slot="button"]').bounding_box()
+                if badge and button:
+                    badge_center = badge["y"] + badge["height"] / 2
+                    button_center = button["y"] + button["height"] / 2
+                    difference = abs(badge_center - button_center)
+                    expect(difference <= 1, key + "/status-actions-alignment",
+                           f"Badge and button vertically misaligned by {difference:.2f}px")
+                    results[-1]["statusActionsCenterDeltaPx"] = round(difference, 2)
+                else:
+                    problem("error", key + "/status-actions-alignment", "Badge or action button was not rendered.")
             if label in SCREENSHOT_ROUTES:
                 page.screenshot(path=str(SHOTS / f"{name}-{label}.png"), full_page=True, animations="disabled")
             print(f"[PAGE] {key} h1={info['h1'][:60]!r} body={info['documentWidth']}/{viewport['width']}", flush=True)
