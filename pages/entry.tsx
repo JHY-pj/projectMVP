@@ -45,3 +45,11 @@ function DemoPagesApp() {
 }
 
 createRoot(document.getElementById("root")!).render(<DemoPagesApp />);
+
+// Preserve the skip-to-content behavior without changing the SPA hash route.
+document.getElementById("skip-to-main")?.addEventListener("click", () => {
+  const main = document.getElementById("main-content");
+  if (!main) return;
+  main.setAttribute("tabindex", "-1");
+  main.focus();
+});
