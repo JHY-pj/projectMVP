@@ -210,8 +210,9 @@
 .wizard-subsection > * { margin-block: 0; }
 .wizard-subsection > * + * { margin-block-start: 1rem; }
 .wizard-subsection > h3 + p { margin-block-start: 0.5rem; }
-.case-identity > div > * { margin-block: 0; }
-.case-identity > div > * + * { margin-block-start: 0.5rem; }
+/* Only the text column has vertical spacing; the adjacent status badge and action button stay aligned. */
+.case-identity > div:first-child > * { margin-block: 0; }
+.case-identity > div:first-child > * + * { margin-block-start: 0.5rem; }
 .report-check-list li h3 { margin-block: 0; }
 .report-check-list li h3 + p { margin-block-start: 0.5rem; }
 .wizard-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; padding-block: 1rem; }
