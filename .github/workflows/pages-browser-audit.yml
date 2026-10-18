@@ -1,0 +1,48 @@
+name: Audit static demo in Chrome
+
+on:
+  push:
+    branches: [demo-pages]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build Pages website
+        run: |
+          npm ci
+          npm run build:pages
+      - name: Install Playwright Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install chromium
+      - name: Audit rendered desktop and mobile site
+        run: |
+          mkdir -p .pages-audit/serve/projectMVP
+          cp -a dist-pages/. .pages-audit/serve/projectMVP/
+          python -m http.server 4173 --bind 127.0.0.1 --directory .pages-audit/serve > .pages-audit/server.log 2>&1 &
+          echo $! > .pages-audit/server.pid
+          python tests/pages-browser-audit.py
+      - name: Upload screenshots and audit summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pages-browser-audit
+          path: |
+            .pages-audit/screenshots/
+            .pages-audit/audit.json
+            .pages-audit/server.log
+          if-no-files-found: warn
