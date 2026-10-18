@@ -143,7 +143,7 @@ def audit_pages(browser, name, viewport, is_mobile):
             menu = page.locator("[data-mobile-menu]")
             menu.locator("summary").click(timeout=6000)
             expect(menu.get_attribute("open") is not None, "mobile/menu-open", "Mobile menu did not open.")
-            page.locator("main").click(position={"x": 20, "y": 20}, force=True)
+            page.get_by_role("link", name="집행나침반 홈").first.click(timeout=6000)
             page.wait_for_timeout(100)
             expect(menu.get_attribute("open") is None, "mobile/menu-close", "Mobile menu remained open after outside click.")
             print("[FLOW] mobile/menu-toggle OK", flush=True)
