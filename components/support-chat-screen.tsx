@@ -68,8 +68,10 @@ const chatbotApiUrl =
   (import.meta as ImportMeta & { env?: { VITE_CHATBOT_API_URL?: string } }).env
     ?.VITE_CHATBOT_API_URL ?? "/api/chat"
 
+const isStaticPagesDemo = (import.meta as ImportMeta & { env?: { VITE_STATIC_DEMO?: string } }).env?.VITE_STATIC_DEMO === "true";
+
 export function SupportChatScreen() {
-  const [messages, setMessages] = useState<ChatMessage[]>([welcomeMessage])
+  const [messages, setMessages] = useState<ChatMessage[]>([isStaticPagesDemo ? { ...welcomeMessage, content: "GitHub Pages 정적 데모에서는 상담 서버가 연결되지 않습니다. 일반 절차와 화면 구성은 둘러볼 수 있습니다." } : welcomeMessage])
   const [draft, setDraft] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
@@ -139,6 +141,12 @@ export function SupportChatScreen() {
     setError("")
     setIsSending(true)
 
+    if (isStaticPagesDemo) {
+      setError("상담 API가 연결되지 않은 정적 데모입니다. 실제 상담 답변은 제공되지 않습니다.");
+      setIsSending(false);
+      return;
+    }
+
     try {
       const response = await fetch(chatbotApiUrl, {
         method: "POST",
@@ -173,7 +181,7 @@ export function SupportChatScreen() {
         <SupportChatHeader>
           <SupportChatTitle>
             <SupportChatIcon><FontAwesomeIcon icon={faScaleBalanced} /></SupportChatIcon>
-            <span><strong>민사 절차 안내</strong><small><i /> 실시간 상담 중</small></span>
+            <span><strong>민사 절차 안내</strong><small><i /> {isStaticPagesDemo ? "상담 서버 미연결" : "실시간 상담 중"}</small></span>
           </SupportChatTitle>
           <SupportChatActions>
             <Button variant="ghost" size="default" type="button" onClick={downloadConversation}>

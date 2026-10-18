@@ -17,7 +17,8 @@
     "test:controls": "node tests/controls.cjs",
     "typecheck": "tsc --noEmit --incremental false",
     "test:styles": "node tests/style-architecture.cjs",
-    "test:style-delivery": "node tests/style-delivery.cjs"
+    "test:style-delivery": "node tests/style-delivery.cjs",
+    "build:pages": "vite build --config vite.pages.config.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -71,5 +72,5 @@
     "wrangler": "4.92.0"
   },
   "type": "module",
-  "displayName": "\uc9d1\ud589\ub098\uce68\ubc18"
+  "displayName": "집행나침반"
 }
